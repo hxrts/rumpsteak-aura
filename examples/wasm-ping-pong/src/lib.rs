@@ -4,7 +4,7 @@
 // This is a minimal two-party protocol where Alice sends a ping and Bob responds with a pong.
 
 use wasm_bindgen::prelude::*;
-use rumpsteak_choreography::{
+use rumpsteak_aura_choreography::{
     InMemoryHandler, Program, interpret,
 };
 use serde::{Serialize, Deserialize};

@@ -2,10 +2,9 @@
 
 **This is a fork of Zak Cutner's [Rumpsteak](https://github.com/zakcutner/rumpsteak) library, which adds a choreographic programming DSL which generates session typed code with an effect API.**
 
-[![Actions](https://github.com/zakcutner/rumpsteak/workflows/Check/badge.svg)](https://github.com/zakcutner/rumpsteak/actions)
-[![Crate](https://img.shields.io/crates/v/rumpsteak)](https://crates.io/crates/rumpsteak)
-[![Docs](https://docs.rs/rumpsteak/badge.svg)](https://docs.rs/rumpsteak)
-[![License](https://img.shields.io/crates/l/rumpsteak)](LICENSE)
+[![Crate](https://img.shields.io/crates/v/rumpsteak-aura)](https://crates.io/crates/rumpsteak-aura)
+[![Docs](https://docs.rs/rumpsteak-aura/badge.svg)](https://docs.rs/rumpsteak-aura)
+[![License](https://img.shields.io/crates/l/rumpsteak-aura)](LICENSE)
 
 Rumpsteak is a Rust framework for _safely_ and _efficiently_ implementing
 [message-passing](https://doc.rust-lang.org/book/ch16-02-message-passing.html)
@@ -48,7 +47,7 @@ rumpsteak-aura-choreography = "0.2"
 Define a protocol using the choreographic DSL:
 
 ```rust
-use rumpsteak_choreography::choreography;
+use rumpsteak_aura_choreography::choreography;
 
 choreography! {
     PingPong {
@@ -62,7 +61,20 @@ choreography! {
 Run the protocol with the effect handler system:
 
 ```rust
-use rumpsteak_choreography::{InMemoryHandler, Program, interpret};
+use rumpsteak_aura_choreography::{InMemoryHandler, Program, interpret};
+use serde::{Serialize, Deserialize};
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+enum Role {
+    Alice,
+    Bob,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+enum Message {
+    Ping,
+    Pong,
+}
 
 let mut handler = InMemoryHandler::new(Role::Alice);
 let program = Program::new()
@@ -84,7 +96,7 @@ This project is organized as a Cargo workspace with multiple crates:
 
 The foundation library providing core session type primitives, async channels, role definitions, and serialization support. This is the base dependency for all other crates and implements the fundamental session types theory.
 
-#### `choreography/` - Choreographic Programming (`rumpsteak-choreography`)
+#### `choreography/` - Choreographic Programming (`rumpsteak-aura-choreography`)
 
 Choreographic programming layer for global protocol specification with automatic projection to local session types. Includes a Pest-based DSL parser for `.choreography` files with support for protocol composition, guards, annotations, and parameterized roles.
 
@@ -92,11 +104,11 @@ A transport-agnostic effect handler system, with `InMemoryHandler` for testing a
 
 *This is the primary extension of the original version with significant enhancements.*
 
-#### `fsm/` - Finite State Machines (`rumpsteak-fsm`)
+#### `fsm/` - Finite State Machines (`rumpsteak-aura-fsm`)
 
 Finite state machine support for session types, including DOT parsing and subtyping verification. Optional dependency for advanced session type analysis.
 
-#### `macros/` - Procedural Macros (`rumpsteak-macros`)
+#### `macros/` - Procedural Macros (`rumpsteak-aura-macros`)
 
 Procedural macros used by both the core library and choreography crate, including the `choreography!` macro for inline protocol definitions.
 
