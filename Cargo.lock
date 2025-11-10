@@ -1643,9 +1643,9 @@ dependencies = [
  "proptest",
  "quote",
  "rand 0.8.5",
- "rumpsteak-choreography",
- "rumpsteak-fsm",
- "rumpsteak-macros",
+ "rumpsteak-aura-choreography",
+ "rumpsteak-aura-fsm",
+ "rumpsteak-aura-macros",
  "serde",
  "syn 2.0.108",
  "tempfile",
@@ -1661,7 +1661,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "rumpsteak-choreography"
+name = "rumpsteak-aura-choreography"
 version = "0.2.0"
 dependencies = [
  "anyhow",
@@ -1680,7 +1680,7 @@ dependencies = [
  "quote",
  "rand 0.8.5",
  "rumpsteak-aura",
- "rumpsteak-macros",
+ "rumpsteak-aura-macros",
  "serde",
  "syn 2.0.108",
  "tempfile",
@@ -1697,7 +1697,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "rumpsteak-fsm"
+name = "rumpsteak-aura-fsm"
 version = "0.2.0"
 dependencies = [
  "argh",
@@ -1713,7 +1713,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "rumpsteak-macros"
+name = "rumpsteak-aura-macros"
 version = "0.2.0"
 dependencies = [
  "proc-macro2",
