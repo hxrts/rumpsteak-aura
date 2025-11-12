@@ -46,6 +46,7 @@ summary:
 # Build the book after regenerating the summary
 book: summary
     mdbook-mermaid install .
+    mv mermaid.min.js mermaid-init.js docs/ 2>/dev/null || true
     mdbook build
 
 # Serve locally with live reload
@@ -56,6 +57,7 @@ serve: summary
 
     # Install mermaid assets
     mdbook-mermaid install .
+    mv mermaid.min.js mermaid-init.js docs/ 2>/dev/null || true
 
     # Try to serve on the default port, fallback to next available port if in use
     for port in 3000 3001 3002 3003 3004 3005; do
