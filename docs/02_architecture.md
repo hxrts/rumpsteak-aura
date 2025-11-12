@@ -14,6 +14,7 @@ The architecture has four main layers:
 ## Component Diagram
 
 ```mermaid
+%%{init: {'theme':'default', 'themeVariables': {'lineWidth': 1}}}%%
 graph TB
     subgraph Input["Developer Input (Compile-Time)"]
         DSL["Choreography DSL<br/>Global Protocol Specification"]
