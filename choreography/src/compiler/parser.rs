@@ -117,7 +117,7 @@ pub enum ParseError {
     InvalidNamespace { namespace: String, span: ErrorSpan },
 
     #[error("{}", .span.format_error(&format!("Invalid annotation: {} = {}: {}", .key, .value, .reason)))]
-    InvalidAnnotation { key: String, value: String, reason: String, span: ErrorSpan },
+    InvalidAnnotation { key: Box<str>, value: Box<str>, reason: Box<str>, span: ErrorSpan },
 
     #[error("{}", .span.format_error(&format!("Dynamic role error: {}", .message)))]
     DynamicRoleError { message: String, span: ErrorSpan },
@@ -154,7 +154,7 @@ impl ParseError {
                 ParseError::InvalidAnnotation { 
                     key, 
                     value, 
-                    reason: format!("{reason} (in context: {context})"), 
+                    reason: format!("{reason} (in context: {context})").into(), 
                     span 
                 }
             }
@@ -178,7 +178,7 @@ impl ParseError {
     /// Create an annotation error with span
     pub fn annotation_error(key: String, value: String, reason: String, pair: &pest::iterators::Pair<Rule>) -> Self {
         let span = ErrorSpan::from_pest_span(pair.as_span(), pair.as_str());
-        ParseError::InvalidAnnotation { key, value, reason, span }
+        ParseError::InvalidAnnotation { key: key.into(), value: value.into(), reason: reason.into(), span }
     }
 
     /// Create a role validation error with span
@@ -1107,6 +1107,7 @@ fn parse_message(
 
 /// Choreography statement types
 #[derive(Debug, Clone)]
+#[allow(clippy::large_enum_variant)] // Statement enum is internal to parser; performance impact is minimal
 enum Statement {
     Send {
         from: Role,

@@ -32,9 +32,7 @@ fn generate_annotation_metadata(name: &str, annotations: &HashMap<String, String
     }
 
     let metadata_name = format_ident!("{}Annotations", name);
-    let annotation_fields: Vec<TokenStream> = annotations
-        .iter()
-        .map(|(key, _value)| {
+    let annotation_fields: Vec<TokenStream> = annotations.keys().map(|key| {
             let field_name = format_ident!("{}", key.to_lowercase());
             quote! {
                 pub #field_name: &'static str,
@@ -81,7 +79,7 @@ fn generate_annotation_attributes(annotations: &HashMap<String, String>) -> Toke
         attrs.push(quote! { #[timeout = #timeout] });
     }
 
-    if annotations.get("async").map_or(false, |v| v == "true") {
+    if annotations.get("async").is_some_and(|v| v == "true") {
         attrs.push(quote! { #[async_trait] });
     }
 

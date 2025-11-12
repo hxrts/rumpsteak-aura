@@ -184,8 +184,8 @@ impl Protocol {
             Protocol::Choice { annotations, .. } => annotations,
             Protocol::Loop { .. } | Protocol::Parallel { .. } | Protocol::Rec { .. } | Protocol::Var(_) | Protocol::End => {
                 // Return empty map for protocol nodes that don't have annotations yet
-                static EMPTY: std::sync::LazyLock<HashMap<String, String>> = std::sync::LazyLock::new(HashMap::new);
-                &EMPTY
+                static EMPTY: std::sync::OnceLock<HashMap<String, String>> = std::sync::OnceLock::new();
+                EMPTY.get_or_init(HashMap::new)
             }
         }
     }
@@ -335,8 +335,8 @@ impl Protocol {
     /// Check if any annotations are present
     pub fn has_any_annotations(&self) -> bool {
         !self.get_annotations().is_empty()
-            || self.get_from_annotations().map_or(false, |a| !a.is_empty())
-            || self.get_to_annotations().map_or(false, |a| !a.is_empty())
+            || self.get_from_annotations().is_some_and(|a| !a.is_empty())
+            || self.get_to_annotations().is_some_and(|a| !a.is_empty())
     }
 
     /// Count total number of annotations (statement + role annotations)

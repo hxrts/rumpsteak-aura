@@ -18,7 +18,7 @@ use rumpsteak_aura_choreography::{
         codegen::{generate_dynamic_role_support, generate_choreography_code_with_dynamic_roles}
     }
 };
-use proc_macro2::Ident;
+// Removed unused import
 use quote::{format_ident, quote};
 use std::collections::HashMap;
 

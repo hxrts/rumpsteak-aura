@@ -131,6 +131,8 @@ type_complexity = "warn"
 unwrap_used = "warn"
 expect_used = "warn"
 
+# Advanced features examples integrated into new_features_demo.rs
+
 [workspace.lints.rust]
 unsafe_code = "deny"
 missing_docs = "warn"
