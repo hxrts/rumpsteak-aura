@@ -38,3 +38,6 @@ rust-project.json
 
 # Working
 work/
+
+# Generated documentation
+/docs/book/
