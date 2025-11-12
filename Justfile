@@ -45,7 +45,7 @@ summary:
 
 # Build the book after regenerating the summary
 book: summary
-    @mdbook-mermaid install . > /dev/null 2>&1 || true
+    mdbook-mermaid install .
     mdbook build
 
 # Serve locally with live reload
@@ -53,6 +53,9 @@ serve: summary
     #!/usr/bin/env bash
     # Trap SIGINT (Ctrl+C) for graceful shutdown
     trap 'echo -e "\nShutting down mdbook server..."; exit 0' INT
+
+    # Install mermaid assets
+    mdbook-mermaid install .
 
     # Try to serve on the default port, fallback to next available port if in use
     for port in 3000 3001 3002 3003 3004 3005; do
