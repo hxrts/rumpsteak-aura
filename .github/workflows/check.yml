@@ -50,7 +50,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: check
-          args: --package rumpsteak-choreography --target wasm32-unknown-unknown --features wasm
+          args: --package rumpsteak-aura-choreography --target wasm32-unknown-unknown --features wasm
       - name: Check WASM compilation (core)
         uses: actions-rs/cargo@v1
         with:
