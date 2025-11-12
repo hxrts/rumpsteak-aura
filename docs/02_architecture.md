@@ -52,27 +52,6 @@ graph TB
     Effects --> Handler
     Handler --> Transport
     Transport --> Exec
-    
-    style Input fill:#f0f0f0,stroke:#333,stroke-width:2px
-    style DSL fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
-    
-    style Layer1 fill:#fff3e0,stroke:#f57c00,stroke-width:2px
-    style Parser fill:#ffe0b2
-    style AST fill:#ffcc80
-    
-    style Layer2 fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
-    style Proj fill:#e1bee7
-    style LT fill:#ce93d8
-    
-    style Layer3 fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
-    style CodeGen fill:#c8e6c9
-    style Session fill:#a5d6a7
-    style Effects fill:#a5d6a7
-    
-    style Layer4 fill:#fce4ec,stroke:#c2185b,stroke-width:2px
-    style Handler fill:#f8bbd0
-    style Transport fill:#f48fb1
-    style Exec fill:#f06292
 ```
 
 ## Core Components
