@@ -6,8 +6,8 @@ Add Rumpsteak to your project (using the Aura fork):
 
 ```toml
 [dependencies]
-rumpsteak-aura = "0.2"
-rumpsteak-aura-choreography = "0.2"
+rumpsteak-aura = "0.3.0"
+rumpsteak-aura-choreography = "0.3.0"
 ```
 
 ### Understanding the Crates
@@ -16,47 +16,71 @@ Rumpsteak-Aura is organized as a Cargo workspace with several crates:
 
 - **`rumpsteak-aura`**: Core session types library (located in the root `src/` directory). Provides fundamental primitives for type-safe asynchronous communication, channels, and role definitions.
 
-- **`rumpsteak-choreography`**: Choreographic programming layer (located in `choreography/`). Provides the DSL parser, automatic projection, effect handler system, and runtime support.
+- **`rumpsteak-aura-choreography`**: Choreographic programming layer (located in `choreography/`). Provides the DSL parser, automatic projection, effect handler system, and runtime support.
 
-- **`rumpsteak-fsm`**: Optional finite state machine support for advanced session type verification.
+- **`rumpsteak-aura-fsm`**: Optional finite state machine support for advanced session type verification.
 
-- **`rumpsteak-macros`**: Procedural macros used internally.
+- **`rumpsteak-aura-macros`**: Procedural macros used internally.
 
-**For most users**: You need both `rumpsteak-aura` and `rumpsteak-choreography`. The core library provides session types, while the choreography layer provides the high-level DSL and effect system.
+**For most users**: You need both `rumpsteak-aura` and `rumpsteak-aura-choreography`. The core library provides session types, while the choreography layer provides the high-level DSL and effect system.
 
 **For advanced users**: If you only need low-level session types without choreographies, you can depend on just `rumpsteak-aura`.
 
 For WASM support, add the wasm feature:
 
 ```toml
-rumpsteak-aura-choreography = { version = "0.2", features = ["wasm"] }
+rumpsteak-aura-choreography = { version = "0.3.0", features = ["wasm"] }
 ```
 
 ## Creating a Choreography
 
 This example shows a simple ping-pong protocol between two roles.
 
-Define the choreography using the macro:
+Define the choreography using the DSL parser:
 
 ```rust
-use rumpsteak_choreography::choreography;
+use rumpsteak_aura_choreography::compiler::parser::parse_choreography_str;
 
-choreography! {
-    PingPong {
-        roles: Alice, Bob
-        Alice -> Bob: Ping
-        Bob -> Alice: Pong
+let choreography_str = r#"
+    choreography PingPong {
+        roles: Alice, Bob;
+        Alice -> Bob: Ping;
+        Bob -> Alice: Pong;
     }
-}
+"#;
+
+let choreography = parse_choreography_str(choreography_str)?;
 ```
 
-The macro generates role types, message types, and session types automatically.
+The parser generates the AST representation which can be used for projection and code generation.
 
 Run the protocol using the effect system:
 
 ```rust
-use rumpsteak_choreography::{InMemoryHandler, Program, interpret};
+use rumpsteak_aura_choreography::{InMemoryHandler, Program, interpret, RoleId};
+use serde::{Serialize, Deserialize};
 
+// Define roles that implement RoleId
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+enum Role {
+    Alice,
+    Bob,
+}
+
+impl RoleId for Role {
+    fn name(&self) -> String {
+        format!("{:?}", self)
+    }
+}
+
+// Define messages
+#[derive(Debug, Clone, Serialize, Deserialize)]
+enum Message {
+    Ping,
+    Pong,
+}
+
+// Create the program
 let mut handler = InMemoryHandler::new(Role::Alice);
 let program = Program::new()
     .send(Role::Bob, Message::Ping)
@@ -98,7 +122,7 @@ server_endpoint.register_channel(Role::Client, server_ch);
 or wrap your own sink/stream transports:
 
 ```rust
-use rumpsteak_choreography::effects::RumpsteakSession;
+use rumpsteak_aura_choreography::effects::RumpsteakSession;
 
 let ws_session = RumpsteakSession::from_sink_stream(websocket_writer, websocket_reader);
 client_endpoint.register_session(Role::Server, ws_session);

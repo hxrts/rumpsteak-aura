@@ -5,7 +5,9 @@
 
 use proc_macro2::{Ident, Span};
 use quote::quote;
-use rumpsteak_aura_choreography::ast::{Branch, Choreography, Condition, MessageType, Protocol, Role};
+use rumpsteak_aura_choreography::ast::{
+    Branch, Choreography, Condition, MessageType, Protocol, Role,
+};
 use rumpsteak_aura_choreography::compiler::{analyze, project};
 use std::collections::HashMap;
 

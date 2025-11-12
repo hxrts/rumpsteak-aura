@@ -333,7 +333,9 @@ impl<T: ChoreoHandler> ChoreoHandlerExt for T {}
 
 /// Utilities for testing and simulation
 pub mod testing {
-    use super::{async_trait, RoleId, ChoreoHandler, Serialize, Result, DeserializeOwned, ChoreographyError};
+    use super::{
+        async_trait, ChoreoHandler, ChoreographyError, DeserializeOwned, Result, RoleId, Serialize,
+    };
     use std::collections::VecDeque;
 
     /// A mock handler that records operations and provides scripted responses

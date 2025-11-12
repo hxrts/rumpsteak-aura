@@ -26,19 +26,19 @@ fn message_strategy() -> impl Strategy<Value = MessageType> {
     prop_oneof![
         Just(MessageType {
             name: format_ident!("Request"),
-        
+
             type_annotation: None,
             payload: Some(quote! { String }),
         }),
         Just(MessageType {
             name: format_ident!("Response"),
-        
+
             type_annotation: None,
             payload: Some(quote! { i32 }),
         }),
         Just(MessageType {
             name: format_ident!("Data"),
-        
+
             type_annotation: None,
             payload: Some(quote! { Vec<u8> }),
         }),
@@ -162,7 +162,7 @@ fn choreography_strategy() -> impl Strategy<Value = Choreography> {
         let roles = extract_roles(&protocol);
         Choreography {
             name: format_ident!("TestChoreography"),
-        namespace: None,
+            namespace: None,
             roles,
             protocol,
             attrs: HashMap::new(),
@@ -290,7 +290,7 @@ proptest! {
                     to: from.clone(),
                     message: MessageType {
                         name: format_ident!("Ack"),
-        
+
                         type_annotation: None,
                         payload: Some(quote! { () }),
                     },
@@ -397,14 +397,14 @@ mod unit_tests {
 
         let choreo = Choreography {
             name: format_ident!("TwoParty"),
-        namespace: None,
+            namespace: None,
             roles: vec![alice.clone(), bob.clone()],
             protocol: Protocol::Send {
                 from: alice.clone(),
                 to: bob.clone(),
                 message: MessageType {
                     name: format_ident!("Hello"),
-        
+
                     type_annotation: None,
                     payload: Some(quote! { String }),
                 },
@@ -437,14 +437,14 @@ mod unit_tests {
 
         let choreo = Choreography {
             name: format_ident!("ThreeParty"),
-        namespace: None,
+            namespace: None,
             roles: vec![alice.clone(), bob.clone(), charlie.clone()],
             protocol: Protocol::Send {
                 from: alice,
                 to: bob,
                 message: MessageType {
                     name: format_ident!("Hello"),
-        
+
                     type_annotation: None,
                     payload: Some(quote! { String }),
                 },

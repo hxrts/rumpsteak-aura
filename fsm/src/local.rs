@@ -58,7 +58,9 @@ struct Builder<'a, R, N, E> {
 impl<R: Clone, N: Clone, E: Clone> Builder<'_, R, N, E> {
     fn variable(&mut self, state: StateIndex) -> usize {
         let variable = &mut self.looped[state.index()];
-        if let Some(variable) = variable { *variable } else {
+        if let Some(variable) = variable {
+            *variable
+        } else {
             let next = *self.variables;
             *variable = Some(next);
             *self.variables += 1;

@@ -2,7 +2,10 @@
 //
 // Full implementation using Pest grammar for parsing choreographic DSL
 
-use crate::ast::{Branch, Choreography, Condition, MessageType, Protocol, Role, RoleParam, RoleIndex, RoleRange, RangeExpr};
+use crate::ast::{
+    Branch, Choreography, Condition, MessageType, Protocol, RangeExpr, Role, RoleIndex, RoleParam,
+    RoleRange,
+};
 use pest::Parser;
 use pest_derive::Parser;
 use proc_macro2::{Ident, Span, TokenStream};
@@ -44,7 +47,7 @@ impl ErrorSpan {
     }
 
     /// Format the error with context
-    #[must_use] 
+    #[must_use]
     pub fn format_error(&self, message: &str) -> String {
         let line_num_width = self.line.to_string().len().max(3);
         let mut output = String::new();
@@ -117,13 +120,22 @@ pub enum ParseError {
     InvalidNamespace { namespace: String, span: ErrorSpan },
 
     #[error("{}", .span.format_error(&format!("Invalid annotation: {} = {}: {}", .key, .value, .reason)))]
-    InvalidAnnotation { key: Box<str>, value: Box<str>, reason: Box<str>, span: ErrorSpan },
+    InvalidAnnotation {
+        key: Box<str>,
+        value: Box<str>,
+        reason: Box<str>,
+        span: ErrorSpan,
+    },
 
     #[error("{}", .span.format_error(&format!("Dynamic role error: {}", .message)))]
     DynamicRoleError { message: String, span: ErrorSpan },
 
     #[error("{}", .span.format_error(&format!("Namespace conflict: namespace '{}' already used in protocol '{}'", .namespace, .protocol)))]
-    NamespaceConflict { namespace: String, protocol: String, span: ErrorSpan },
+    NamespaceConflict {
+        namespace: String,
+        protocol: String,
+        span: ErrorSpan,
+    },
 
     #[error("{}", .span.format_error(&format!("Role validation error: {}", .message)))]
     RoleValidationError { message: String, span: ErrorSpan },
@@ -144,26 +156,25 @@ impl ParseError {
     /// Create an enhanced error with detailed context
     pub fn with_detailed_context(self, context: &str) -> Self {
         match self {
-            ParseError::DynamicRoleError { message, span } => {
-                ParseError::DynamicRoleError { 
-                    message: format!("{message} (in context: {context})"), 
-                    span 
-                }
-            }
-            ParseError::InvalidAnnotation { key, value, reason, span } => {
-                ParseError::InvalidAnnotation { 
-                    key, 
-                    value, 
-                    reason: format!("{reason} (in context: {context})").into(), 
-                    span 
-                }
-            }
-            ParseError::RoleValidationError { message, span } => {
-                ParseError::RoleValidationError { 
-                    message: format!("{message} (in context: {context})"), 
-                    span 
-                }
-            }
+            ParseError::DynamicRoleError { message, span } => ParseError::DynamicRoleError {
+                message: format!("{message} (in context: {context})"),
+                span,
+            },
+            ParseError::InvalidAnnotation {
+                key,
+                value,
+                reason,
+                span,
+            } => ParseError::InvalidAnnotation {
+                key,
+                value,
+                reason: format!("{reason} (in context: {context})").into(),
+                span,
+            },
+            ParseError::RoleValidationError { message, span } => ParseError::RoleValidationError {
+                message: format!("{message} (in context: {context})"),
+                span,
+            },
             // For other errors, return as-is
             other => other,
         }
@@ -176,9 +187,19 @@ impl ParseError {
     }
 
     /// Create an annotation error with span
-    pub fn annotation_error(key: String, value: String, reason: String, pair: &pest::iterators::Pair<Rule>) -> Self {
+    pub fn annotation_error(
+        key: String,
+        value: String,
+        reason: String,
+        pair: &pest::iterators::Pair<Rule>,
+    ) -> Self {
         let span = ErrorSpan::from_pest_span(pair.as_span(), pair.as_str());
-        ParseError::InvalidAnnotation { key: key.into(), value: value.into(), reason: reason.into(), span }
+        ParseError::InvalidAnnotation {
+            key: key.into(),
+            value: value.into(),
+            reason: reason.into(),
+            span,
+        }
     }
 
     /// Create a role validation error with span
@@ -195,27 +216,29 @@ impl ParseError {
 
     /// Check if this error is recoverable (allowing parsing to continue)
     pub fn is_recoverable(&self) -> bool {
-        matches!(self, 
-            ParseError::InvalidAnnotation { .. } |
-            ParseError::AnnotationSyntaxError { .. }
+        matches!(
+            self,
+            ParseError::InvalidAnnotation { .. } | ParseError::AnnotationSyntaxError { .. }
         )
     }
 
     /// Get error severity level
     pub fn severity(&self) -> ErrorSeverity {
         match self {
-            ParseError::UndefinedRole { .. } | 
-            ParseError::DuplicateRole { .. } |
-            ParseError::Syntax { .. } => ErrorSeverity::Error,
-            
-            ParseError::RoleOverflowError { .. } |
-            ParseError::DynamicRoleError { .. } => ErrorSeverity::Error,
-            
-            ParseError::InvalidAnnotation { .. } |
-            ParseError::AnnotationSyntaxError { .. } => ErrorSeverity::Warning,
-            
+            ParseError::UndefinedRole { .. }
+            | ParseError::DuplicateRole { .. }
+            | ParseError::Syntax { .. } => ErrorSeverity::Error,
+
+            ParseError::RoleOverflowError { .. } | ParseError::DynamicRoleError { .. } => {
+                ErrorSeverity::Error
+            }
+
+            ParseError::InvalidAnnotation { .. } | ParseError::AnnotationSyntaxError { .. } => {
+                ErrorSeverity::Warning
+            }
+
             ParseError::NamespaceConflict { .. } => ErrorSeverity::Error,
-            
+
             _ => ErrorSeverity::Error,
         }
     }
@@ -259,7 +282,7 @@ fn parse_annotation_item(
 ) -> std::result::Result<(String, String), ParseError> {
     let mut key = String::new();
     let mut value = String::new();
-    
+
     for inner in pair.into_inner() {
         match inner.as_rule() {
             Rule::ident => {
@@ -273,14 +296,14 @@ fn parse_annotation_item(
             _ => {}
         }
     }
-    
+
     if key.is_empty() {
         key = "unknown".to_string();
     }
     if value.is_empty() {
         value = "true".to_string();
     }
-    
+
     Ok((key, value))
 }
 
@@ -313,7 +336,7 @@ fn parse_annotations(
                             if let Rule::annotation_arg = arg_item.as_rule() {
                                 let mut arg_key = String::new();
                                 let mut arg_val = "true".to_string();
-                                
+
                                 for part in arg_item.into_inner() {
                                     match part.as_rule() {
                                         Rule::ident => {
@@ -327,7 +350,7 @@ fn parse_annotations(
                                         _ => {}
                                     }
                                 }
-                                
+
                                 if !arg_key.is_empty() {
                                     if arg_val == "true" {
                                         values.push(arg_key);
@@ -339,7 +362,11 @@ fn parse_annotations(
                         }
                         // Create a single annotation with comma-separated values
                         let combined_value = values.join(",");
-                        let key = if current_key.is_empty() { "unknown".to_string() } else { current_key.clone() };
+                        let key = if current_key.is_empty() {
+                            "unknown".to_string()
+                        } else {
+                            current_key.clone()
+                        };
                         annotations.insert(key, combined_value);
                     }
                 }
@@ -364,12 +391,12 @@ fn parse_role_param(
 ) -> std::result::Result<RoleParam, ParseError> {
     let mut inner = pair.into_inner();
     let param_expr = inner.next().unwrap();
-    
+
     match param_expr.as_rule() {
         Rule::role_param_expr => {
             // Check the content of the param_expr directly
             let param_content_str = param_expr.as_str().trim();
-            
+
             if param_content_str == "*" {
                 // Runtime parameter
                 Ok(RoleParam::Runtime)
@@ -399,47 +426,46 @@ fn parse_role_index(
 ) -> std::result::Result<RoleIndex, ParseError> {
     let mut inner = pair.into_inner();
     let index_expr = inner.next().unwrap();
-    
+
     match index_expr.as_rule() {
         Rule::role_index_expr => {
             let index_content_str = index_expr.as_str().trim();
             let index_span = index_expr.as_span();
             if let Some(index_content) = index_expr.into_inner().next() {
                 match index_content.as_rule() {
-                Rule::integer => {
-                    let index = index_content.as_str().parse::<u32>()
-                        .map_err(|_| ParseError::Syntax {
-                            span: ErrorSpan::from_pest_span(index_content.as_span(), input),
-                            message: "Invalid integer in role index".to_string(),
+                    Rule::integer => {
+                        let index = index_content.as_str().parse::<u32>().map_err(|_| {
+                            ParseError::Syntax {
+                                span: ErrorSpan::from_pest_span(index_content.as_span(), input),
+                                message: "Invalid integer in role index".to_string(),
+                            }
                         })?;
-                    
-                    // Use safe constructor with overflow checking
-                    RoleIndex::safe_concrete(index).map_err(|e| ParseError::Syntax {
-                        span: ErrorSpan::from_pest_span(index_content.as_span(), input),
-                        message: format!("Role index validation failed: {}", e),
-                    })
-                }
-                Rule::ident => {
-                    // Symbolic index like Worker[i]
-                    let symbolic_name = index_content.as_str().to_string();
-                    Ok(RoleIndex::Symbolic(symbolic_name))
-                }
-                Rule::range_expr => {
-                    parse_range_expr(index_content, input)
-                }
-                _ => {
-                    // Check for "*" wildcard
-                    let content_str = index_content.as_str();
-                    if content_str == "*" {
-                        Ok(RoleIndex::Wildcard)
-                    } else {
-                        Err(ParseError::Syntax {
+
+                        // Use safe constructor with overflow checking
+                        RoleIndex::safe_concrete(index).map_err(|e| ParseError::Syntax {
                             span: ErrorSpan::from_pest_span(index_content.as_span(), input),
-                            message: format!("Invalid role index: {}", content_str),
+                            message: format!("Role index validation failed: {}", e),
                         })
                     }
+                    Rule::ident => {
+                        // Symbolic index like Worker[i]
+                        let symbolic_name = index_content.as_str().to_string();
+                        Ok(RoleIndex::Symbolic(symbolic_name))
+                    }
+                    Rule::range_expr => parse_range_expr(index_content, input),
+                    _ => {
+                        // Check for "*" wildcard
+                        let content_str = index_content.as_str();
+                        if content_str == "*" {
+                            Ok(RoleIndex::Wildcard)
+                        } else {
+                            Err(ParseError::Syntax {
+                                span: ErrorSpan::from_pest_span(index_content.as_span(), input),
+                                message: format!("Invalid role index: {}", content_str),
+                            })
+                        }
+                    }
                 }
-            }
             } else {
                 // Handle terminal rules like "*" by checking the content directly
                 if index_content_str == "*" {
@@ -468,10 +494,12 @@ fn parse_range_expr(
     let mut inner = pair.into_inner();
     let start_expr = inner.next().unwrap();
     let end_expr = inner.next().unwrap();
-    
+
     let start = match start_expr.as_rule() {
         Rule::integer => {
-            let value = start_expr.as_str().parse::<u32>()
+            let value = start_expr
+                .as_str()
+                .parse::<u32>()
                 .map_err(|_| ParseError::Syntax {
                     span: ErrorSpan::from_pest_span(start_expr.as_span(), input),
                     message: "Invalid integer in range start".to_string(),
@@ -479,15 +507,19 @@ fn parse_range_expr(
             RangeExpr::Concrete(value)
         }
         Rule::ident => RangeExpr::Symbolic(start_expr.as_str().to_string()),
-        _ => return Err(ParseError::Syntax {
-            span: ErrorSpan::from_pest_span(start_expr.as_span(), input),
-            message: "Invalid range start expression".to_string(),
-        }),
+        _ => {
+            return Err(ParseError::Syntax {
+                span: ErrorSpan::from_pest_span(start_expr.as_span(), input),
+                message: "Invalid range start expression".to_string(),
+            })
+        }
     };
-    
+
     let end = match end_expr.as_rule() {
         Rule::integer => {
-            let value = end_expr.as_str().parse::<u32>()
+            let value = end_expr
+                .as_str()
+                .parse::<u32>()
                 .map_err(|_| ParseError::Syntax {
                     span: ErrorSpan::from_pest_span(end_expr.as_span(), input),
                     message: "Invalid integer in range end".to_string(),
@@ -495,33 +527,42 @@ fn parse_range_expr(
             RangeExpr::Concrete(value)
         }
         Rule::ident => RangeExpr::Symbolic(end_expr.as_str().to_string()),
-        _ => return Err(ParseError::Syntax {
-            span: ErrorSpan::from_pest_span(end_expr.as_span(), input),
-            message: "Invalid range end expression".to_string(),
-        }),
+        _ => {
+            return Err(ParseError::Syntax {
+                span: ErrorSpan::from_pest_span(end_expr.as_span(), input),
+                message: "Invalid range end expression".to_string(),
+            })
+        }
     };
-    
+
     let range = RoleRange { start, end };
-    
+
     // Validate the range
     range.validate().map_err(|e| ParseError::Syntax {
         span: ErrorSpan::from_pest_span(pair_span, input),
         message: format!("Range validation failed: {}", e),
     })?;
-    
+
     Ok(RoleIndex::Range(range))
 }
 
 /// Parse a namespace declaration from the AST
-fn parse_namespace_decl(pair: pest::iterators::Pair<Rule>, input: &str) -> std::result::Result<String, ParseError> {
+fn parse_namespace_decl(
+    pair: pest::iterators::Pair<Rule>,
+    input: &str,
+) -> std::result::Result<String, ParseError> {
     let span = pair.as_span();
-    
+
     for inner in pair.into_inner() {
         if inner.as_rule() == Rule::string {
             let namespace_str = inner.as_str().trim_matches('"');
-            
+
             // Validate namespace format (alphanumeric + underscore)
-            if namespace_str.chars().all(|c| c.is_alphanumeric() || c == '_') && !namespace_str.is_empty() {
+            if namespace_str
+                .chars()
+                .all(|c| c.is_alphanumeric() || c == '_')
+                && !namespace_str.is_empty()
+            {
                 return Ok(namespace_str.to_string());
             } else {
                 let inner_span = inner.as_span();
@@ -532,7 +573,7 @@ fn parse_namespace_decl(pair: pest::iterators::Pair<Rule>, input: &str) -> std::
             }
         }
     }
-    
+
     Err(ParseError::Syntax {
         span: ErrorSpan::from_pest_span(span, input),
         message: "Missing namespace string in declaration".to_string(),
@@ -580,8 +621,12 @@ pub fn parse_choreography_str(input: &str) -> std::result::Result<Choreography, 
                                         let role = if let Some(param_pair) = inner_role.next() {
                                             if param_pair.as_rule() == Rule::role_param {
                                                 // Parse the enhanced parameter syntax
-                                                match parse_role_param(param_pair, role_name, input) {
-                                                    Ok(param) => Role::with_param(format_ident!("{}", role_name), param),
+                                                match parse_role_param(param_pair, role_name, input)
+                                                {
+                                                    Ok(param) => Role::with_param(
+                                                        format_ident!("{}", role_name),
+                                                        param,
+                                                    ),
                                                     Err(e) => return Err(e),
                                                 }
                                             } else {
@@ -683,7 +728,7 @@ fn parse_statement(
     if let Rule::annotated_stmt = pair.as_rule() {
         let mut inner = pair.into_inner();
         let mut annotations = HashMap::new();
-        
+
         // Parse all annotations
         let mut stmt_pair = inner.next().unwrap();
         while stmt_pair.as_rule() == Rule::annotation {
@@ -691,7 +736,7 @@ fn parse_statement(
             annotations.extend(annotation_map);
             stmt_pair = inner.next().unwrap();
         }
-        
+
         // Parse the statement and add annotations
         let mut statement = parse_statement_inner(stmt_pair, declared_roles, input, protocol_defs)?;
         add_annotations_to_statement(&mut statement, annotations);
@@ -704,13 +749,22 @@ fn parse_statement(
 /// Add statement-level annotations to a parsed statement
 fn add_annotations_to_statement(statement: &mut Statement, annotations: HashMap<String, String>) {
     match statement {
-        Statement::Send { annotations: stmt_annotations, .. } => {
+        Statement::Send {
+            annotations: stmt_annotations,
+            ..
+        } => {
             *stmt_annotations = annotations;
         }
-        Statement::Broadcast { annotations: stmt_annotations, .. } => {
+        Statement::Broadcast {
+            annotations: stmt_annotations,
+            ..
+        } => {
             *stmt_annotations = annotations;
         }
-        Statement::Choice { annotations: stmt_annotations, .. } => {
+        Statement::Choice {
+            annotations: stmt_annotations,
+            ..
+        } => {
             *stmt_annotations = annotations;
         }
         _ => {
@@ -788,11 +842,11 @@ fn parse_annotated_role(
     input: &str,
 ) -> std::result::Result<Role, ParseError> {
     let mut inner = pair.into_inner();
-    
+
     // First part should be role_ref
     let role_ref_pair = inner.next().unwrap();
     let role = parse_role_ref(role_ref_pair, declared_roles, input)?;
-    
+
     // Check for optional role_annotations
     if let Some(annotations_pair) = inner.next() {
         if annotations_pair.as_rule() == Rule::role_annotations {
@@ -801,7 +855,7 @@ fn parse_annotated_role(
             // Otherwise, we'll just ignore them for now and focus on getting the parsing to work
         }
     }
-    
+
     Ok(role)
 }
 
@@ -821,9 +875,9 @@ fn parse_send_stmt(
 
     let message = parse_message(inner.next().unwrap(), input)?;
 
-    Ok(Statement::Send { 
-        from, 
-        to, 
+    Ok(Statement::Send {
+        from,
+        to,
         message,
         annotations: HashMap::new(),
         from_annotations: HashMap::new(),
@@ -844,8 +898,8 @@ fn parse_broadcast_stmt(
 
     let message = parse_message(inner.next().unwrap(), input)?;
 
-    Ok(Statement::Broadcast { 
-        from, 
+    Ok(Statement::Broadcast {
+        from,
         message,
         annotations: HashMap::new(),
         from_annotations: HashMap::new(),
@@ -918,8 +972,8 @@ fn parse_choice_stmt(
         }
     }
 
-    Ok(Statement::Choice { 
-        role, 
+    Ok(Statement::Choice {
+        role,
         branches,
         annotations: HashMap::new(),
     })
@@ -1176,13 +1230,13 @@ fn convert_statements_to_protocol(statements: &[Statement], roles: &[Role]) -> P
     // Build protocol from back to front
     for statement in inlined.iter().rev() {
         current = match statement {
-            Statement::Send { 
-                from, 
-                to, 
-                message, 
-                annotations, 
-                from_annotations, 
-                to_annotations 
+            Statement::Send {
+                from,
+                to,
+                message,
+                annotations,
+                from_annotations,
+                to_annotations,
             } => Protocol::Send {
                 from: from.clone(),
                 to: to.clone(),
@@ -1196,11 +1250,11 @@ fn convert_statements_to_protocol(statements: &[Statement], roles: &[Role]) -> P
                 from_annotations: from_annotations.clone(),
                 to_annotations: to_annotations.clone(),
             },
-            Statement::Broadcast { 
-                from, 
-                message, 
-                annotations, 
-                from_annotations 
+            Statement::Broadcast {
+                from,
+                message,
+                annotations,
+                from_annotations,
             } => {
                 // Resolve to all roles except the sender
                 let to_all = roles
@@ -1222,10 +1276,10 @@ fn convert_statements_to_protocol(statements: &[Statement], roles: &[Role]) -> P
                     from_annotations: from_annotations.clone(),
                 }
             }
-            Statement::Choice { 
-                role, 
-                branches, 
-                annotations 
+            Statement::Choice {
+                role,
+                branches,
+                annotations,
             } => Protocol::Choice {
                 role: role.clone(),
                 branches: branches
@@ -1372,7 +1426,7 @@ pub fn parse_dsl(input: &str) -> std::result::Result<Choreography, ParseError> {
 
 // Example of how the macro would work
 #[doc(hidden)]
-#[must_use] 
+#[must_use]
 pub fn choreography_macro(input: TokenStream) -> TokenStream {
     let choreography = match parse_choreography(input) {
         Ok(c) => c,
@@ -1394,10 +1448,7 @@ pub fn choreography_macro(input: TokenStream) -> TokenStream {
     }
 
     // Generate code with namespace support
-    super::codegen::generate_choreography_code_with_namespacing(
-        &choreography,
-        &local_types,
-    )
+    super::codegen::generate_choreography_code_with_namespacing(&choreography, &local_types)
 }
 
 #[cfg(test)]

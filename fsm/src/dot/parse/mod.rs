@@ -266,7 +266,9 @@ impl<E: transition::Expression> Iterator for ParseIter<'_, E> {
     type Item = Result<Fsm<String, String, E>, ParseErrors>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.tokens.peek().inner == fsm::Token::Eoi { None } else {
+        if self.tokens.peek().inner == fsm::Token::Eoi {
+            None
+        } else {
             let fsm = fsm::parse(&mut self.tokens);
             self.tokens.finish();
             let errors = self.tokens.take_errors();

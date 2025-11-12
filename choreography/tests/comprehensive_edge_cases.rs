@@ -10,9 +10,8 @@
 use rumpsteak_aura_choreography::{
     ast::*,
     compiler::{
-        parser::parse_choreography_str,
+        codegen::generate_choreography_code_with_dynamic_roles, parser::parse_choreography_str,
         projection::project,
-        codegen::generate_choreography_code_with_dynamic_roles,
     },
 };
 
@@ -30,7 +29,7 @@ fn test_namespace_conflicts_and_resolution() {
             Client -> Server: Request;
         }
     "#;
-    
+
     let protocol_b = r#"
         #[namespace = "service_b"] 
         choreography Protocol {
@@ -38,10 +37,10 @@ fn test_namespace_conflicts_and_resolution() {
             Client -> Server: Request;
         }
     "#;
-    
+
     let choreo_a = parse_choreography_str(protocol_a).expect("Protocol A should parse");
     let choreo_b = parse_choreography_str(protocol_b).expect("Protocol B should parse");
-    
+
     // Same name but different qualified names
     assert_eq!(choreo_a.name.to_string(), "Protocol");
     assert_eq!(choreo_b.name.to_string(), "Protocol");
@@ -53,57 +52,66 @@ fn test_namespace_conflicts_and_resolution() {
 #[test]
 fn test_namespace_validation_edge_cases() {
     // Test namespace with keywords - may or may not be rejected
-    let _result = parse_choreography_str(r#"
+    let _result = parse_choreography_str(
+        r#"
         #[namespace = "impl"]
         choreography Test {
             roles: A, B;
             A -> B: Msg;
         }
-    "#);
+    "#,
+    );
     // Note: The parser may accept this since it's just a string literal
-    
+
     // Test namespace with special characters
-    let _result = parse_choreography_str(r#"
+    let _result = parse_choreography_str(
+        r#"
         #[namespace = "test::namespace"]
         choreography Test {
             roles: A, B;
             A -> B: Msg;
         }
-    "#);
+    "#,
+    );
     // Parser may accept this as a string literal - behavior depends on implementation
-    
+
     // Test extremely long namespace
     let long_namespace = "a".repeat(200);
-    let protocol = format!(r#"
+    let protocol = format!(
+        r#"
         #[namespace = "{}"]
         choreography Test {{
             roles: A, B;
             A -> B: Msg;
         }}
-    "#, long_namespace);
+    "#,
+        long_namespace
+    );
     let result = parse_choreography_str(&protocol);
     // Should either parse or give clear error
-    match result {
-        Ok(choreo) => assert_eq!(choreo.namespace.as_ref().unwrap(), &long_namespace),
-        Err(_) => {} // Acceptable to reject very long names
+    if let Ok(choreo) = result {
+        assert_eq!(choreo.namespace.as_ref().unwrap(), &long_namespace);
     }
+    // Acceptable to reject very long names
 }
 
 #[test]
 fn test_namespace_with_unicode() {
     // Test namespace with Unicode characters
-    let _result = parse_choreography_str(r#"
+    let _result = parse_choreography_str(
+        r#"
         #[namespace = "测试"]
         choreography Test {
             roles: A, B;
             A -> B: Msg;
         }
-    "#);
+    "#,
+    );
     // Should handle Unicode appropriately (either accept or reject consistently)
-    match _result {
-        Ok(choreo) => assert_eq!(choreo.namespace.as_ref().unwrap(), "测试"),
-        Err(_) => {} // Acceptable to reject Unicode in identifiers
+    if let Ok(choreo) = _result {
+        assert_eq!(choreo.namespace.as_ref().unwrap(), "测试");
     }
+    // Acceptable to reject Unicode in identifiers
 }
 
 // ============================================================================
@@ -113,20 +121,28 @@ fn test_namespace_with_unicode() {
 #[test]
 fn test_complex_dynamic_role_overflow_scenarios() {
     // Test nested dynamic roles with potential overflow
-    let protocol = format!(r#"
+    let protocol = format!(
+        r#"
         choreography OverflowTest {{
             roles: Controller, Workers[{}], Monitors[{}];
             
             Controller -> Workers[*]: Start;
             Workers[0..{}] -> Monitors[*]: Status;
         }}
-    "#, MAX_ROLE_COUNT / 2, MAX_ROLE_COUNT / 2, MAX_RANGE_SIZE / 2);
-    
+    "#,
+        MAX_ROLE_COUNT / 2,
+        MAX_ROLE_COUNT / 2,
+        MAX_RANGE_SIZE / 2
+    );
+
     let choreo = parse_choreography_str(&protocol).expect("Should parse valid counts");
-    
+
     // Verify that validation catches potential runtime overflow
     for role in &choreo.roles {
-        assert!(role.validate().is_ok(), "Role validation should pass for valid counts");
+        assert!(
+            role.validate().is_ok(),
+            "Role validation should pass for valid counts"
+        );
     }
 }
 
@@ -134,18 +150,24 @@ fn test_complex_dynamic_role_overflow_scenarios() {
 fn test_role_index_overflow_protection() {
     // Test that role indices are protected against overflow
     let result = RoleIndex::safe_concrete(MAX_ROLE_INDEX + 1);
-    assert!(matches!(result, Err(RoleValidationError::IndexOverflow { .. })));
-    
+    assert!(matches!(
+        result,
+        Err(RoleValidationError::IndexOverflow { .. })
+    ));
+
     let result = RoleIndex::safe_concrete(MAX_ROLE_INDEX);
     assert!(result.is_ok());
 }
 
-#[test] 
+#[test]
 fn test_range_size_overflow_protection() {
     // Test that range sizes are protected against overflow
     let result = RoleRange::safe_concrete(0, MAX_RANGE_SIZE + 10);
-    assert!(matches!(result, Err(RoleValidationError::RangeSizeOverflow { .. })));
-    
+    assert!(matches!(
+        result,
+        Err(RoleValidationError::RangeSizeOverflow { .. })
+    ));
+
     // Test valid range at boundary
     let result = RoleRange::safe_concrete(0, MAX_RANGE_SIZE - 1);
     assert!(result.is_ok());
@@ -155,112 +177,134 @@ fn test_range_size_overflow_protection() {
 fn test_dynamic_role_binding_overflow() {
     // Test that overflow protection catches unsafe role parameters
     let result = RoleParam::safe_static(MAX_ROLE_COUNT + 1);
-    assert!(matches!(result, Err(RoleValidationError::CountOverflow { .. })));
-    
+    assert!(matches!(
+        result,
+        Err(RoleValidationError::CountOverflow { .. })
+    ));
+
     // Test binding at boundary
     let result = RoleParam::safe_static(MAX_ROLE_COUNT);
     assert!(result.is_ok());
-    
+
     // Test runtime role validation
     let runtime_param = RoleParam::Runtime;
     assert!(runtime_param.validate().is_ok());
 }
 
 // ============================================================================
-// Annotation Validation Edge Cases  
+// Annotation Validation Edge Cases
 // ============================================================================
 
 #[test]
 fn test_malformed_annotation_handling() {
     // Test completely malformed annotation syntax
-    let result = parse_choreography_str(r#"
+    let result = parse_choreography_str(
+        r#"
         choreography Test {
             roles: A, B;
             [@malformed syntax here
             A -> B: Msg;
         }
-    "#);
+    "#,
+    );
     assert!(result.is_err(), "Should reject malformed annotation syntax");
-    
+
     // Test unclosed annotation
-    let result = parse_choreography_str(r#"
+    let result = parse_choreography_str(
+        r#"
         choreography Test {
             roles: A, B;
             [@unclosed=value
             A -> B: Msg;
         }
-    "#);
+    "#,
+    );
     assert!(result.is_err(), "Should reject unclosed annotations");
-    
+
     // Test annotation with no value
-    let _result = parse_choreography_str(r#"
+    let _result = parse_choreography_str(
+        r#"
         choreography Test {
             roles: A, B;
             [@key=]
             A -> B: Msg;
         }
-    "#);
-    assert!(_result.is_err(), "Should reject annotations with empty values");
+    "#,
+    );
+    assert!(
+        _result.is_err(),
+        "Should reject annotations with empty values"
+    );
 }
 
 #[test]
 fn test_annotation_key_validation() {
     // Test annotations with invalid key names
-    let result = parse_choreography_str(r#"
+    let result = parse_choreography_str(
+        r#"
         choreography Test {
             roles: A, B;
             [@123invalid=value]
             A -> B: Msg;
         }
-    "#);
+    "#,
+    );
     assert!(result.is_err(), "Should reject numeric annotation keys");
-    
+
     // Test annotation with spaces in key
-    let _result = parse_choreography_str(r#"
+    let _result = parse_choreography_str(
+        r#"
         choreography Test {
             roles: A, B;
             [@"key with spaces"=value]
             A -> B: Msg;
         }
-    "#);
+    "#,
+    );
     // May or may not be supported - check behavior is consistent
 }
 
-#[test] 
+#[test]
 fn test_annotation_value_edge_cases() {
     // Test annotation with very long value
     let long_value = "x".repeat(1000);
-    let protocol = format!(r#"
+    let protocol = format!(
+        r#"
         choreography Test {{
             roles: A, B;
             [@longval="{}"]
             A -> B: Msg;
         }}
-    "#, long_value);
-    
+    "#,
+        long_value
+    );
+
     let result = parse_choreography_str(&protocol);
-    match result {
-        Ok(choreo) => {
-            // If accepted, should store the full value
-            match &choreo.protocol {
-                Protocol::Send { annotations, .. } => {
-                    assert_eq!(annotations.get("longval").unwrap(), &long_value);
-                }
-                _ => panic!("Expected Send protocol")
+    if let Ok(choreo) = result {
+        // If accepted, should store the full value
+        match &choreo.protocol {
+            Protocol::Send { annotations, .. } => {
+                assert_eq!(annotations.get("longval").unwrap(), &long_value);
             }
+            _ => panic!("Expected Send protocol"),
         }
-        Err(_) => {} // Acceptable to reject very long values
     }
-    
+    // Acceptable to reject very long values
+
     // Test annotation with special characters in value
-    let _result = parse_choreography_str(r#"
+    let _result = parse_choreography_str(
+        r#"
         choreography Test {
             roles: A, B;
             [@special="value with spaces and symbols !@#$%^&*()"]
             A -> B: Msg;
         }
-    "#);
-    assert!(_result.is_ok(), "Should accept special characters in annotation values");
+    "#,
+    );
+    assert!(
+        _result.is_ok(),
+        "Should accept special characters in annotation values"
+    );
 }
 
 #[test]
@@ -270,29 +314,30 @@ fn test_multiple_annotation_boundary_conditions() {
         .map(|i| format!("@key{}=\"value{}\"", i, i))
         .collect::<Vec<_>>()
         .join(", ");
-    
-    let protocol = format!(r#"
+
+    let protocol = format!(
+        r#"
         choreography Test {{
             roles: A, B;
             [{}]
             A -> B: Msg;
         }}
-    "#, many_annotations);
-    
+    "#,
+        many_annotations
+    );
+
     let _result = parse_choreography_str(&protocol);
-    match _result {
-        Ok(choreo) => {
-            // Should handle many annotations correctly
-            match &choreo.protocol {
-                Protocol::Send { annotations, .. } => {
-                    assert_eq!(annotations.len(), 50);
-                    assert_eq!(annotations.get("key25").unwrap(), "value25");
-                }
-                _ => panic!("Expected Send protocol")
+    if let Ok(choreo) = _result {
+        // Should handle many annotations correctly
+        match &choreo.protocol {
+            Protocol::Send { annotations, .. } => {
+                assert_eq!(annotations.len(), 50);
+                assert_eq!(annotations.get("key25").unwrap(), "value25");
             }
+            _ => panic!("Expected Send protocol"),
         }
-        Err(_) => {} // Acceptable to limit annotation count
     }
+    // Acceptable to limit annotation count
 }
 
 // ============================================================================
@@ -302,73 +347,92 @@ fn test_multiple_annotation_boundary_conditions() {
 #[test]
 fn test_range_boundary_conditions() {
     // Test range at maximum boundary
-    let protocol = format!(r#"
+    let protocol = format!(
+        r#"
         choreography RangeTest {{
             roles: Controller, Workers[{}];
             
             Workers[0..{}] -> Controller: Status;
         }}
-    "#, MAX_ROLE_COUNT, MAX_RANGE_SIZE - 1);
-    
+    "#,
+        MAX_ROLE_COUNT,
+        MAX_RANGE_SIZE - 1
+    );
+
     let result = parse_choreography_str(&protocol);
     assert!(result.is_ok(), "Should accept range at valid boundary");
-    
+
     // Test range exceeding boundary
-    let protocol = format!(r#"
+    let protocol = format!(
+        r#"
         choreography RangeTest {{
             roles: Controller, Workers[{}];
             
             Workers[0..{}] -> Controller: Status;
         }}
-    "#, MAX_ROLE_COUNT, MAX_RANGE_SIZE + 100);
-    
+    "#,
+        MAX_ROLE_COUNT,
+        MAX_RANGE_SIZE + 100
+    );
+
     let result = parse_choreography_str(&protocol);
-    assert!(result.is_err(), "Should reject range exceeding maximum size");
+    assert!(
+        result.is_err(),
+        "Should reject range exceeding maximum size"
+    );
 }
 
 #[test]
 fn test_invalid_range_expressions() {
     // Test range with start > end
-    let result = parse_choreography_str(r#"
+    let result = parse_choreography_str(
+        r#"
         choreography InvalidRange {
             roles: Controller, Workers[10];
             
             Workers[5..2] -> Controller: Status;
         }
-    "#);
+    "#,
+    );
     assert!(result.is_err(), "Should reject range with start > end");
-    
+
     // Test range with negative indices (if supported)
-    let _result = parse_choreography_str(r#"
+    let _result = parse_choreography_str(
+        r#"
         choreography NegativeRange {
             roles: Controller, Workers[10];
             
             Workers[-1..5] -> Controller: Status;
         }
-    "#);
+    "#,
+    );
     // Should either parse (if negative indices are supported) or reject consistently
-    
+
     // Test range with symbolic bounds
-    let result = parse_choreography_str(r#"
+    let result = parse_choreography_str(
+        r#"
         choreography SymbolicRange {
             roles: Controller, Workers[N];
             
             Workers[start..end] -> Controller: Status;
         }
-    "#);
+    "#,
+    );
     assert!(result.is_ok(), "Should accept symbolic range bounds");
 }
 
 #[test]
 fn test_nested_range_expressions() {
     // Test complex range expressions with nested references
-    let result = parse_choreography_str(r#"
+    let result = parse_choreography_str(
+        r#"
         choreography NestedRange {
             roles: Coordinator, Workers[N], Monitors[M];
             
             Workers[0..quorum] -> Monitors[i..j]: Data;
         }
-    "#);
+    "#,
+    );
     assert!(result.is_ok(), "Should handle complex range expressions");
 }
 
@@ -407,30 +471,33 @@ fn test_namespace_dynamic_roles_annotations_integration() {
             }
         }
     "#;
-    
+
     let choreo = parse_choreography_str(protocol).expect("Complete integration should parse");
-    
+
     // Verify all features are present
     assert_eq!(choreo.namespace.as_ref().unwrap(), "integration_test");
     assert_eq!(choreo.roles.len(), 3);
-    
+
     // Verify dynamic roles
     let workers = &choreo.roles[1];
     assert_eq!(workers.name.to_string(), "Workers");
     assert!(workers.is_dynamic());
-    
+
     // Test code generation with all features
     let local_types = vec![
         (choreo.roles[0].clone(), LocalType::End),
         (choreo.roles[1].clone(), LocalType::End),
         (choreo.roles[2].clone(), LocalType::End),
     ];
-    
+
     let generated_code = generate_choreography_code_with_dynamic_roles(&choreo, &local_types);
     let code_str = generated_code.to_string();
-    
+
     // Verify some form of integration in generated code
-    println!("Generated code snippet: {}", &code_str[0..std::cmp::min(500, code_str.len())]);
+    println!(
+        "Generated code snippet: {}",
+        &code_str[0..std::cmp::min(500, code_str.len())]
+    );
     assert!(!code_str.is_empty(), "Should generate some code");
 }
 
@@ -453,20 +520,23 @@ fn test_complex_projection_with_all_features() {
             LoadBalancer -> Client: FinalResponse;
         }
     "#;
-    
+
     let choreo = parse_choreography_str(protocol).expect("Should parse projection test");
-    
+
     // Test projection for each role
     for role in &choreo.roles {
         let result = project(&choreo, role);
         match result {
             Ok(local_type) => {
-                // For dynamic roles without bindings, End may be valid 
+                // For dynamic roles without bindings, End may be valid
                 println!("Projection result for {}: {:?}", role.name, local_type);
             }
             Err(err) => {
                 // Projection may fail for dynamic roles without bindings - ensure error is reasonable
-                println!("Expected projection error for dynamic role {}: {:?}", role.name, err);
+                println!(
+                    "Expected projection error for dynamic role {}: {:?}",
+                    role.name, err
+                );
             }
         }
     }
@@ -486,10 +556,13 @@ fn test_error_propagation_across_features() {
             B[999999999999] -> UndefinedRole: InvalidMessage;
         }
     "#;
-    
+
     let result = parse_choreography_str(protocol);
-    assert!(result.is_err(), "Should reject protocol with multiple errors");
-    
+    assert!(
+        result.is_err(),
+        "Should reject protocol with multiple errors"
+    );
+
     // Verify error contains useful information
     let error_msg = result.unwrap_err().to_string();
     println!("Error message: {}", error_msg);
@@ -497,11 +570,11 @@ fn test_error_propagation_across_features() {
     assert!(!error_msg.is_empty());
 }
 
-#[test] 
+#[test]
 fn test_performance_with_all_features() {
     // Test that combining all features doesn't cause performance degradation
     use std::time::Instant;
-    
+
     let complex_protocol = r#"
         #[namespace = "performance_integration"]
         choreography PerformanceTest {
@@ -540,26 +613,37 @@ fn test_performance_with_all_features() {
             }
         }
     "#;
-    
+
     let start = Instant::now();
-    
+
     // Parse multiple times to test performance consistency
     for _ in 0..10 {
-        let choreo = parse_choreography_str(complex_protocol).expect("Should parse complex protocol");
-        
+        let choreo =
+            parse_choreography_str(complex_protocol).expect("Should parse complex protocol");
+
         // Quick validation
-        assert_eq!(choreo.namespace.as_ref().unwrap(), "performance_integration");
+        assert_eq!(
+            choreo.namespace.as_ref().unwrap(),
+            "performance_integration"
+        );
         assert_eq!(choreo.roles.len(), 4);
-        
+
         // Test projection attempt (may fail but shouldn't crash)
         for role in &choreo.roles {
             let _ = project(&choreo, role);
         }
     }
-    
+
     let duration = start.elapsed();
-    
+
     // Performance assertion - should handle complex protocols quickly
-    assert!(duration.as_millis() < 500, "Performance test took too long: {:?}", duration);
-    println!("Performance integration test completed 10 iterations in {:?}", duration);
+    assert!(
+        duration.as_millis() < 500,
+        "Performance test took too long: {:?}",
+        duration
+    );
+    println!(
+        "Performance integration test completed 10 iterations in {:?}",
+        duration
+    );
 }

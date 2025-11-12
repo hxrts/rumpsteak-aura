@@ -21,7 +21,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             "  - Name: {}, Index: {:?}, Array_size: {:?}, Is_array: {}",
             role.name,
             role.index,
-            role.array_size.as_ref().map(std::string::ToString::to_string),
+            role.array_size
+                .as_ref()
+                .map(std::string::ToString::to_string),
             role.is_array()
         );
     }

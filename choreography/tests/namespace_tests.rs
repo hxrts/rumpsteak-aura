@@ -2,8 +2,9 @@
 ///
 /// This module tests the namespace functionality added to support multiple
 /// choreographies in the same crate without type conflicts.
-
-use rumpsteak_aura_choreography::compiler::{parse_choreography_str, generate_choreography_code_with_namespacing, project};
+use rumpsteak_aura_choreography::compiler::{
+    generate_choreography_code_with_namespacing, parse_choreography_str, project,
+};
 
 #[test]
 fn test_parse_simple_namespaced_choreography() {
@@ -16,7 +17,11 @@ choreography SimpleProtocol {
 "#;
 
     let result = parse_choreography_str(input);
-    assert!(result.is_ok(), "Failed to parse namespaced choreography: {:?}", result.err());
+    assert!(
+        result.is_ok(),
+        "Failed to parse namespaced choreography: {:?}",
+        result.err()
+    );
 
     let choreo = result.unwrap();
     assert_eq!(choreo.name.to_string(), "SimpleProtocol");
@@ -34,7 +39,11 @@ choreography SimpleProtocol {
 "#;
 
     let result = parse_choreography_str(input);
-    assert!(result.is_ok(), "Failed to parse non-namespaced choreography: {:?}", result.err());
+    assert!(
+        result.is_ok(),
+        "Failed to parse non-namespaced choreography: {:?}",
+        result.err()
+    );
 
     let choreo = result.unwrap();
     assert_eq!(choreo.name.to_string(), "SimpleProtocol");
@@ -54,7 +63,10 @@ choreography ThresholdProtocol {
 "#;
 
     let choreo = parse_choreography_str(input).unwrap();
-    assert_eq!(choreo.qualified_name(), "threshold_ceremony::ThresholdProtocol");
+    assert_eq!(
+        choreo.qualified_name(),
+        "threshold_ceremony::ThresholdProtocol"
+    );
 }
 
 #[test]
@@ -109,7 +121,11 @@ choreography TestProtocol {
 "#;
 
     let result = parse_choreography_str(input);
-    assert!(result.is_ok(), "Should accept namespace with underscores: {:?}", result.err());
+    assert!(
+        result.is_ok(),
+        "Should accept namespace with underscores: {:?}",
+        result.err()
+    );
 
     // Test namespace with numbers
     let input = r#"
@@ -121,7 +137,11 @@ choreography TestProtocol {
 "#;
 
     let result = parse_choreography_str(input);
-    assert!(result.is_ok(), "Should accept namespace with numbers: {:?}", result.err());
+    assert!(
+        result.is_ok(),
+        "Should accept namespace with numbers: {:?}",
+        result.err()
+    );
 }
 
 #[test]
@@ -135,7 +155,7 @@ choreography TestProtocol {
 "#;
 
     let choreo = parse_choreography_str(input).unwrap();
-    
+
     // Project to local types
     let mut local_types = Vec::new();
     for role in &choreo.roles {
@@ -148,10 +168,16 @@ choreography TestProtocol {
     let code_string = generated_code.to_string();
 
     // Check that the code is wrapped in a module
-    assert!(code_string.contains("pub mod test_namespace"), 
-           "Generated code should contain namespace module: {}", code_string);
-    assert!(code_string.contains("use super :: *"), 
-           "Generated code should contain super import: {}", code_string);
+    assert!(
+        code_string.contains("pub mod test_namespace"),
+        "Generated code should contain namespace module: {}",
+        code_string
+    );
+    assert!(
+        code_string.contains("use super :: *"),
+        "Generated code should contain super import: {}",
+        code_string
+    );
 }
 
 #[test]
@@ -164,7 +190,7 @@ choreography TestProtocol {
 "#;
 
     let choreo = parse_choreography_str(input).unwrap();
-    
+
     // Project to local types
     let mut local_types = Vec::new();
     for role in &choreo.roles {
@@ -177,18 +203,22 @@ choreography TestProtocol {
     let code_string = generated_code.to_string();
 
     // Check that the code does not contain a namespace module (only annotations module is allowed)
-    assert!(!code_string.contains("pub mod test") && !code_string.contains("pub mod Test"), 
-           "Non-namespaced code should not contain namespace module wrapper");
+    assert!(
+        !code_string.contains("pub mod test") && !code_string.contains("pub mod Test"),
+        "Non-namespaced code should not contain namespace module wrapper"
+    );
     // Annotations module is expected for enhanced annotation support
-    assert!(code_string.contains("pub mod annotations"),
-           "Generated code should contain annotations module for enhanced annotation support");
+    assert!(
+        code_string.contains("pub mod annotations"),
+        "Generated code should contain annotations module for enhanced annotation support"
+    );
 }
 
 #[test]
 fn test_multiple_namespaced_protocols_compilation() {
     // This test verifies that multiple protocols with different namespaces
     // can be defined without conflicts (compilation test)
-    
+
     let protocol_a = r#"
 #[namespace = "protocol_a"]
 choreography ProtocolA {
@@ -251,7 +281,11 @@ choreography ComplexProtocol {
 "#;
 
     let result = parse_choreography_str(input);
-    assert!(result.is_ok(), "Complex namespaced protocol should parse: {:?}", result.err());
+    assert!(
+        result.is_ok(),
+        "Complex namespaced protocol should parse: {:?}",
+        result.err()
+    );
 
     let choreo = result.unwrap();
     assert_eq!(choreo.namespace, Some("complex_protocol".to_string()));
@@ -260,7 +294,8 @@ choreography ComplexProtocol {
 
 #[test]
 fn test_namespace_validation() {
-    let choreo = parse_choreography_str(r#"
+    let choreo = parse_choreography_str(
+        r#"
 #[namespace = "test_validation"]
 choreography TestProtocol {
     roles: A, B, C
@@ -268,9 +303,15 @@ choreography TestProtocol {
     B -> C: Message2
     C -> A: Message3
 }
-"#).unwrap();
+"#,
+    )
+    .unwrap();
 
     // Choreography validation should work normally with namespaces
     let validation_result = choreo.validate();
-    assert!(validation_result.is_ok(), "Namespaced choreography should validate: {:?}", validation_result.err());
+    assert!(
+        validation_result.is_ok(),
+        "Namespaced choreography should validate: {:?}",
+        validation_result.err()
+    );
 }

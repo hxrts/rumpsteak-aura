@@ -37,33 +37,37 @@ choreography MyProtocol {
 Choreographies can be namespaced to avoid conflicts when multiple protocols are defined in the same crate:
 
 ```rust
-choreography! {
+let threshold_dsl = r#"
     #[namespace = "threshold_ceremony"]
-    ThresholdProtocol {
+    choreography ThresholdProtocol {
         roles: Coordinator, Signers[*];
         Coordinator -> Signers[*]: Request;
     }
-}
+"#;
+let choreo = parse_choreography_str(threshold_dsl)?;
 ```
 
-This generates the protocol within a `threshold_ceremony` module. Multiple choreographies with different namespaces can coexist:
+This generates the protocol within a `threshold_ceremony` module. Multiple choreographies with different namespaces can coexist by parsing them separately and using the namespace for code generation:
 
 ```rust
-choreography! {
+let consensus_dsl = r#"
     #[namespace = "consensus"]
-    ConsensusProtocol {
+    choreography ConsensusProtocol {
         roles: Leader, Followers[N];
         // protocol body
     }
-}
+"#;
 
-choreography! {
+let recovery_dsl = r#"
     #[namespace = "recovery"]
-    RecoveryProtocol {
+    choreography RecoveryProtocol {
         roles: Requester, Guardians[*];
         // protocol body
     }
-}
+"#;
+
+let consensus_choreo = parse_choreography_str(consensus_dsl)?;
+let recovery_choreo = parse_choreography_str(recovery_dsl)?;
 ```
 
 ### Supported Constructs
@@ -338,7 +342,7 @@ choreography StaticWorkers {
 
 **Runtime binding example:**
 ```rust
-use rumpsteak_choreography::compiler::{parse_choreography_str, generate_choreography_code_with_dynamic_roles};
+use rumpsteak_aura_choreography::compiler::{parse_choreography_str, codegen::generate_choreography_code_with_dynamic_roles};
 
 let dsl = r#"
 choreography Threshold {
@@ -358,42 +362,46 @@ runtime.map_signers_instances(vec!["alice", "bob", "charlie", "dave", "eve"])?;
 
 The system provides comprehensive security through bounds checking, preventing overflow attacks and ensuring memory safety.
 
-#### 11. Macro Support for Inline Protocols
+#### 11. String-based Protocol Definition
 
-The `choreography!` procedural macro enables embedding choreographic protocols directly in Rust code with full support for namespaces, annotations, and dynamic roles.
+The current implementation uses `parse_choreography_str` to parse choreographic protocols from string literals, with support for namespaces, annotations, and dynamic roles.
 
 **Basic usage:**
 ```rust
-use rumpsteak_macros::choreography;
+use rumpsteak_aura_choreography::compiler::parser::parse_choreography_str;
 
-choreography! {
-    PingPong {
+let protocol = r#"
+    choreography PingPong {
         roles: Alice, Bob;
 
         Alice -> Bob: Ping;
         Bob -> Alice: Pong;
     }
-}
+"#;
+
+let choreography = parse_choreography_str(protocol)?;
 ```
 
 **Namespaced protocols:**
 ```rust
-choreography! {
+let protocol = r#"
     #[namespace = "secure_messaging"]
-    EncryptedProtocol {
+    choreography EncryptedProtocol {
         roles: Sender, Receiver;
 
         [@encrypt = "aes256"]
         Sender -> Receiver: SecureMessage;
     }
-}
+"#;
+
+let choreography = parse_choreography_str(protocol)?;
 ```
 
 **Dynamic roles with annotations:**
 ```rust
-choreography! {
+let protocol = r#"
     #[namespace = "consensus"]
-    ByzantineFaultTolerant {
+    choreography ByzantineFaultTolerant {
         roles: Leader, Replicas[*];
 
         [@phase = "prepare", @timeout = 5000]
@@ -401,41 +409,25 @@ choreography! {
 
         Replicas[0..quorum] -> Leader: PrepareOk;
     }
-}
+"#;
+
+let choreography = parse_choreography_str(protocol)?;
 ```
 
-**String literal syntax:**
-```rust
-choreography! {
-    r#"
-    #[namespace = "example"]
-    choreography Example {
-        roles: A, B, C;
+The parser:
+- Parses choreographic protocol specifications from strings
+- Builds AST representation for further processing
+- Supports full protocol syntax including annotations and dynamic roles
+- Provides detailed error reporting with span information
+- Enables runtime protocol generation and analysis
 
-        [@cost = 100]
-        A -> B: Request;
-        B -> C: Forward;
-        C -> A: Response;
-    }
-    "#
-}
-```
+**Generated AST can be used for:**
+- Protocol projection to local types
+- Code generation for session types
+- Runtime analysis and validation
+- Dynamic role binding and management
 
-The macro:
-- Parses choreographic protocol specifications
-- Generates role structs and message types
-- Creates session types for each role
-- Provides setup functions for instantiation
-- Supports both inline and string literal syntaxes
-- Enables compile-time validation of protocols
-
-**Generated code includes:**
-- Role type definitions implementing the `Role` trait
-- Message type definitions implementing the `Message` trait
-- Session type definitions for type-safe communication
-- Setup function for creating protocol instances
-
-This allows protocols to be defined inline and used with full type safety and compile-time checking.
+This approach allows for flexible protocol definition and runtime manipulation of choreographic specifications.
 
 ## Implementation Details
 
@@ -484,7 +476,7 @@ Choreography Object
 Parse a choreographic DSL string into a Choreography AST.
 
 ```rust
-use rumpsteak_choreography::compiler::parser::parse_choreography_str;
+use rumpsteak_aura_choreography::compiler::parser::parse_choreography_str;
 
 let choreo = parse_choreography_str(r#"
 choreography Example {
@@ -499,7 +491,7 @@ Parse a choreographic DSL from a file.
 
 ```rust
 use std::path::Path;
-use rumpsteak_choreography::compiler::parser::parse_choreography_file;
+use rumpsteak_aura_choreography::compiler::parser::parse_choreography_file;
 
 let choreo = parse_choreography_file(Path::new("protocol.choreo"))?;
 ```
@@ -685,7 +677,7 @@ let choreo = parse_choreography_str(input)?;
 Parse and project to local types:
 
 ```rust
-use rumpsteak_choreography::compiler::{parser, projection};
+use rumpsteak_aura_choreography::compiler::{parser, projection};
 
 let choreo = parser::parse_choreography_str(input)?;
 
@@ -700,7 +692,7 @@ for role in &choreo.roles {
 Parse and generate Rumpsteak session types:
 
 ```rust
-use rumpsteak_choreography::compiler::{parser, projection, codegen};
+use rumpsteak_aura_choreography::compiler::{parser, projection, codegen};
 
 let choreo = parser::parse_choreography_str(input)?;
 let mut local_types = Vec::new();
@@ -731,5 +723,5 @@ The parser includes comprehensive test coverage:
 
 Run tests with:
 ```bash
-cargo test --package rumpsteak-choreography parser
+cargo test --package rumpsteak-aura-choreography parser
 ```

@@ -258,7 +258,10 @@ pub fn is_subtype<R: Eq, N: Eq>(
     right: &Fsm<R, N, Infallible>,
     visits: usize,
 ) -> bool {
-    assert!(!(left.role() != right.role()), "FSMs are for different roles");
+    assert!(
+        !(left.role() != right.role()),
+        "FSMs are for different roles"
+    );
 
     let sizes = Pair::new(left.size().0, right.size().0);
     let mut visitor = SubtypeVisitor {

@@ -1,6 +1,6 @@
 // Choreography struct definition and validation
 
-use super::{Role, Protocol, ValidationError};
+use super::{Protocol, Role, ValidationError};
 use proc_macro2::Ident;
 use std::collections::HashMap;
 
@@ -131,7 +131,8 @@ impl Choreography {
     /// Find all protocol nodes with a specific annotation value
     pub fn find_nodes_with_annotation_value(&self, key: &str, value: &str) -> Vec<&Protocol> {
         let mut nodes = Vec::new();
-        self.protocol.collect_nodes_with_annotation_value(key, value, &mut nodes);
+        self.protocol
+            .collect_nodes_with_annotation_value(key, value, &mut nodes);
         nodes
     }
 

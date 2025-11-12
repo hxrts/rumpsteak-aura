@@ -164,7 +164,7 @@ impl<Q: Role + 'static, R: 'static, C: SerializeChoices> Serialize for Branch<'s
     }
 }
 
-#[must_use] 
+#[must_use]
 pub fn serialize<S: FromState<'static> + Serialize>() -> Fsm<Type, Type, Infallible> {
     let mut serializer = Serializer {
         fsm: Fsm::new(Type::new::<S::Role>()),

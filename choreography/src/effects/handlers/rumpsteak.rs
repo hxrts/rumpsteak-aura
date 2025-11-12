@@ -55,7 +55,7 @@ pub struct SimpleChannel {
 
 impl SimpleChannel {
     /// Create a pair of connected channels.
-    #[must_use] 
+    #[must_use]
     pub fn pair() -> (Self, Self) {
         let (left, right) = SimpleChannelInner::pair();
         (Self { inner: left }, Self { inner: right })
@@ -300,12 +300,12 @@ impl Debug for RumpsteakSession {
 }
 
 impl RumpsteakSession {
-    #[must_use] 
+    #[must_use]
     pub fn new(inner: Box<dyn SessionTypeDynamic>) -> Self {
         Self { inner }
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn from_simple_channel(channel: SimpleChannel) -> Self {
         Self::new(Box::new(SimpleSession::new(channel)))
     }
@@ -321,7 +321,7 @@ impl RumpsteakSession {
         Self::new(Box::new(SinkStreamSession::new(sender, receiver, label)))
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn type_name(&self) -> &'static str {
         self.inner.type_name()
     }
@@ -465,7 +465,7 @@ impl<R, M> RumpsteakHandler<R, M>
 where
     R: Role + Eq + std::hash::Hash + Clone + Debug,
 {
-    #[must_use] 
+    #[must_use]
     pub fn new() -> Self {
         Self {
             _phantom: PhantomData,

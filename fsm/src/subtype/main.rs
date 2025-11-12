@@ -18,7 +18,11 @@ struct ColorChoice(termcolor::ColorChoice);
 
 impl ColorChoice {
     fn auto() -> Self {
-        if atty::is(atty::Stream::Stdout) { Self(termcolor::ColorChoice::Auto) } else { Self(termcolor::ColorChoice::Never) }
+        if atty::is(atty::Stream::Stdout) {
+            Self(termcolor::ColorChoice::Auto)
+        } else {
+            Self(termcolor::ColorChoice::Never)
+        }
     }
 }
 

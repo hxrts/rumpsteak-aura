@@ -364,9 +364,10 @@ impl Drop for SessionGuard {
             // In debug mode, panic if the session was not properly completed
             #[cfg(debug_assertions)]
             {
-                assert!(std::thread::panicking(), 
-                        "Session dropped without completing! This indicates a protocol violation."
-                    );
+                assert!(
+                    std::thread::panicking(),
+                    "Session dropped without completing! This indicates a protocol violation."
+                );
             }
         }
     }

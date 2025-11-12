@@ -181,9 +181,21 @@ pub enum BinaryOp {
 impl Operator for BinaryOp {
     fn associativity(&self) -> Associativity {
         match self {
-            Self::LAnd | Self::LOr | Self::Equal | Self::NotEqual | Self::Less | Self::Greater 
-            | Self::LessEqual | Self::GreaterEqual | Self::Add | Self::Subtract | Self::Multiply 
-            | Self::Divide | Self::And | Self::Xor | Self::Or => Associativity::Left,
+            Self::LAnd
+            | Self::LOr
+            | Self::Equal
+            | Self::NotEqual
+            | Self::Less
+            | Self::Greater
+            | Self::LessEqual
+            | Self::GreaterEqual
+            | Self::Add
+            | Self::Subtract
+            | Self::Multiply
+            | Self::Divide
+            | Self::And
+            | Self::Xor
+            | Self::Or => Associativity::Left,
         }
     }
 
@@ -349,7 +361,7 @@ impl<N, E> Default for Parameters<N, E> {
 
 impl<N, E> Parameters<N, E> {
     /// Returns true if there are no parameters.
-    #[must_use] 
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         match self {
             Parameters::Unnamed(parameters) => parameters.is_empty(),
@@ -522,7 +534,7 @@ impl<R, N, E> Clone for TransitionRef<'_, R, N, E> {
 
 impl<R: Clone, N: Clone, E: Clone> TransitionRef<'_, R, N, E> {
     /// Converts this transition reference to an owned transition.
-    #[must_use] 
+    #[must_use]
     pub fn to_owned(&self) -> Transition<R, N, E> {
         Transition::new(self.role.clone(), self.action, self.message.clone())
     }

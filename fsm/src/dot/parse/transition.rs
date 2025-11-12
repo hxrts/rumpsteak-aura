@@ -452,7 +452,9 @@ fn parse_expression(
     }
 
     let mut outputs = outputs.into_iter().peekable();
-    let Some(output) = outputs.next() else { return Some(None) };
+    let Some(output) = outputs.next() else {
+        return Some(None);
+    };
 
     if outputs.peek().is_some() {
         for output in outputs {
@@ -534,7 +536,9 @@ pub(super) fn parse<E: Expression>(tokens: &mut Lexer) -> Option<Transition<Stri
     let role = tokens.expect_next_if(TokenId::Identifier)?;
     let role = role.map(Token::into_identifier);
 
-    let action = if tokens.next_if(TokenId::Question).is_some() { Action::Input } else {
+    let action = if tokens.next_if(TokenId::Question).is_some() {
+        Action::Input
+    } else {
         tokens.expect_next_if(TokenId::Bang)?;
         Action::Output
     };

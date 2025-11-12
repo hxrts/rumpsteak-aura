@@ -45,7 +45,9 @@ pub fn message(input: TokenStream) -> Result<TokenStream> {
         }?;
 
         let mut fields_iter = fields.iter();
-        let field = if let (Some(field), None) = (fields_iter.next(), fields_iter.next()) { Ok(field) } else {
+        let field = if let (Some(field), None) = (fields_iter.next(), fields_iter.next()) {
+            Ok(field)
+        } else {
             let message = "expected exactly one field per variant";
             Err(Error::new_spanned(fields, message))
         }?;

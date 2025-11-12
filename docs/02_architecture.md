@@ -65,25 +65,48 @@ The AST represents choreographies as data structures. Main types:
 ```rust
 pub struct Choreography {
     pub name: Ident,
+    pub namespace: Option<String>,
     pub roles: Vec<Role>,
     pub protocol: Protocol,
+    pub attrs: HashMap<String, String>,
 }
 ```
 
-Choreography holds the protocol name, participating roles, and the protocol tree.
+Choreography holds the protocol name, optional namespace, participating roles, the protocol tree, and metadata attributes.
 
 ```rust
 pub enum Protocol {
-    Send { from: Role, to: Role, message: MessageType, continuation: Box<Protocol> },
-    Choice { role: Role, branches: Vec<(Label, Protocol)> },
+    Send { 
+        from: Role, 
+        to: Role, 
+        message: MessageType, 
+        continuation: Box<Protocol>,
+        annotations: HashMap<String, String>,
+        from_annotations: HashMap<String, String>,
+        to_annotations: HashMap<String, String>,
+    },
+    Broadcast { 
+        from: Role, 
+        to_all: Vec<Role>, 
+        message: MessageType, 
+        continuation: Box<Protocol>,
+        annotations: HashMap<String, String>,
+        from_annotations: HashMap<String, String>,
+    },
+    Choice { 
+        role: Role, 
+        branches: Vec<Branch>, 
+        annotations: HashMap<String, String>,
+    },
     Loop { condition: Option<Condition>, body: Box<Protocol> },
     Parallel { protocols: Vec<Protocol> },
-    Rec { name: Ident, body: Box<Protocol> },
+    Rec { label: Ident, body: Box<Protocol> },
+    Var(Ident),
     End,
 }
 ```
 
-Protocol is a recursive tree structure representing all possible protocol actions.
+Protocol is a recursive tree structure representing all possible protocol actions. It includes support for annotations at multiple levels, broadcasts, and recursive definitions.
 
 ### Parser Module
 
@@ -123,11 +146,14 @@ The codegen module converts local types into Rust session types and effect progr
 Functions:
 
 ```rust
-pub fn generate_session_types(choreography: &Choreography) -> TokenStream
+pub fn generate_session_type(role: &Role, local_type: &LocalType, protocol_name: &str) -> TokenStream
+pub fn generate_choreography_code(name: &str, roles: &[Role], local_types: &[(Role, LocalType)]) -> TokenStream
+pub fn generate_choreography_code_with_dynamic_roles(choreography: &Choreography, local_types: &[(Role, LocalType)]) -> TokenStream
+pub fn generate_dynamic_role_support(choreography: &Choreography) -> TokenStream
 pub fn generate_effects_protocol(choreography: &Choreography) -> TokenStream
 ```
 
-The generator creates role structs, message enums, and session type definitions.
+The generator creates session types, role structs, and code with dynamic role support including parameterized roles and runtime management.
 
 ### Effect System
 
@@ -278,12 +304,10 @@ rumpsteak-aura/
 
 **rumpsteak-aura** (root `src/`): Foundation session types library providing core primitives for type-safe asynchronous communication. This is the base dependency for all other crates.
 
-**rumpsteak-choreography**: High-level choreographic programming layer with DSL parser, automatic projection, effect handlers, and runtime support. Builds on top of rumpsteak-aura.
+**rumpsteak-aura-choreography**: High-level choreographic programming layer with DSL parser, automatic projection, effect handlers, and runtime support. Builds on top of rumpsteak-aura.
 
-**rumpsteak-fsm**: Finite state machine support for session types, including DOT parsing and subtyping verification. Optional dependency for advanced use cases.
+**rumpsteak-aura-fsm**: Finite state machine support for session types, including DOT parsing and subtyping verification. Optional dependency for advanced use cases.
 
-**rumpsteak-macros**: Procedural macros used by both rumpsteak-aura and rumpsteak-choreography.
+**rumpsteak-aura-macros**: Procedural macros used by both rumpsteak-aura and rumpsteak-aura-choreography.
 
 **caching**: Example application demonstrating real-world usage with Redis and HTTP caching.
-
-This workspace structure follows standard Rust conventions where the root crate provides core functionality and workspace members extend it with specialized capabilities.

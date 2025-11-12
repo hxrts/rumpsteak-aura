@@ -27,8 +27,7 @@ pub use local_type::LocalType;
 pub use message::MessageType;
 pub use protocol::{Branch, Condition, Protocol};
 pub use role::{
-    Role, RoleParam, RoleIndex, RoleRange, RangeExpr,
-    RoleValidationError, RoleValidationResult, RoleBoundsChecker,
-    MAX_ROLE_COUNT, MAX_ROLE_INDEX, MAX_RANGE_SIZE
+    RangeExpr, Role, RoleBoundsChecker, RoleIndex, RoleParam, RoleRange, RoleValidationError,
+    RoleValidationResult, MAX_RANGE_SIZE, MAX_ROLE_COUNT, MAX_ROLE_INDEX,
 };
 pub use validation::ValidationError;

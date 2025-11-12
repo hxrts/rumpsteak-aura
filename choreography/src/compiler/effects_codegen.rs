@@ -11,7 +11,7 @@ use std::collections::HashSet;
 /// Generate annotation-aware effect metadata for a protocol node
 fn generate_effect_metadata_from_annotations(protocol: &Protocol, _role: &Role) -> TokenStream {
     let annotations = protocol.get_annotations();
-    
+
     if annotations.is_empty() {
         return quote! {};
     }
@@ -41,7 +41,7 @@ fn generate_effect_metadata_from_annotations(protocol: &Protocol, _role: &Role) 
 }
 
 /// Generate effect-based protocol implementation
-#[must_use] 
+#[must_use]
 pub fn generate_effects_protocol(choreography: &Choreography) -> TokenStream {
     let protocol_name = &choreography.name;
     let roles = generate_role_enum(&choreography.roles);

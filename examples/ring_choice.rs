@@ -101,9 +101,7 @@ async fn ring_a(role: &mut A, mut input: i32) -> Result<Infallible> {
             };
         }
         println!("A: Completed {max_rounds} rounds, final value: {input}");
-        println!(
-            "Note: Session types are infinite - limited to {max_rounds} rounds for testing"
-        );
+        println!("Note: Session types are infinite - limited to {max_rounds} rounds for testing");
         unreachable!()
     })
     .await

@@ -1,6 +1,6 @@
 // Protocol AST definitions
 
-use super::{Role, MessageType, ValidationError};
+use super::{MessageType, Role, ValidationError};
 use proc_macro2::{Ident, TokenStream};
 use std::collections::HashMap;
 
@@ -34,8 +34,8 @@ pub enum Protocol {
     },
 
     /// Choice made by a role
-    Choice { 
-        role: Role, 
+    Choice {
+        role: Role,
         branches: Vec<Branch>,
         /// Statement-level annotations
         annotations: HashMap<String, String>,
@@ -80,7 +80,7 @@ pub enum Condition {
 }
 
 impl Protocol {
-    #[must_use] 
+    #[must_use]
     pub fn mentions_role(&self, role: &Role) -> bool {
         match self {
             Protocol::Send {
@@ -103,9 +103,9 @@ impl Protocol {
                     || to_all.iter().any(|r| r.matches_family(role))
                     || continuation.mentions_role(role)
             }
-            Protocol::Choice { role: r, branches, .. } => {
-                r.matches_family(role) || branches.iter().any(|b| b.protocol.mentions_role(role))
-            }
+            Protocol::Choice {
+                role: r, branches, ..
+            } => r.matches_family(role) || branches.iter().any(|b| b.protocol.mentions_role(role)),
             Protocol::Loop { body, .. } => body.mentions_role(role),
             Protocol::Parallel { protocols } => protocols.iter().any(|p| p.mentions_role(role)),
             Protocol::Rec { body, .. } => body.mentions_role(role),
@@ -182,9 +182,14 @@ impl Protocol {
             Protocol::Send { annotations, .. } => annotations,
             Protocol::Broadcast { annotations, .. } => annotations,
             Protocol::Choice { annotations, .. } => annotations,
-            Protocol::Loop { .. } | Protocol::Parallel { .. } | Protocol::Rec { .. } | Protocol::Var(_) | Protocol::End => {
+            Protocol::Loop { .. }
+            | Protocol::Parallel { .. }
+            | Protocol::Rec { .. }
+            | Protocol::Var(_)
+            | Protocol::End => {
                 // Return empty map for protocol nodes that don't have annotations yet
-                static EMPTY: std::sync::OnceLock<HashMap<String, String>> = std::sync::OnceLock::new();
+                static EMPTY: std::sync::OnceLock<HashMap<String, String>> =
+                    std::sync::OnceLock::new();
                 EMPTY.get_or_init(HashMap::new)
             }
         }
@@ -203,8 +208,12 @@ impl Protocol {
     /// Get from-role annotations for Send/Broadcast statements
     pub fn get_from_annotations(&self) -> Option<&HashMap<String, String>> {
         match self {
-            Protocol::Send { from_annotations, .. } => Some(from_annotations),
-            Protocol::Broadcast { from_annotations, .. } => Some(from_annotations),
+            Protocol::Send {
+                from_annotations, ..
+            } => Some(from_annotations),
+            Protocol::Broadcast {
+                from_annotations, ..
+            } => Some(from_annotations),
             _ => None,
         }
     }
@@ -223,15 +232,23 @@ impl Protocol {
             Protocol::Send { annotations, .. } => Some(annotations),
             Protocol::Broadcast { annotations, .. } => Some(annotations),
             Protocol::Choice { annotations, .. } => Some(annotations),
-            Protocol::Loop { .. } | Protocol::Parallel { .. } | Protocol::Rec { .. } | Protocol::Var(_) | Protocol::End => None,
+            Protocol::Loop { .. }
+            | Protocol::Parallel { .. }
+            | Protocol::Rec { .. }
+            | Protocol::Var(_)
+            | Protocol::End => None,
         }
     }
 
     /// Get mutable reference to from-role annotations
     pub fn get_from_annotations_mut(&mut self) -> Option<&mut HashMap<String, String>> {
         match self {
-            Protocol::Send { from_annotations, .. } => Some(from_annotations),
-            Protocol::Broadcast { from_annotations, .. } => Some(from_annotations),
+            Protocol::Send {
+                from_annotations, ..
+            } => Some(from_annotations),
+            Protocol::Broadcast {
+                from_annotations, ..
+            } => Some(from_annotations),
             _ => None,
         }
     }
@@ -310,7 +327,7 @@ impl Protocol {
         self.get_annotation(key)?.parse().ok()
     }
 
-    /// Get annotation as boolean (supports "true"/"false", "1"/"0", "yes"/"no") 
+    /// Get annotation as boolean (supports "true"/"false", "1"/"0", "yes"/"no")
     pub fn get_annotation_as_bool(&self, key: &str) -> Option<bool> {
         let value = self.get_annotation(key)?;
         match value.to_lowercase().as_str() {
@@ -356,14 +373,19 @@ impl Protocol {
         }
 
         // Merge from-role annotations
-        if let (Some(self_from), Some(other_from)) = (self.get_from_annotations_mut(), other.get_from_annotations()) {
+        if let (Some(self_from), Some(other_from)) = (
+            self.get_from_annotations_mut(),
+            other.get_from_annotations(),
+        ) {
             for (key, value) in other_from {
                 self_from.insert(key.clone(), value.clone());
             }
         }
 
         // Merge to-role annotations
-        if let (Some(self_to), Some(other_to)) = (self.get_to_annotations_mut(), other.get_to_annotations()) {
+        if let (Some(self_to), Some(other_to)) =
+            (self.get_to_annotations_mut(), other.get_to_annotations())
+        {
             for (key, value) in other_to {
                 self_to.insert(key.clone(), value.clone());
             }
@@ -431,7 +453,12 @@ impl Protocol {
     }
 
     /// Collect all protocol nodes that have a specific annotation with a specific value
-    pub fn collect_nodes_with_annotation_value<'a>(&'a self, key: &str, value: &str, nodes: &mut Vec<&'a Protocol>) {
+    pub fn collect_nodes_with_annotation_value<'a>(
+        &'a self,
+        key: &str,
+        value: &str,
+        nodes: &mut Vec<&'a Protocol>,
+    ) {
         if self.annotation_matches(key, value) {
             nodes.push(self);
         }
@@ -446,7 +473,9 @@ impl Protocol {
             }
             Protocol::Choice { branches, .. } => {
                 for branch in branches {
-                    branch.protocol.collect_nodes_with_annotation_value(key, value, nodes);
+                    branch
+                        .protocol
+                        .collect_nodes_with_annotation_value(key, value, nodes);
                 }
             }
             Protocol::Loop { body, .. } => {

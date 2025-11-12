@@ -52,7 +52,7 @@ Provides fast local message passing for testing. Uses futures channels internall
 Usage:
 
 ```rust
-use rumpsteak_choreography::InMemoryHandler;
+use rumpsteak_aura_choreography::InMemoryHandler;
 
 let mut handler = InMemoryHandler::new(Role::Alice);
 ```
@@ -88,7 +88,7 @@ Records all operations for verification and testing. Stores a log of send, recv,
 Usage:
 
 ```rust
-use rumpsteak_choreography::RecordingHandler;
+use rumpsteak_aura_choreography::RecordingHandler;
 
 let mut handler = RecordingHandler::new(Role::Alice);
 // ... execute protocol ...
@@ -123,7 +123,7 @@ Logs all operations for debugging. Outputs send, recv, choose, and offer calls w
 Usage:
 
 ```rust
-use rumpsteak_choreography::middleware::Trace;
+use rumpsteak_aura_choreography::middleware::Trace;
 
 let base_handler = InMemoryHandler::new(role);
 let mut handler = Trace::new(base_handler, "Alice".to_string());
@@ -140,7 +140,7 @@ Counts operations for monitoring. Tracks send_count, recv_count, choose_count, a
 Usage:
 
 ```rust
-use rumpsteak_choreography::middleware::Metrics;
+use rumpsteak_aura_choreography::middleware::Metrics;
 
 let base_handler = InMemoryHandler::new(role);
 let mut handler = Metrics::new(base_handler);
@@ -159,7 +159,7 @@ Retries failed operations with exponential backoff. Only retries send operations
 Usage:
 
 ```rust
-use rumpsteak_choreography::middleware::Retry;
+use rumpsteak_aura_choreography::middleware::Retry;
 use std::time::Duration;
 
 let base_handler = InMemoryHandler::new(role);
@@ -177,7 +177,7 @@ Requires the `test-utils` feature. Injects random failures and delays for testin
 Usage:
 
 ```rust
-use rumpsteak_choreography::middleware::FaultInjection;
+use rumpsteak_aura_choreography::middleware::FaultInjection;
 use std::time::Duration;
 
 let base_handler = InMemoryHandler::new(role);

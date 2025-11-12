@@ -246,7 +246,7 @@ pub struct NoOpHandler<R: RoleId> {
 
 impl<R: RoleId> NoOpHandler<R> {
     /// Create a new no-op handler
-    #[must_use] 
+    #[must_use]
     pub fn new() -> Self {
         Self {
             _phantom: std::marker::PhantomData,

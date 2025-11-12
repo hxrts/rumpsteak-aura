@@ -49,7 +49,9 @@ fn augment_type(mut ty: &mut Type, exclude: &HashSet<Ident>) {
             break;
         }
 
-        let Some(segment) = path.path.segments.last_mut() else { break };
+        let Some(segment) = path.path.segments.last_mut() else {
+            break;
+        };
 
         if let PathArguments::None = segment.arguments {
             if exclude.contains(&segment.ident) {

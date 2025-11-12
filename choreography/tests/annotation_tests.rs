@@ -5,7 +5,9 @@
 
 use proc_macro2::{Ident, Span};
 use rumpsteak_aura_choreography::ast::{Branch, Choreography, MessageType, Protocol, Role};
-use rumpsteak_aura_choreography::compiler::{parse_choreography_str, generate_choreography_code_with_namespacing};
+use rumpsteak_aura_choreography::compiler::{
+    generate_choreography_code_with_namespacing, parse_choreography_str,
+};
 use std::collections::HashMap;
 
 // Helper to create identifiers
@@ -43,9 +45,18 @@ fn test_protocol_annotation_storage() {
     assert!(protocol.set_to_annotation("retry".to_string(), "3".to_string()));
 
     // Test getting annotations
-    assert_eq!(protocol.get_annotation("priority"), Some(&"high".to_string()));
-    assert_eq!(protocol.get_from_annotations().unwrap().get("timeout"), Some(&"30s".to_string()));
-    assert_eq!(protocol.get_to_annotations().unwrap().get("retry"), Some(&"3".to_string()));
+    assert_eq!(
+        protocol.get_annotation("priority"),
+        Some(&"high".to_string())
+    );
+    assert_eq!(
+        protocol.get_from_annotations().unwrap().get("timeout"),
+        Some(&"30s".to_string())
+    );
+    assert_eq!(
+        protocol.get_to_annotations().unwrap().get("retry"),
+        Some(&"3".to_string())
+    );
 
     // Test boolean annotations
     protocol.set_annotation("async".to_string(), "true".to_string());
@@ -149,20 +160,44 @@ fn test_protocol_annotation_merging() {
         to: bob.clone(),
         message: msg("Test2"),
         continuation: Box::new(Protocol::End),
-        annotations: HashMap::from([("priority".to_string(), "low".to_string()), ("async".to_string(), "true".to_string())]),
-        from_annotations: HashMap::from([("timeout".to_string(), "60s".to_string()), ("buffer".to_string(), "1024".to_string())]),
-        to_annotations: HashMap::from([("retry".to_string(), "5".to_string()), ("backoff".to_string(), "exponential".to_string())]),
+        annotations: HashMap::from([
+            ("priority".to_string(), "low".to_string()),
+            ("async".to_string(), "true".to_string()),
+        ]),
+        from_annotations: HashMap::from([
+            ("timeout".to_string(), "60s".to_string()),
+            ("buffer".to_string(), "1024".to_string()),
+        ]),
+        to_annotations: HashMap::from([
+            ("retry".to_string(), "5".to_string()),
+            ("backoff".to_string(), "exponential".to_string()),
+        ]),
     };
 
     protocol1.merge_annotations_from(&protocol2);
 
     // Verify merged annotations (protocol2 should override protocol1)
-    assert_eq!(protocol1.get_annotation("priority"), Some(&"low".to_string()));
+    assert_eq!(
+        protocol1.get_annotation("priority"),
+        Some(&"low".to_string())
+    );
     assert_eq!(protocol1.get_annotation("async"), Some(&"true".to_string()));
-    assert_eq!(protocol1.get_from_annotations().unwrap().get("timeout"), Some(&"60s".to_string()));
-    assert_eq!(protocol1.get_from_annotations().unwrap().get("buffer"), Some(&"1024".to_string()));
-    assert_eq!(protocol1.get_to_annotations().unwrap().get("retry"), Some(&"5".to_string()));
-    assert_eq!(protocol1.get_to_annotations().unwrap().get("backoff"), Some(&"exponential".to_string()));
+    assert_eq!(
+        protocol1.get_from_annotations().unwrap().get("timeout"),
+        Some(&"60s".to_string())
+    );
+    assert_eq!(
+        protocol1.get_from_annotations().unwrap().get("buffer"),
+        Some(&"1024".to_string())
+    );
+    assert_eq!(
+        protocol1.get_to_annotations().unwrap().get("retry"),
+        Some(&"5".to_string())
+    );
+    assert_eq!(
+        protocol1.get_to_annotations().unwrap().get("backoff"),
+        Some(&"exponential".to_string())
+    );
 }
 
 #[test]
@@ -314,7 +349,10 @@ fn test_choice_annotation_support() {
 
     // Test Choice annotation support
     assert!(choice.set_annotation("decision_timeout".to_string(), "10s".to_string()));
-    assert_eq!(choice.get_annotation("decision_timeout"), Some(&"10s".to_string()));
+    assert_eq!(
+        choice.get_annotation("decision_timeout"),
+        Some(&"10s".to_string())
+    );
     assert!(choice.has_any_annotations());
 }
 
@@ -336,10 +374,16 @@ fn test_broadcast_annotation_support() {
     // Test Broadcast annotation support
     assert!(broadcast.set_annotation("reliability".to_string(), "at_least_once".to_string()));
     assert!(broadcast.set_from_annotation("batch_size".to_string(), "100".to_string()));
-    
-    assert_eq!(broadcast.get_annotation("reliability"), Some(&"at_least_once".to_string()));
-    assert_eq!(broadcast.get_from_annotations().unwrap().get("batch_size"), Some(&"100".to_string()));
-    
+
+    assert_eq!(
+        broadcast.get_annotation("reliability"),
+        Some(&"at_least_once".to_string())
+    );
+    assert_eq!(
+        broadcast.get_from_annotations().unwrap().get("batch_size"),
+        Some(&"100".to_string())
+    );
+
     // Broadcast doesn't have to_annotations
     assert!(!broadcast.set_to_annotation("invalid".to_string(), "value".to_string()));
     assert!(broadcast.get_to_annotations().is_none());
@@ -362,7 +406,7 @@ fn test_annotation_parsing_integration() {
     // This would test the full parsing pipeline if we had the complete implementation
     // For now, we just test that the parse function exists
     let result = parse_choreography_str(choreography_dsl);
-    
+
     // The test may fail due to parsing issues, but we're testing the infrastructure
     // In a complete implementation, we would verify:
     // - Choreography has version="1.0" and author="test" attributes
@@ -406,7 +450,10 @@ fn test_code_generation_with_annotations() {
 
     // Verify that annotation metadata is included in generated code
     assert!(code_string.contains("annotations"));
-    println!("Generated code includes annotation support: {}", code_string.contains("annotations"));
+    println!(
+        "Generated code includes annotation support: {}",
+        code_string.contains("annotations")
+    );
 }
 
 #[test]
@@ -433,16 +480,25 @@ fn test_annotation_different_types() {
     protocol.set_annotation("boolean_no".to_string(), "no".to_string());
 
     // Test string values
-    assert_eq!(protocol.get_annotation("string_value"), Some(&"hello".to_string()));
+    assert_eq!(
+        protocol.get_annotation("string_value"),
+        Some(&"hello".to_string())
+    );
 
     // Test numeric parsing
     assert_eq!(protocol.get_annotation_as::<i32>("number_value"), Some(42));
     assert_eq!(protocol.get_annotation_as::<u32>("number_value"), Some(42));
-    assert_eq!(protocol.get_annotation_as::<f64>("number_value"), Some(42.0));
+    assert_eq!(
+        protocol.get_annotation_as::<f64>("number_value"),
+        Some(42.0)
+    );
 
     // Test boolean parsing
     assert_eq!(protocol.get_annotation_as_bool("boolean_true"), Some(true));
-    assert_eq!(protocol.get_annotation_as_bool("boolean_false"), Some(false));
+    assert_eq!(
+        protocol.get_annotation_as_bool("boolean_false"),
+        Some(false)
+    );
     assert_eq!(protocol.get_annotation_as_bool("boolean_yes"), Some(true));
     assert_eq!(protocol.get_annotation_as_bool("boolean_no"), Some(false));
 

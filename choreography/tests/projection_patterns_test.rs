@@ -72,7 +72,7 @@ fn test_loop_with_condition() {
                 to: bob.clone(),
                 message: MessageType {
                     name: format_ident!("Data"),
-        
+
                     type_annotation: None,
                     payload: Some(quote! { String }),
                 },
@@ -122,7 +122,7 @@ fn test_parallel_no_conflict() {
                     to: bob.clone(),
                     message: MessageType {
                         name: format_ident!("Msg1"),
-        
+
                         type_annotation: None,
                         payload: Some(quote! { String }),
                     },
@@ -136,7 +136,7 @@ fn test_parallel_no_conflict() {
                     to: charlie.clone(),
                     message: MessageType {
                         name: format_ident!("Msg2"),
-        
+
                         type_annotation: None,
                         payload: Some(quote! { i32 }),
                     },
@@ -182,7 +182,7 @@ fn test_parallel_with_conflict() {
                     to: bob.clone(),
                     message: MessageType {
                         name: format_ident!("Msg1"),
-        
+
                         type_annotation: None,
                         payload: Some(quote! { String }),
                     },
@@ -196,7 +196,7 @@ fn test_parallel_with_conflict() {
                     to: bob.clone(), // Same recipient - conflict!
                     message: MessageType {
                         name: format_ident!("Msg2"),
-        
+
                         type_annotation: None,
                         payload: Some(quote! { i32 }),
                     },
@@ -236,7 +236,7 @@ fn test_mixed_choice_communicated_vs_local() {
                         to: bob.clone(),
                         message: MessageType {
                             name: format_ident!("Data"),
-        
+
                             type_annotation: None,
                             payload: Some(quote! { String }),
                         },
@@ -254,7 +254,7 @@ fn test_mixed_choice_communicated_vs_local() {
                         to: bob.clone(),
                         message: MessageType {
                             name: format_ident!("NoData"),
-        
+
                             type_annotation: None,
                             payload: Some(quote! { () }),
                         },

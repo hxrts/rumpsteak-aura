@@ -9,7 +9,7 @@
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
 use quote::format_ident;
 use rumpsteak_aura_choreography::{
-    ast::{Choreography, Role, Protocol, MessageType, Condition, Branch},
+    ast::{Branch, Choreography, Condition, MessageType, Protocol, Role},
     compiler::{codegen::generate_session_type, projection::project},
     effects::{interpret, NoOpHandler, Program},
 };

@@ -40,12 +40,12 @@ impl rumpsteak_aura::Message<Box<dyn std::any::Any + Send>> for BenchMessage {
 
 fn bench_send_recv_throughput(c: &mut Criterion) {
     let mut group = c.benchmark_group("send_recv_throughput");
-    let runtime = Runtime::new().unwrap();
 
     for size in &[128, 1024, 4096, 16384, 65536] {
         group.throughput(Throughput::Bytes(*size as u64));
 
         group.bench_with_input(BenchmarkId::from_parameter(size), size, |b, &size| {
+            let runtime = Runtime::new().unwrap();
             b.iter(|| {
                 runtime.block_on(async {
                     let mut alice_ep = RumpsteakEndpoint::new(BenchRole::Alice);
@@ -71,7 +71,7 @@ fn bench_send_recv_throughput(c: &mut Criterion) {
                         .recv(&mut bob_ep, BenchRole::Alice)
                         .await
                         .unwrap();
-                });
+                })
             });
         });
     }
@@ -80,8 +80,8 @@ fn bench_send_recv_throughput(c: &mut Criterion) {
 }
 
 fn bench_choice_overhead(c: &mut Criterion) {
-    let runtime = Runtime::new().unwrap();
     c.bench_function("choice_selection", |b| {
+        let runtime = Runtime::new().unwrap();
         b.iter(|| {
             runtime.block_on(async {
                 let mut alice_ep = RumpsteakEndpoint::new(BenchRole::Alice);
@@ -105,17 +105,17 @@ fn bench_choice_overhead(c: &mut Criterion) {
                     .offer(&mut bob_ep, BenchRole::Alice)
                     .await
                     .unwrap();
-            });
+            })
         });
     });
 }
 
 fn bench_sequential_messages(c: &mut Criterion) {
     let mut group = c.benchmark_group("sequential_messages");
-    let runtime = Runtime::new().unwrap();
 
     for count in &[10, 50, 100] {
         group.bench_with_input(BenchmarkId::from_parameter(count), count, |b, &count| {
+            let runtime = Runtime::new().unwrap();
             b.iter(|| {
                 runtime.block_on(async {
                     let mut alice_ep = RumpsteakEndpoint::new(BenchRole::Alice);
@@ -143,7 +143,7 @@ fn bench_sequential_messages(c: &mut Criterion) {
                             .await
                             .unwrap();
                     }
-                });
+                })
             });
         });
     }
@@ -152,8 +152,8 @@ fn bench_sequential_messages(c: &mut Criterion) {
 }
 
 fn bench_metadata_tracking_overhead(c: &mut Criterion) {
-    let runtime = Runtime::new().unwrap();
     c.bench_function("metadata_tracking", |b| {
+        let runtime = Runtime::new().unwrap();
         b.iter(|| {
             runtime.block_on(async {
                 let mut alice_ep = RumpsteakEndpoint::new(BenchRole::Alice);
@@ -183,7 +183,7 @@ fn bench_metadata_tracking_overhead(c: &mut Criterion) {
                     .unwrap();
 
                 let _ = bob_ep.get_metadata(&BenchRole::Alice);
-            });
+            })
         });
     });
 }
