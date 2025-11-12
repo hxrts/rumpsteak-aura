@@ -33,13 +33,13 @@ This is the Aura fork of Rumpsteak with enhanced choreographic programming suppo
 
 ```toml
 [dependencies]
-rumpsteak-aura = "0.2"
+rumpsteak-aura = "*"
 ```
 
 For choreographic programming:
 ```toml
 [dependencies]
-rumpsteak-aura-choreography = "0.2"
+rumpsteak-aura-choreography = "*"
 ```
 
 ## Example

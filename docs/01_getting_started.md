@@ -6,8 +6,8 @@ Add Rumpsteak to your project (using the Aura fork):
 
 ```toml
 [dependencies]
-rumpsteak-aura = "0.3.0"
-rumpsteak-aura-choreography = "0.3.0"
+rumpsteak-aura = "*"
+rumpsteak-aura-choreography = "*"
 ```
 
 ### Understanding the Crates
@@ -29,7 +29,7 @@ Rumpsteak-Aura is organized as a Cargo workspace with several crates:
 For WASM support, add the wasm feature:
 
 ```toml
-rumpsteak-aura-choreography = { version = "0.3.0", features = ["wasm"] }
+rumpsteak-aura-choreography = { version = "*", features = ["wasm"] }
 ```
 
 ## Creating a Choreography
