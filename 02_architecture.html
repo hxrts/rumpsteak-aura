@@ -1,0 +1,484 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Architecture - Rumpsteak Aura</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "rust";
+            window.path_to_searchindex_js = "searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Rumpsteak Aura</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="architecture"><a class="header" href="#architecture">Architecture</a></h1>
+<h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
+<p>Rumpsteak implements choreographic programming for Rust. The system compiles global protocol specifications into local session types for each participant.</p>
+<p>The architecture has four main layers:</p>
+<ol>
+<li>DSL and parsing (choreographic syntax to AST)</li>
+<li>Projection (global protocol to local types)</li>
+<li>Code generation (local types to Rust code)</li>
+<li>Effect system (protocol execution with pluggable transports)</li>
+</ol>
+<h2 id="component-diagram"><a class="header" href="#component-diagram">Component Diagram</a></h2>
+<pre class="mermaid">graph TB
+    subgraph Input[&quot;Developer Input (Compile-Time)&quot;]
+        DSL[&quot;Choreography DSL&lt;br/&gt;Global Protocol Specification&quot;]
+    end
+
+    subgraph Layer1[&quot;Layer 1: Parsing &amp; AST Construction&quot;]
+        Parser[&quot;Parser&lt;br/&gt;(Pest Grammar)&quot;]
+        AST[&quot;AST&lt;br/&gt;Choreography + Protocol Tree&quot;]
+    end
+
+    subgraph Layer2[&quot;Layer 2: Projection&quot;]
+        Proj[&quot;Projection Algorithm&quot;]
+        LT[&quot;Local Types&lt;br/&gt;(Per Role)&quot;]
+    end
+
+    subgraph Layer3[&quot;Layer 3: Code Generation&quot;]
+        CodeGen[&quot;Code Generator&quot;]
+        Session[&quot;Generated Session Types&quot;]
+        Effects[&quot;Generated Effect Programs&quot;]
+    end
+
+    subgraph Layer4[&quot;Layer 4: Runtime Execution&quot;]
+        Handler[&quot;Effect Handler&lt;br/&gt;(InMemory / Rumpsteak)&quot;]
+        Transport[&quot;Transport Layer&lt;br/&gt;(Channels / Network)&quot;]
+        Exec[&quot;Running Protocol&quot;]
+    end
+
+    DSL --&gt; Parser
+    Parser --&gt; AST
+    AST --&gt; Proj
+    Proj --&gt; LT
+    LT --&gt; CodeGen
+    CodeGen --&gt; Session
+    CodeGen --&gt; Effects
+    Session --&gt; Handler
+    Effects --&gt; Handler
+    Handler --&gt; Transport
+    Transport --&gt; Exec
+</pre>
+<h2 id="core-components"><a class="header" href="#core-components">Core Components</a></h2>
+<h3 id="ast-module"><a class="header" href="#ast-module">AST Module</a></h3>
+<p>Location: <code>choreography/src/ast/</code></p>
+<p>The AST represents choreographies as data structures. Main types:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct Choreography {
+    pub name: Ident,
+    pub namespace: Option&lt;String&gt;,
+    pub roles: Vec&lt;Role&gt;,
+    pub protocol: Protocol,
+    pub attrs: HashMap&lt;String, String&gt;,
+}
+<span class="boring">}</span></code></pre></pre>
+<p>Choreography holds the protocol name, optional namespace, participating roles, the protocol tree, and metadata attributes.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub enum Protocol {
+    Send { 
+        from: Role, 
+        to: Role, 
+        message: MessageType, 
+        continuation: Box&lt;Protocol&gt;,
+        annotations: HashMap&lt;String, String&gt;,
+        from_annotations: HashMap&lt;String, String&gt;,
+        to_annotations: HashMap&lt;String, String&gt;,
+    },
+    Broadcast { 
+        from: Role, 
+        to_all: Vec&lt;Role&gt;, 
+        message: MessageType, 
+        continuation: Box&lt;Protocol&gt;,
+        annotations: HashMap&lt;String, String&gt;,
+        from_annotations: HashMap&lt;String, String&gt;,
+    },
+    Choice { 
+        role: Role, 
+        branches: Vec&lt;Branch&gt;, 
+        annotations: HashMap&lt;String, String&gt;,
+    },
+    Loop { condition: Option&lt;Condition&gt;, body: Box&lt;Protocol&gt; },
+    Parallel { protocols: Vec&lt;Protocol&gt; },
+    Rec { label: Ident, body: Box&lt;Protocol&gt; },
+    Var(Ident),
+    End,
+}
+<span class="boring">}</span></code></pre></pre>
+<p>Protocol is a recursive tree structure representing all possible protocol actions. It includes support for annotations at multiple levels, broadcasts, and recursive definitions.</p>
+<h3 id="parser-module"><a class="header" href="#parser-module">Parser Module</a></h3>
+<p>Location: <code>choreography/src/compiler/parser.rs</code></p>
+<p>The parser converts DSL text into AST using the Pest parser generator. It validates role declarations and builds the protocol tree.</p>
+<p>Entry points:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn parse_choreography_str(input: &amp;str) -&gt; Result&lt;Choreography, ParseError&gt;
+pub fn parse_choreography_file(path: &amp;Path) -&gt; Result&lt;Choreography, ParseError&gt;
+<span class="boring">}</span></code></pre></pre>
+<p>The parser performs syntactic validation and basic semantic checks.</p>
+<h3 id="projection-module"><a class="header" href="#projection-module">Projection Module</a></h3>
+<p>Location: <code>choreography/src/compiler/projection.rs</code></p>
+<p>Projection transforms a global protocol into a local view for each role. The algorithm determines what each participant should do.</p>
+<p>Main function:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn project(choreography: &amp;Choreography, role: &amp;Role) -&gt; Result&lt;LocalType, ProjectionError&gt;
+<span class="boring">}</span></code></pre></pre>
+<p>Projection handles merging parallel branches and detecting conflicts.</p>
+<h3 id="code-generation-module"><a class="header" href="#code-generation-module">Code Generation Module</a></h3>
+<p>Location: <code>choreography/src/compiler/codegen.rs</code></p>
+<p>The codegen module converts local types into Rust session types and effect programs. It generates compile-time type-safe protocol implementations.</p>
+<p>Functions:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn generate_session_type(role: &amp;Role, local_type: &amp;LocalType, protocol_name: &amp;str) -&gt; TokenStream
+pub fn generate_choreography_code(name: &amp;str, roles: &amp;[Role], local_types: &amp;[(Role, LocalType)]) -&gt; TokenStream
+pub fn generate_choreography_code_with_dynamic_roles(choreography: &amp;Choreography, local_types: &amp;[(Role, LocalType)]) -&gt; TokenStream
+pub fn generate_dynamic_role_support(choreography: &amp;Choreography) -&gt; TokenStream
+pub fn generate_effects_protocol(choreography: &amp;Choreography) -&gt; TokenStream
+<span class="boring">}</span></code></pre></pre>
+<p>The generator creates session types, role structs, and code with dynamic role support including parameterized roles and runtime management.</p>
+<h3 id="effect-system"><a class="header" href="#effect-system">Effect System</a></h3>
+<p>Location: <code>choreography/src/effects/</code></p>
+<p>The effect system decouples protocol logic from transport. Protocols are represented as effect programs that handlers interpret.</p>
+<p>Core trait:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub trait ChoreoHandler {
+    type Role: RoleId;
+    type Endpoint;
+
+    async fn send&lt;M&gt;(&amp;mut self, ep: &amp;mut Self::Endpoint, to: Self::Role, msg: &amp;M) -&gt; Result&lt;()&gt;;
+    async fn recv&lt;M&gt;(&amp;mut self, ep: &amp;mut Self::Endpoint, from: Self::Role) -&gt; Result&lt;M&gt;;
+    async fn choose(&amp;mut self, ep: &amp;mut Self::Endpoint, who: Self::Role, label: Label) -&gt; Result&lt;()&gt;;
+    async fn offer(&amp;mut self, ep: &amp;mut Self::Endpoint, from: Self::Role) -&gt; Result&lt;Label&gt;;
+}
+<span class="boring">}</span></code></pre></pre>
+<p>Handlers implement this trait to provide different execution strategies.</p>
+<h2 id="data-flow"><a class="header" href="#data-flow">Data Flow</a></h2>
+<p>Input choreography:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>Alice -&gt; Bob: Request
+Bob -&gt; Alice: Response
+<span class="boring">}</span></code></pre></pre>
+<p>After parsing, AST contains:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>Protocol::Send {
+    from: Alice, to: Bob, message: Request,
+    continuation: Protocol::Send {
+        from: Bob, to: Alice, message: Response,
+        continuation: Protocol::End
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<p>After projection for Alice:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>LocalType::Send {
+    to: Bob, message: Request,
+    continuation: LocalType::Receive {
+        from: Bob, message: Response,
+        continuation: LocalType::End
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<p>After projection for Bob:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>LocalType::Receive {
+    from: Alice, message: Request,
+    continuation: LocalType::Send {
+        to: Alice, message: Response,
+        continuation: LocalType::End
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<p>After code generation for Alice:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>type Alice_Protocol = Send&lt;Bob, Request, Receive&lt;Bob, Response, End&gt;&gt;;
+<span class="boring">}</span></code></pre></pre>
+<p>At runtime, effect programs execute using handlers:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>Program::new()
+    .send(Bob, Request)
+    .recv::&lt;Response&gt;(Bob)
+    .end()
+<span class="boring">}</span></code></pre></pre>
+<h2 id="design-decisions"><a class="header" href="#design-decisions">Design Decisions</a></h2>
+<h3 id="why-choreographic-programming"><a class="header" href="#why-choreographic-programming">Why Choreographic Programming</a></h3>
+<p>Creating distributed programs typically requires writing separate implementations for each participant. Choreographies specify the global protocol once and project to local code automatically.</p>
+<p>This approach prevents protocol mismatches and simplifies reasoning about distributed systems.</p>
+<h3 id="why-effect-handlers"><a class="header" href="#why-effect-handlers">Why Effect Handlers</a></h3>
+<p>Separating protocol logic from transport enables testing, composition, and runtime flexibility. The same protocol can run with different handlers without code changes.</p>
+<h3 id="why-session-types"><a class="header" href="#why-session-types">Why Session Types</a></h3>
+<p>Session types provide compile-time guarantees about protocol compliance. The Rust type system enforces that each role follows their protocol correctly.</p>
+<h3 id="platform-abstraction"><a class="header" href="#platform-abstraction">Platform Abstraction</a></h3>
+<p>The runtime module provides platform-specific async primitives. Native targets use tokio while WASM uses wasm-bindgen-futures. This abstraction makes the core library portable.</p>
+<h2 id="extension-points"><a class="header" href="#extension-points">Extension Points</a></h2>
+<h3 id="custom-handlers"><a class="header" href="#custom-handlers">Custom Handlers</a></h3>
+<p>Implement <code>ChoreoHandler</code> to add new transport mechanisms. See <a href="05_effect_handlers.html">Effect Handlers</a> for details.</p>
+<h3 id="middleware"><a class="header" href="#middleware">Middleware</a></h3>
+<p>Wrap handlers with middleware for cross-cutting concerns like logging, metrics, or retry logic. Middleware composes naturally.</p>
+<h3 id="custom-projections"><a class="header" href="#custom-projections">Custom Projections</a></h3>
+<p>The projection algorithm can be extended for domain-specific optimizations. Override default projection rules by implementing custom projection functions.</p>
+<h3 id="code-generation-backends"><a class="header" href="#code-generation-backends">Code Generation Backends</a></h3>
+<p>Add new code generation backends to target different session type libraries or languages. The AST and LocalType representations are language-agnostic.</p>
+<h2 id="workspace-organization"><a class="header" href="#workspace-organization">Workspace Organization</a></h2>
+<p>Rumpsteak-Aura is organized as a Cargo workspace with multiple crates:</p>
+<pre><code>rumpsteak-aura/
+├── src/                     Core session types library (rumpsteak-aura crate)
+│   ├── lib.rs              Session type primitives, channels, roles
+│   ├── channel.rs          Async channel implementations
+│   └── serialize.rs        Serialization support
+├── choreography/            Choreographic programming extensions
+│   ├── src/
+│   │   ├── ast/            AST definitions
+│   │   ├── compiler/       Parser, projection, codegen
+│   │   ├── effects/        Effect system
+│   │   │   ├── handlers/  Handler implementations
+│   │   │   └── middleware/ Middleware implementations
+│   │   └── runtime.rs      Platform abstraction
+│   ├── tests/              Integration tests
+│   └── examples/           Example protocols
+├── fsm/                     Finite state machine support
+│   └── src/                FSM types and subtyping verification
+├── macros/                  Procedural macros
+│   └── src/                choreography! and other macros
+├── caching/                 HTTP cache case study
+│   └── src/                Redis-backed cache example
+├── examples/                Additional examples
+│   └── wasm-ping-pong/     WASM browser example
+└── docs/                    Documentation
+</code></pre>
+<h3 id="crate-responsibilities"><a class="header" href="#crate-responsibilities">Crate Responsibilities</a></h3>
+<p><strong>rumpsteak-aura</strong> (root <code>src/</code>): Foundation session types library providing core primitives for type-safe asynchronous communication. This is the base dependency for all other crates.</p>
+<p><strong>rumpsteak-aura-choreography</strong>: High-level choreographic programming layer with DSL parser, automatic projection, effect handlers, and runtime support. Builds on top of rumpsteak-aura.</p>
+<p><strong>rumpsteak-aura-fsm</strong>: Finite state machine support for session types, including DOT parsing and subtyping verification. Optional dependency for advanced use cases.</p>
+<p><strong>rumpsteak-aura-macros</strong>: Procedural macros used by both rumpsteak-aura and rumpsteak-aura-choreography.</p>
+<p><strong>caching</strong>: Example application demonstrating real-world usage with Redis and HTTP caching.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="01_getting_started.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="03_dsl_reference.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="01_getting_started.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="03_dsl_reference.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="mermaid.min.js"></script>
+        <script src="mermaid-init.js"></script>
+
+
+
+    </div>
+    </body>
+</html>

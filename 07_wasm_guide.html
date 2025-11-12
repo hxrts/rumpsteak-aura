@@ -1,0 +1,452 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>WASM Guide - Rumpsteak Aura</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "rust";
+            window.path_to_searchindex_js = "searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Rumpsteak Aura</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="wasm-guide"><a class="header" href="#wasm-guide">WASM Guide</a></h1>
+<h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
+<p>Rumpsteak's choreographic programming system compiles to WebAssembly. The core library and effect handlers work in browser environments.</p>
+<p>WASM support enables choreographic protocols in web applications, browser-based distributed systems, and serverless edge computing.</p>
+<h2 id="what-works-in-wasm"><a class="header" href="#what-works-in-wasm">What Works in WASM</a></h2>
+<p>The following features compile and run in WASM:</p>
+<p>Core session types and choreography system work fully. The InMemoryHandler provides local message passing for testing protocols. RumpsteakHandler now compiles for WASM and can be used with custom network transports (WebSocket, fetch API, etc.). All middleware (Trace, Metrics, Retry, FaultInjection) functions correctly. Effect system and interpreter execute normally. Timeouts use wasm-timer for cross-platform support.</p>
+<h2 id="what-does-not-work-in-wasm"><a class="header" href="#what-does-not-work-in-wasm">What Does Not Work in WASM</a></h2>
+<p>The caching example uses Redis and Hyper which are not WASM compatible.</p>
+<p>Multi-threading is unavailable since WASM runs single-threaded.</p>
+<p>Native file system access requires browser File APIs.</p>
+<h2 id="building-for-wasm"><a class="header" href="#building-for-wasm">Building for WASM</a></h2>
+<p>Add the wasm feature to your dependencies:</p>
+<pre><code class="language-toml">[dependencies]
+rumpsteak-choreography = { version = "0.1", features = ["wasm"] }
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+</code></pre>
+<p>Build using wasm-pack:</p>
+<pre><code class="language-bash">wasm-pack build --target web
+</code></pre>
+<p>This generates a pkg directory with JavaScript bindings.</p>
+<h2 id="example-protocol"><a class="header" href="#example-protocol">Example Protocol</a></h2>
+<p>The wasm-ping-pong example demonstrates a complete browser protocol:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use wasm_bindgen::prelude::*;
+use rumpsteak_choreography::{InMemoryHandler, Program, interpret};
+
+#[wasm_bindgen]
+pub async fn run_protocol(message: String) -&gt; Result&lt;String, JsValue&gt; {
+    let mut handler = InMemoryHandler::new(Role::Alice);
+    
+    let program = Program::new()
+        .send(Role::Bob, Message::Ping(message))
+        .recv::&lt;Message&gt;(Role::Bob)
+        .end();
+    
+    let mut endpoint = ();
+    let result = interpret(&amp;mut handler, &amp;mut endpoint, program).await
+        .map_err(|e| JsValue::from_str(&amp;format!("{:?}", e)))?;
+    
+    match result.received_values.first() {
+        Some(Message::Pong(response)) =&gt; Ok(response.clone()),
+        _ =&gt; Err(JsValue::from_str("Expected Pong message")),
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<p>The wasm_bindgen attribute exposes the function to JavaScript.</p>
+<p>Build and run the example:</p>
+<pre><code class="language-bash">cd examples/wasm-ping-pong
+./build.sh
+python3 -m http.server 8000
+</code></pre>
+<p>Open http://localhost:8000 in a browser to run the protocol.</p>
+<h2 id="using-rumpsteakhandler-in-wasm"><a class="header" href="#using-rumpsteakhandler-in-wasm">Using RumpsteakHandler in WASM</a></h2>
+<p>RumpsteakHandler now compiles for WASM. To use it with real network transport:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use wasm_bindgen::prelude::*;
+use rumpsteak_choreography::{RumpsteakHandler, RumpsteakEndpoint, SimpleChannel};
+
+#[wasm_bindgen]
+pub async fn run_distributed_protocol() -&gt; Result&lt;(), JsValue&gt; {
+    // Create endpoints
+    let mut alice_ep = RumpsteakEndpoint::new(Role::Alice);
+    let mut bob_ep = RumpsteakEndpoint::new(Role::Bob);
+    
+    // Option 1: use SimpleChannel (works natively and in WASM)
+    let (alice_ch, bob_ch) = SimpleChannel::pair();
+    alice_ep.register_channel(Role::Bob, alice_ch);
+    bob_ep.register_channel(Role::Alice, bob_ch);
+
+    // Option 2: wrap browser transports directly
+    // let ws_session = RumpsteakSession::from_sink_stream(ws_writer, ws_reader);
+    // alice_ep.register_session(Role::Bob, ws_session);
+    
+    // Create handler
+    let mut handler = RumpsteakHandler::new();
+    
+    // Use with choreography operations
+    handler.send(&amp;mut alice_ep, Role::Bob, &amp;message).await?;
+    let response = handler.recv(&amp;mut bob_ep, Role::Alice).await?;
+    
+    Ok(())
+}
+<span class="boring">}</span></code></pre></pre>
+<p>SimpleChannel uses futures::channel::mpsc which is WASM-compatible. For distributed WASM applications, implement custom channels using browser APIs.</p>
+<h3 id="async-traits-in-wasm"><a class="header" href="#async-traits-in-wasm">Async traits in WASM</a></h3>
+<p>The handler traits continue to use the <code>async_trait</code> macro rather than native <code>async fn</code> in traits. This keeps the traits object-safe (needed for middleware stacks such as <code>Trace&lt;Retry&lt;H&gt;&gt;</code>) and lets us share a single implementation strategy across native and WASM targets. The generated futures are still <code>Send</code>, so handlers that run under multithreaded executors behave the same way as handlers compiled for single-threaded WASM.</p>
+<h2 id="custom-network-transport"><a class="header" href="#custom-network-transport">Custom Network Transport</a></h2>
+<p>InMemoryHandler works for single-context protocols. Real distributed WASM applications need network transport.</p>
+<p>Implement ChoreoHandler with WebSocket or fetch APIs:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use web_sys::WebSocket;
+use wasm_bindgen::JsCast;
+
+pub struct WebSocketHandler {
+    role: Role,
+    socket: WebSocket,
+    incoming: mpsc::UnboundedReceiver&lt;Vec&lt;u8&gt;&gt;,
+}
+
+impl WebSocketHandler {
+    pub fn new(role: Role, url: &amp;str) -&gt; Result&lt;Self, JsValue&gt; {
+        let socket = WebSocket::new(url)?;
+        let (tx, rx) = mpsc::unbounded();
+        
+        let onmessage = Closure::wrap(Box::new(move |e: MessageEvent| {
+            // Handle incoming messages
+            if let Ok(buffer) = e.data().dyn_into::&lt;js_sys::ArrayBuffer&gt;() {
+                let bytes = js_sys::Uint8Array::new(&amp;buffer).to_vec();
+                tx.unbounded_send(bytes).ok();
+            }
+        }) as Box&lt;dyn FnMut(MessageEvent)&gt;);
+        
+        socket.set_onmessage(Some(onmessage.as_ref().unchecked_ref()));
+        onmessage.forget();
+        
+        Ok(Self { role, socket, incoming: rx })
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<p>With the Phase 3 handler you can skip the custom <code>ChoreoHandler</code>—wrap this
+<code>WebSocketHandler</code> with <code>RumpsteakSession::from_sink_stream</code> and register it on
+the endpoint instead.</p>
+<p>For HTTP-based protocols, use the fetch API:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use web_sys::window;
+
+async fn send_http(to: Role, msg: &amp;Message) -&gt; Result&lt;()&gt; {
+    let window = window().ok_or("no window")?;
+    let resp = JsFuture::from(
+        window.fetch_with_str(&amp;format!("http://server/{}", to))
+    ).await?;
+    Ok(())
+}
+<span class="boring">}</span></code></pre></pre>
+<p>The pattern is the same: implement ChoreoHandler using browser APIs for your transport.</p>
+<h2 id="platform-differences"><a class="header" href="#platform-differences">Platform Differences</a></h2>
+<p>The runtime module provides platform-specific functions:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use rumpsteak_choreography::runtime::{spawn, spawn_local};
+
+spawn(async { /* task */ });  // Works on native and WASM
+<span class="boring">}</span></code></pre></pre>
+<p>On native targets, spawn uses tokio. On WASM, it uses wasm-bindgen-futures.</p>
+<p>Timeouts use conditional compilation:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Native
+tokio::time::timeout(duration, future).await
+
+// WASM
+use wasm_timer::Delay;
+futures::select! {
+    result = future =&gt; result,
+    _ = Delay::new(duration) =&gt; Err(Timeout),
+}
+<span class="boring">}</span></code></pre></pre>
+<p>The library handles this automatically. Your code works on both platforms.</p>
+<h2 id="testing-in-wasm"><a class="header" href="#testing-in-wasm">Testing in WASM</a></h2>
+<p>Use wasm-bindgen-test for browser tests:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use wasm_bindgen_test::*;
+
+wasm_bindgen_test_configure!(run_in_browser);
+
+#[wasm_bindgen_test]
+async fn test_protocol() {
+    let mut handler = InMemoryHandler::new(Role::Alice);
+    let program = Program::new().send(Role::Bob, Message::Test).end();
+    let mut endpoint = ();
+    let result = interpret(&amp;mut handler, &amp;mut endpoint, program).await;
+    assert!(result.is_ok());
+}
+<span class="boring">}</span></code></pre></pre>
+<p>Run tests with wasm-pack:</p>
+<pre><code class="language-bash">wasm-pack test --headless --chrome
+</code></pre>
+<p>The tests execute in a headless browser.</p>
+<h2 id="deployment"><a class="header" href="#deployment">Deployment</a></h2>
+<p>For production WASM deployments:</p>
+<p>Build with release optimizations:</p>
+<pre><code class="language-bash">wasm-pack build --target web --release
+</code></pre>
+<p>The generated WASM is optimized for size and performance.</p>
+<p>Serve the pkg directory with your web application. Import the JavaScript bindings:</p>
+<pre><code class="language-html">&lt;script type="module"&gt;
+    import init, { run_protocol } from './pkg/my_protocol.js';
+    
+    async function main() {
+        await init();
+        const result = await run_protocol("data");
+        console.log(result);
+    }
+    
+    main();
+&lt;/script&gt;
+</code></pre>
+<p>The init function loads the WASM module. Protocol functions then become available.</p>
+<h2 id="browser-compatibility"><a class="header" href="#browser-compatibility">Browser Compatibility</a></h2>
+<p>WASM support works in modern browsers:</p>
+<p>Chrome/Chromium 90+, Firefox 88+, Safari 14+, Edge 90+.</p>
+<p>Older browsers may require polyfills or transpilation.</p>
+<h2 id="performance"><a class="header" href="#performance">Performance</a></h2>
+<p>WASM execution is near-native speed for computation. Network operations have typical browser fetch/WebSocket latency.</p>
+<p>InMemoryHandler has negligible overhead in WASM. Custom network handlers add latency from browser APIs.</p>
+<p>The generated WASM binary size is approximately 200-300KB after optimization.</p>
+<h2 id="limitations"><a class="header" href="#limitations">Limitations</a></h2>
+<p>WASM is single-threaded. Parallel protocol execution uses async concurrency, not OS threads.</p>
+<p>Browser security restricts some operations. Cross-origin requests need CORS configuration. WebSocket connections require proper server setup.</p>
+<p>File system access uses browser APIs which differ from native file operations.</p>
+<h2 id="example-projects"><a class="header" href="#example-projects">Example Projects</a></h2>
+<p>The examples/wasm-ping-pong directory contains a complete working example.</p>
+<p>See the build script for compilation details and the README for deployment instructions.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="06_rumpsteak_handler.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="08_examples.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="06_rumpsteak_handler.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="08_examples.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="mermaid.min.js"></script>
+        <script src="mermaid-init.js"></script>
+
+
+
+    </div>
+    </body>
+</html>

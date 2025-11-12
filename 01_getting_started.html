@@ -1,0 +1,336 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Getting Started - Rumpsteak Aura</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "rust";
+            window.path_to_searchindex_js = "searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Rumpsteak Aura</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="getting-started"><a class="header" href="#getting-started">Getting Started</a></h1>
+<h2 id="installation"><a class="header" href="#installation">Installation</a></h2>
+<p>Add Rumpsteak to your project (using the Aura fork):</p>
+<pre><code class="language-toml">[dependencies]
+rumpsteak-aura = "*"
+rumpsteak-aura-choreography = "*"
+</code></pre>
+<h3 id="understanding-the-crates"><a class="header" href="#understanding-the-crates">Understanding the Crates</a></h3>
+<p>Rumpsteak-Aura is organized as a Cargo workspace with several crates:</p>
+<ul>
+<li>
+<p><strong><code>rumpsteak-aura</code></strong>: Core session types library (located in the root <code>src/</code> directory). Provides fundamental primitives for type-safe asynchronous communication, channels, and role definitions.</p>
+</li>
+<li>
+<p><strong><code>rumpsteak-aura-choreography</code></strong>: Choreographic programming layer (located in <code>choreography/</code>). Provides the DSL parser, automatic projection, effect handler system, and runtime support.</p>
+</li>
+<li>
+<p><strong><code>rumpsteak-aura-fsm</code></strong>: Optional finite state machine support for advanced session type verification.</p>
+</li>
+<li>
+<p><strong><code>rumpsteak-aura-macros</code></strong>: Procedural macros used internally.</p>
+</li>
+</ul>
+<p><strong>For most users</strong>: You need both <code>rumpsteak-aura</code> and <code>rumpsteak-aura-choreography</code>. The core library provides session types, while the choreography layer provides the high-level DSL and effect system.</p>
+<p><strong>For advanced users</strong>: If you only need low-level session types without choreographies, you can depend on just <code>rumpsteak-aura</code>.</p>
+<p>For WASM support, add the wasm feature:</p>
+<pre><code class="language-toml">rumpsteak-aura-choreography = { version = "*", features = ["wasm"] }
+</code></pre>
+<h2 id="creating-a-choreography"><a class="header" href="#creating-a-choreography">Creating a Choreography</a></h2>
+<p>This example shows a simple ping-pong protocol between two roles.</p>
+<p>Define the choreography using the DSL parser:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use rumpsteak_aura_choreography::compiler::parser::parse_choreography_str;
+
+let choreography_str = r#"
+    choreography PingPong {
+        roles: Alice, Bob;
+        Alice -&gt; Bob: Ping;
+        Bob -&gt; Alice: Pong;
+    }
+"#;
+
+let choreography = parse_choreography_str(choreography_str)?;
+<span class="boring">}</span></code></pre></pre>
+<p>The parser generates the AST representation which can be used for projection and code generation.</p>
+<p>Run the protocol using the effect system:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use rumpsteak_aura_choreography::{InMemoryHandler, Program, interpret, RoleId};
+use serde::{Serialize, Deserialize};
+
+// Define roles that implement RoleId
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+enum Role {
+    Alice,
+    Bob,
+}
+
+impl RoleId for Role {
+    fn name(&amp;self) -&gt; String {
+        format!("{:?}", self)
+    }
+}
+
+// Define messages
+#[derive(Debug, Clone, Serialize, Deserialize)]
+enum Message {
+    Ping,
+    Pong,
+}
+
+// Create the program
+let mut handler = InMemoryHandler::new(Role::Alice);
+let program = Program::new()
+    .send(Role::Bob, Message::Ping)
+    .recv::&lt;Message&gt;(Role::Bob)
+    .end();
+
+let mut endpoint = ();
+let result = interpret(&amp;mut handler, &amp;mut endpoint, program).await?;
+<span class="boring">}</span></code></pre></pre>
+<p>The <code>InMemoryHandler</code> provides local message passing for testing. See <a href="06_rumpsteak_handler.html">Using Rumpsteak Handlers</a> for production handlers.</p>
+<h2 id="core-concepts"><a class="header" href="#core-concepts">Core Concepts</a></h2>
+<h3 id="choreographies"><a class="header" href="#choreographies">Choreographies</a></h3>
+<p>A choreography specifies a distributed protocol from a global viewpoint. Each role sees only their local behavior after projection.</p>
+<h3 id="roles"><a class="header" href="#roles">Roles</a></h3>
+<p>Roles are participants in the protocol. They send and receive messages according to their projected session type.</p>
+<h3 id="messages"><a class="header" href="#messages">Messages</a></h3>
+<p>Messages are data exchanged between roles. They must implement serde's <code>Serialize</code> and <code>Deserialize</code>.</p>
+<h3 id="effect-handlers"><a class="header" href="#effect-handlers">Effect Handlers</a></h3>
+<p>Handlers interpret choreographic effects into actual communication. Different handlers provide different transports (in-memory, session-typed channels, WebSockets).</p>
+<p>With <code>RumpsteakHandler</code>, you can either register the built-in <code>SimpleChannel</code> pairs:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let (client_ch, server_ch) = SimpleChannel::pair();
+client_endpoint.register_channel(Role::Server, client_ch);
+server_endpoint.register_channel(Role::Client, server_ch);
+<span class="boring">}</span></code></pre></pre>
+<p>or wrap your own sink/stream transports:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use rumpsteak_aura_choreography::effects::RumpsteakSession;
+
+let ws_session = RumpsteakSession::from_sink_stream(websocket_writer, websocket_reader);
+client_endpoint.register_session(Role::Server, ws_session);
+<span class="boring">}</span></code></pre></pre>
+<p>Both options integrate with the same handler.</p>
+<h3 id="projection"><a class="header" href="#projection">Projection</a></h3>
+<p>The system projects global choreographies into local session types. Each role gets a type-safe API for their part of the protocol.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+                            <a rel="next prefetch" href="02_architecture.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+                    <a rel="next prefetch" href="02_architecture.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="mermaid.min.js"></script>
+        <script src="mermaid-init.js"></script>
+
+
+
+    </div>
+    </body>
+</html>

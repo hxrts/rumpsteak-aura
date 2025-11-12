@@ -1,0 +1,2818 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Rumpsteak Aura</title>
+        <meta name="robots" content="noindex">
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "rust";
+            window.path_to_searchindex_js = "searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Rumpsteak Aura</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="getting-started"><a class="header" href="#getting-started">Getting Started</a></h1>
+<h2 id="installation"><a class="header" href="#installation">Installation</a></h2>
+<p>Add Rumpsteak to your project (using the Aura fork):</p>
+<pre><code class="language-toml">[dependencies]
+rumpsteak-aura = "*"
+rumpsteak-aura-choreography = "*"
+</code></pre>
+<h3 id="understanding-the-crates"><a class="header" href="#understanding-the-crates">Understanding the Crates</a></h3>
+<p>Rumpsteak-Aura is organized as a Cargo workspace with several crates:</p>
+<ul>
+<li>
+<p><strong><code>rumpsteak-aura</code></strong>: Core session types library (located in the root <code>src/</code> directory). Provides fundamental primitives for type-safe asynchronous communication, channels, and role definitions.</p>
+</li>
+<li>
+<p><strong><code>rumpsteak-aura-choreography</code></strong>: Choreographic programming layer (located in <code>choreography/</code>). Provides the DSL parser, automatic projection, effect handler system, and runtime support.</p>
+</li>
+<li>
+<p><strong><code>rumpsteak-aura-fsm</code></strong>: Optional finite state machine support for advanced session type verification.</p>
+</li>
+<li>
+<p><strong><code>rumpsteak-aura-macros</code></strong>: Procedural macros used internally.</p>
+</li>
+</ul>
+<p><strong>For most users</strong>: You need both <code>rumpsteak-aura</code> and <code>rumpsteak-aura-choreography</code>. The core library provides session types, while the choreography layer provides the high-level DSL and effect system.</p>
+<p><strong>For advanced users</strong>: If you only need low-level session types without choreographies, you can depend on just <code>rumpsteak-aura</code>.</p>
+<p>For WASM support, add the wasm feature:</p>
+<pre><code class="language-toml">rumpsteak-aura-choreography = { version = "*", features = ["wasm"] }
+</code></pre>
+<h2 id="creating-a-choreography"><a class="header" href="#creating-a-choreography">Creating a Choreography</a></h2>
+<p>This example shows a simple ping-pong protocol between two roles.</p>
+<p>Define the choreography using the DSL parser:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use rumpsteak_aura_choreography::compiler::parser::parse_choreography_str;
+
+let choreography_str = r#"
+    choreography PingPong {
+        roles: Alice, Bob;
+        Alice -&gt; Bob: Ping;
+        Bob -&gt; Alice: Pong;
+    }
+"#;
+
+let choreography = parse_choreography_str(choreography_str)?;
+<span class="boring">}</span></code></pre></pre>
+<p>The parser generates the AST representation which can be used for projection and code generation.</p>
+<p>Run the protocol using the effect system:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use rumpsteak_aura_choreography::{InMemoryHandler, Program, interpret, RoleId};
+use serde::{Serialize, Deserialize};
+
+// Define roles that implement RoleId
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+enum Role {
+    Alice,
+    Bob,
+}
+
+impl RoleId for Role {
+    fn name(&amp;self) -&gt; String {
+        format!("{:?}", self)
+    }
+}
+
+// Define messages
+#[derive(Debug, Clone, Serialize, Deserialize)]
+enum Message {
+    Ping,
+    Pong,
+}
+
+// Create the program
+let mut handler = InMemoryHandler::new(Role::Alice);
+let program = Program::new()
+    .send(Role::Bob, Message::Ping)
+    .recv::&lt;Message&gt;(Role::Bob)
+    .end();
+
+let mut endpoint = ();
+let result = interpret(&amp;mut handler, &amp;mut endpoint, program).await?;
+<span class="boring">}</span></code></pre></pre>
+<p>The <code>InMemoryHandler</code> provides local message passing for testing. See <a href="06_rumpsteak_handler.html">Using Rumpsteak Handlers</a> for production handlers.</p>
+<h2 id="core-concepts"><a class="header" href="#core-concepts">Core Concepts</a></h2>
+<h3 id="choreographies"><a class="header" href="#choreographies">Choreographies</a></h3>
+<p>A choreography specifies a distributed protocol from a global viewpoint. Each role sees only their local behavior after projection.</p>
+<h3 id="roles"><a class="header" href="#roles">Roles</a></h3>
+<p>Roles are participants in the protocol. They send and receive messages according to their projected session type.</p>
+<h3 id="messages"><a class="header" href="#messages">Messages</a></h3>
+<p>Messages are data exchanged between roles. They must implement serde's <code>Serialize</code> and <code>Deserialize</code>.</p>
+<h3 id="effect-handlers"><a class="header" href="#effect-handlers">Effect Handlers</a></h3>
+<p>Handlers interpret choreographic effects into actual communication. Different handlers provide different transports (in-memory, session-typed channels, WebSockets).</p>
+<p>With <code>RumpsteakHandler</code>, you can either register the built-in <code>SimpleChannel</code> pairs:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let (client_ch, server_ch) = SimpleChannel::pair();
+client_endpoint.register_channel(Role::Server, client_ch);
+server_endpoint.register_channel(Role::Client, server_ch);
+<span class="boring">}</span></code></pre></pre>
+<p>or wrap your own sink/stream transports:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use rumpsteak_aura_choreography::effects::RumpsteakSession;
+
+let ws_session = RumpsteakSession::from_sink_stream(websocket_writer, websocket_reader);
+client_endpoint.register_session(Role::Server, ws_session);
+<span class="boring">}</span></code></pre></pre>
+<p>Both options integrate with the same handler.</p>
+<h3 id="projection"><a class="header" href="#projection">Projection</a></h3>
+<p>The system projects global choreographies into local session types. Each role gets a type-safe API for their part of the protocol.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="architecture"><a class="header" href="#architecture">Architecture</a></h1>
+<h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
+<p>Rumpsteak implements choreographic programming for Rust. The system compiles global protocol specifications into local session types for each participant.</p>
+<p>The architecture has four main layers:</p>
+<ol>
+<li>DSL and parsing (choreographic syntax to AST)</li>
+<li>Projection (global protocol to local types)</li>
+<li>Code generation (local types to Rust code)</li>
+<li>Effect system (protocol execution with pluggable transports)</li>
+</ol>
+<h2 id="component-diagram"><a class="header" href="#component-diagram">Component Diagram</a></h2>
+<pre class="mermaid">graph TB
+    subgraph Input[&quot;Developer Input (Compile-Time)&quot;]
+        DSL[&quot;Choreography DSL&lt;br/&gt;Global Protocol Specification&quot;]
+    end
+
+    subgraph Layer1[&quot;Layer 1: Parsing &amp; AST Construction&quot;]
+        Parser[&quot;Parser&lt;br/&gt;(Pest Grammar)&quot;]
+        AST[&quot;AST&lt;br/&gt;Choreography + Protocol Tree&quot;]
+    end
+
+    subgraph Layer2[&quot;Layer 2: Projection&quot;]
+        Proj[&quot;Projection Algorithm&quot;]
+        LT[&quot;Local Types&lt;br/&gt;(Per Role)&quot;]
+    end
+
+    subgraph Layer3[&quot;Layer 3: Code Generation&quot;]
+        CodeGen[&quot;Code Generator&quot;]
+        Session[&quot;Generated Session Types&quot;]
+        Effects[&quot;Generated Effect Programs&quot;]
+    end
+
+    subgraph Layer4[&quot;Layer 4: Runtime Execution&quot;]
+        Handler[&quot;Effect Handler&lt;br/&gt;(InMemory / Rumpsteak)&quot;]
+        Transport[&quot;Transport Layer&lt;br/&gt;(Channels / Network)&quot;]
+        Exec[&quot;Running Protocol&quot;]
+    end
+
+    DSL --&gt; Parser
+    Parser --&gt; AST
+    AST --&gt; Proj
+    Proj --&gt; LT
+    LT --&gt; CodeGen
+    CodeGen --&gt; Session
+    CodeGen --&gt; Effects
+    Session --&gt; Handler
+    Effects --&gt; Handler
+    Handler --&gt; Transport
+    Transport --&gt; Exec
+</pre>
+<h2 id="core-components"><a class="header" href="#core-components">Core Components</a></h2>
+<h3 id="ast-module"><a class="header" href="#ast-module">AST Module</a></h3>
+<p>Location: <code>choreography/src/ast/</code></p>
+<p>The AST represents choreographies as data structures. Main types:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct Choreography {
+    pub name: Ident,
+    pub namespace: Option&lt;String&gt;,
+    pub roles: Vec&lt;Role&gt;,
+    pub protocol: Protocol,
+    pub attrs: HashMap&lt;String, String&gt;,
+}
+<span class="boring">}</span></code></pre></pre>
+<p>Choreography holds the protocol name, optional namespace, participating roles, the protocol tree, and metadata attributes.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub enum Protocol {
+    Send { 
+        from: Role, 
+        to: Role, 
+        message: MessageType, 
+        continuation: Box&lt;Protocol&gt;,
+        annotations: HashMap&lt;String, String&gt;,
+        from_annotations: HashMap&lt;String, String&gt;,
+        to_annotations: HashMap&lt;String, String&gt;,
+    },
+    Broadcast { 
+        from: Role, 
+        to_all: Vec&lt;Role&gt;, 
+        message: MessageType, 
+        continuation: Box&lt;Protocol&gt;,
+        annotations: HashMap&lt;String, String&gt;,
+        from_annotations: HashMap&lt;String, String&gt;,
+    },
+    Choice { 
+        role: Role, 
+        branches: Vec&lt;Branch&gt;, 
+        annotations: HashMap&lt;String, String&gt;,
+    },
+    Loop { condition: Option&lt;Condition&gt;, body: Box&lt;Protocol&gt; },
+    Parallel { protocols: Vec&lt;Protocol&gt; },
+    Rec { label: Ident, body: Box&lt;Protocol&gt; },
+    Var(Ident),
+    End,
+}
+<span class="boring">}</span></code></pre></pre>
+<p>Protocol is a recursive tree structure representing all possible protocol actions. It includes support for annotations at multiple levels, broadcasts, and recursive definitions.</p>
+<h3 id="parser-module"><a class="header" href="#parser-module">Parser Module</a></h3>
+<p>Location: <code>choreography/src/compiler/parser.rs</code></p>
+<p>The parser converts DSL text into AST using the Pest parser generator. It validates role declarations and builds the protocol tree.</p>
+<p>Entry points:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn parse_choreography_str(input: &amp;str) -&gt; Result&lt;Choreography, ParseError&gt;
+pub fn parse_choreography_file(path: &amp;Path) -&gt; Result&lt;Choreography, ParseError&gt;
+<span class="boring">}</span></code></pre></pre>
+<p>The parser performs syntactic validation and basic semantic checks.</p>
+<h3 id="projection-module"><a class="header" href="#projection-module">Projection Module</a></h3>
+<p>Location: <code>choreography/src/compiler/projection.rs</code></p>
+<p>Projection transforms a global protocol into a local view for each role. The algorithm determines what each participant should do.</p>
+<p>Main function:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn project(choreography: &amp;Choreography, role: &amp;Role) -&gt; Result&lt;LocalType, ProjectionError&gt;
+<span class="boring">}</span></code></pre></pre>
+<p>Projection handles merging parallel branches and detecting conflicts.</p>
+<h3 id="code-generation-module"><a class="header" href="#code-generation-module">Code Generation Module</a></h3>
+<p>Location: <code>choreography/src/compiler/codegen.rs</code></p>
+<p>The codegen module converts local types into Rust session types and effect programs. It generates compile-time type-safe protocol implementations.</p>
+<p>Functions:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn generate_session_type(role: &amp;Role, local_type: &amp;LocalType, protocol_name: &amp;str) -&gt; TokenStream
+pub fn generate_choreography_code(name: &amp;str, roles: &amp;[Role], local_types: &amp;[(Role, LocalType)]) -&gt; TokenStream
+pub fn generate_choreography_code_with_dynamic_roles(choreography: &amp;Choreography, local_types: &amp;[(Role, LocalType)]) -&gt; TokenStream
+pub fn generate_dynamic_role_support(choreography: &amp;Choreography) -&gt; TokenStream
+pub fn generate_effects_protocol(choreography: &amp;Choreography) -&gt; TokenStream
+<span class="boring">}</span></code></pre></pre>
+<p>The generator creates session types, role structs, and code with dynamic role support including parameterized roles and runtime management.</p>
+<h3 id="effect-system"><a class="header" href="#effect-system">Effect System</a></h3>
+<p>Location: <code>choreography/src/effects/</code></p>
+<p>The effect system decouples protocol logic from transport. Protocols are represented as effect programs that handlers interpret.</p>
+<p>Core trait:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub trait ChoreoHandler {
+    type Role: RoleId;
+    type Endpoint;
+
+    async fn send&lt;M&gt;(&amp;mut self, ep: &amp;mut Self::Endpoint, to: Self::Role, msg: &amp;M) -&gt; Result&lt;()&gt;;
+    async fn recv&lt;M&gt;(&amp;mut self, ep: &amp;mut Self::Endpoint, from: Self::Role) -&gt; Result&lt;M&gt;;
+    async fn choose(&amp;mut self, ep: &amp;mut Self::Endpoint, who: Self::Role, label: Label) -&gt; Result&lt;()&gt;;
+    async fn offer(&amp;mut self, ep: &amp;mut Self::Endpoint, from: Self::Role) -&gt; Result&lt;Label&gt;;
+}
+<span class="boring">}</span></code></pre></pre>
+<p>Handlers implement this trait to provide different execution strategies.</p>
+<h2 id="data-flow"><a class="header" href="#data-flow">Data Flow</a></h2>
+<p>Input choreography:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>Alice -&gt; Bob: Request
+Bob -&gt; Alice: Response
+<span class="boring">}</span></code></pre></pre>
+<p>After parsing, AST contains:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>Protocol::Send {
+    from: Alice, to: Bob, message: Request,
+    continuation: Protocol::Send {
+        from: Bob, to: Alice, message: Response,
+        continuation: Protocol::End
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<p>After projection for Alice:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>LocalType::Send {
+    to: Bob, message: Request,
+    continuation: LocalType::Receive {
+        from: Bob, message: Response,
+        continuation: LocalType::End
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<p>After projection for Bob:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>LocalType::Receive {
+    from: Alice, message: Request,
+    continuation: LocalType::Send {
+        to: Alice, message: Response,
+        continuation: LocalType::End
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<p>After code generation for Alice:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>type Alice_Protocol = Send&lt;Bob, Request, Receive&lt;Bob, Response, End&gt;&gt;;
+<span class="boring">}</span></code></pre></pre>
+<p>At runtime, effect programs execute using handlers:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>Program::new()
+    .send(Bob, Request)
+    .recv::&lt;Response&gt;(Bob)
+    .end()
+<span class="boring">}</span></code></pre></pre>
+<h2 id="design-decisions"><a class="header" href="#design-decisions">Design Decisions</a></h2>
+<h3 id="why-choreographic-programming"><a class="header" href="#why-choreographic-programming">Why Choreographic Programming</a></h3>
+<p>Creating distributed programs typically requires writing separate implementations for each participant. Choreographies specify the global protocol once and project to local code automatically.</p>
+<p>This approach prevents protocol mismatches and simplifies reasoning about distributed systems.</p>
+<h3 id="why-effect-handlers"><a class="header" href="#why-effect-handlers">Why Effect Handlers</a></h3>
+<p>Separating protocol logic from transport enables testing, composition, and runtime flexibility. The same protocol can run with different handlers without code changes.</p>
+<h3 id="why-session-types"><a class="header" href="#why-session-types">Why Session Types</a></h3>
+<p>Session types provide compile-time guarantees about protocol compliance. The Rust type system enforces that each role follows their protocol correctly.</p>
+<h3 id="platform-abstraction"><a class="header" href="#platform-abstraction">Platform Abstraction</a></h3>
+<p>The runtime module provides platform-specific async primitives. Native targets use tokio while WASM uses wasm-bindgen-futures. This abstraction makes the core library portable.</p>
+<h2 id="extension-points"><a class="header" href="#extension-points">Extension Points</a></h2>
+<h3 id="custom-handlers"><a class="header" href="#custom-handlers">Custom Handlers</a></h3>
+<p>Implement <code>ChoreoHandler</code> to add new transport mechanisms. See <a href="05_effect_handlers.html">Effect Handlers</a> for details.</p>
+<h3 id="middleware"><a class="header" href="#middleware">Middleware</a></h3>
+<p>Wrap handlers with middleware for cross-cutting concerns like logging, metrics, or retry logic. Middleware composes naturally.</p>
+<h3 id="custom-projections"><a class="header" href="#custom-projections">Custom Projections</a></h3>
+<p>The projection algorithm can be extended for domain-specific optimizations. Override default projection rules by implementing custom projection functions.</p>
+<h3 id="code-generation-backends"><a class="header" href="#code-generation-backends">Code Generation Backends</a></h3>
+<p>Add new code generation backends to target different session type libraries or languages. The AST and LocalType representations are language-agnostic.</p>
+<h2 id="workspace-organization"><a class="header" href="#workspace-organization">Workspace Organization</a></h2>
+<p>Rumpsteak-Aura is organized as a Cargo workspace with multiple crates:</p>
+<pre><code>rumpsteak-aura/
+├── src/                     Core session types library (rumpsteak-aura crate)
+│   ├── lib.rs              Session type primitives, channels, roles
+│   ├── channel.rs          Async channel implementations
+│   └── serialize.rs        Serialization support
+├── choreography/            Choreographic programming extensions
+│   ├── src/
+│   │   ├── ast/            AST definitions
+│   │   ├── compiler/       Parser, projection, codegen
+│   │   ├── effects/        Effect system
+│   │   │   ├── handlers/  Handler implementations
+│   │   │   └── middleware/ Middleware implementations
+│   │   └── runtime.rs      Platform abstraction
+│   ├── tests/              Integration tests
+│   └── examples/           Example protocols
+├── fsm/                     Finite state machine support
+│   └── src/                FSM types and subtyping verification
+├── macros/                  Procedural macros
+│   └── src/                choreography! and other macros
+├── caching/                 HTTP cache case study
+│   └── src/                Redis-backed cache example
+├── examples/                Additional examples
+│   └── wasm-ping-pong/     WASM browser example
+└── docs/                    Documentation
+</code></pre>
+<h3 id="crate-responsibilities"><a class="header" href="#crate-responsibilities">Crate Responsibilities</a></h3>
+<p><strong>rumpsteak-aura</strong> (root <code>src/</code>): Foundation session types library providing core primitives for type-safe asynchronous communication. This is the base dependency for all other crates.</p>
+<p><strong>rumpsteak-aura-choreography</strong>: High-level choreographic programming layer with DSL parser, automatic projection, effect handlers, and runtime support. Builds on top of rumpsteak-aura.</p>
+<p><strong>rumpsteak-aura-fsm</strong>: Finite state machine support for session types, including DOT parsing and subtyping verification. Optional dependency for advanced use cases.</p>
+<p><strong>rumpsteak-aura-macros</strong>: Procedural macros used by both rumpsteak-aura and rumpsteak-aura-choreography.</p>
+<p><strong>caching</strong>: Example application demonstrating real-world usage with Redis and HTTP caching.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="choreographic-dsl-parser"><a class="header" href="#choreographic-dsl-parser">Choreographic DSL Parser</a></h1>
+<h2 id="current-status"><a class="header" href="#current-status">Current Status</a></h2>
+<p>The parser module (<code>choreography/src/compiler/parser.rs</code>) provides an implementation of a choreographic DSL parser using the Pest parser generator.</p>
+<h2 id="overview-1"><a class="header" href="#overview-1">Overview</a></h2>
+<p>The parser translates choreographic protocol specifications from a high-level DSL into the internal AST representation (<code>Choreography</code>, <code>Protocol</code>, etc.).</p>
+<h2 id="choreographic-dsl-syntax"><a class="header" href="#choreographic-dsl-syntax">Choreographic DSL Syntax</a></h2>
+<p>The choreographic DSL follows this syntax:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>choreography MyProtocol {
+    roles: Alice, Bob, Carol
+
+    Alice -&gt; Bob: Greeting
+    Bob -&gt; Alice: Response
+
+    choice Alice {
+        continue: {
+            Alice -&gt; Carol: Data
+        }
+        stop: {
+            Alice -&gt; Bob: Done
+        }
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<h3 id="namespaces"><a class="header" href="#namespaces">Namespaces</a></h3>
+<p>Choreographies can be namespaced to avoid conflicts when multiple protocols are defined in the same crate:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let threshold_dsl = r#"
+    #[namespace = "threshold_ceremony"]
+    choreography ThresholdProtocol {
+        roles: Coordinator, Signers[*];
+        Coordinator -&gt; Signers[*]: Request;
+    }
+"#;
+let choreo = parse_choreography_str(threshold_dsl)?;
+<span class="boring">}</span></code></pre></pre>
+<p>This generates the protocol within a <code>threshold_ceremony</code> module. Multiple choreographies with different namespaces can coexist by parsing them separately and using the namespace for code generation:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let consensus_dsl = r#"
+    #[namespace = "consensus"]
+    choreography ConsensusProtocol {
+        roles: Leader, Followers[N];
+        // protocol body
+    }
+"#;
+
+let recovery_dsl = r#"
+    #[namespace = "recovery"]
+    choreography RecoveryProtocol {
+        roles: Requester, Guardians[*];
+        // protocol body
+    }
+"#;
+
+let consensus_choreo = parse_choreography_str(consensus_dsl)?;
+let recovery_choreo = parse_choreography_str(recovery_dsl)?;
+<span class="boring">}</span></code></pre></pre>
+<h3 id="supported-constructs"><a class="header" href="#supported-constructs">Supported Constructs</a></h3>
+<h4 id="1-send-statement"><a class="header" href="#1-send-statement">1. Send Statement</a></h4>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>Role1 -&gt; Role2: MessageName
+Role1 -&gt; Role2: MessageWithPayload(data: String, count: i32)
+<span class="boring">}</span></code></pre></pre>
+<h4 id="2-broadcast-statement"><a class="header" href="#2-broadcast-statement">2. Broadcast Statement</a></h4>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>Leader -&gt;* : Announcement
+<span class="boring">}</span></code></pre></pre>
+<h4 id="3-choice-statement"><a class="header" href="#3-choice-statement">3. Choice Statement</a></h4>
+<p>Basic choice:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>choice DeciderRole {
+    option1: {
+        // protocol statements
+    }
+    option2: {
+        // protocol statements
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<p>With guards:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>choice Client {
+    buy when (balance &gt; price): {
+        Client -&gt; Server: Purchase
+    }
+    cancel: {
+        Client -&gt; Server: Cancel
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<p>Guards are optional conditions that can be attached to choice branches. The guard expression is any valid Rust boolean expression.</p>
+<h4 id="4-loop-statement"><a class="header" href="#4-loop-statement">4. Loop Statement</a></h4>
+<p>With count:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>loop (count: 5) {
+    A -&gt; B: Request
+    B -&gt; A: Response
+}
+<span class="boring">}</span></code></pre></pre>
+<p>With role decision:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>loop (decides: Client) {
+    Client -&gt; Server: Request
+    Server -&gt; Client: Response
+}
+<span class="boring">}</span></code></pre></pre>
+<p>With custom condition:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>loop (custom: "has_more_data") {
+    A -&gt; B: Data
+}
+<span class="boring">}</span></code></pre></pre>
+<p>Without condition (infinite):</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>loop {
+    A -&gt; B: Tick
+}
+<span class="boring">}</span></code></pre></pre>
+<h4 id="5-parallel-statement"><a class="header" href="#5-parallel-statement">5. Parallel Statement</a></h4>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>parallel {
+    A -&gt; B: Msg1
+|
+    C -&gt; D: Msg2
+}
+<span class="boring">}</span></code></pre></pre>
+<h4 id="6-recursive-protocol"><a class="header" href="#6-recursive-protocol">6. Recursive Protocol</a></h4>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>rec LoopLabel {
+    A -&gt; B: Data
+}
+<span class="boring">}</span></code></pre></pre>
+<h4 id="7-protocol-composition-sub-protocols"><a class="header" href="#7-protocol-composition-sub-protocols">7. Protocol Composition (Sub-protocols)</a></h4>
+<p>Define and reuse protocol fragments</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>choreography Main {
+    roles: A, B, C
+
+    protocol Handshake {
+        A -&gt; B: Hello
+        B -&gt; A: Hi
+    }
+
+    protocol DataTransfer {
+        A -&gt; B: Data
+        B -&gt; A: Ack
+    }
+
+    call Handshake
+    call DataTransfer
+    A -&gt; C: Done
+}
+<span class="boring">}</span></code></pre></pre>
+<p>Protocol definitions are:</p>
+<ul>
+<li>Defined before the main protocol body</li>
+<li>Inlined at call sites (no runtime overhead)</li>
+<li>Can be called multiple times</li>
+<li>Can be nested (protocols can call other protocols)</li>
+<li>Can be used within choice branches, loops, etc.</li>
+</ul>
+<h4 id="8-enhanced-annotations"><a class="header" href="#8-enhanced-annotations">8. Enhanced Annotations</a></h4>
+<p>Annotations provide meta-information for optimization, verification, cost analysis, and other protocol properties. The system supports both statement-level and role-specific annotations.</p>
+<p><strong>Statement-level annotations:</strong></p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>choreography EnhancedProtocol {
+    roles: A, B, C;
+
+    [@cost = 100, @priority = "high"]
+    A -&gt; B: ImportantMessage;
+
+    [@timeout = 5000, @retry = 3]
+    B -&gt; C: RetriableMessage;
+}
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Role-specific annotations:</strong></p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>choreography RoleAnnotatedProtocol {
+    roles: Coordinator, Worker[*];
+
+    Coordinator[@cost = 200] -&gt; Worker[*]: BroadcastMessage;
+    Worker[i][@priority = "low"] -&gt; Coordinator: Response;
+}
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Multiple annotation types:</strong></p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>choreography FullyAnnotated {
+    roles: Client, Server, Database;
+
+    [@critical, @audit_log = "true"]
+    Client -&gt; Server: AuthRequest;
+
+    Server[@timeout = 1000] -&gt; Database[@cost = 50]: Query;
+
+    [@buffered, @compress = "gzip"]
+    Database -&gt; Server: QueryResult;
+}
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Supported annotation keys:</strong></p>
+<ul>
+<li><code>@cost</code> - Execution cost (integer value)</li>
+<li><code>@priority</code> - Priority level ("high", "medium", "low")</li>
+<li><code>@timeout</code> - Timeout in milliseconds (integer)</li>
+<li><code>@retry</code> - Retry count (integer)</li>
+<li><code>@critical</code> - Mark critical operations (boolean)</li>
+<li><code>@buffered</code> - Enable message buffering (boolean)</li>
+<li><code>@audit_log</code> - Enable audit logging (boolean)</li>
+<li><code>@compress</code> - Compression type (string value)</li>
+</ul>
+<p>Annotations are accessible through the generated code and can be used by runtime systems for optimization, monitoring, and policy enforcement.</p>
+<h4 id="9-type-annotations-for-messages"><a class="header" href="#9-type-annotations-for-messages">9. Type Annotations for Messages</a></h4>
+<p>Messages can include explicit type annotations to specify the types of data being transmitted.</p>
+<p><strong>Simple types:</strong></p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>choreography TypedMessages {
+    roles: A, B
+
+    A -&gt; B: Request&lt;String&gt;
+    B -&gt; A: Response&lt;i32&gt;
+}
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Multiple types:</strong></p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>A -&gt; B: Data&lt;String, i32, bool&gt;
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Generic types:</strong></p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>A -&gt; B: Container&lt;Vec&lt;String&gt;&gt;
+B -&gt; A: Result&lt;i32, Error&gt;
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Path types:</strong></p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>A -&gt; B: Data&lt;std::string::String&gt;
+B -&gt; A: Result&lt;std::vec::Vec&lt;i32&gt;&gt;
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Type annotations with payloads:</strong></p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>A -&gt; B: Request&lt;String&gt;(data)
+B -&gt; A: Response&lt;i32&gt;(result)
+<span class="boring">}</span></code></pre></pre>
+<p>Type annotations are:</p>
+<ul>
+<li>Optional - messages without types are still valid</li>
+<li>Stored as <code>TokenStream</code> in the AST for flexibility</li>
+<li>Can be nested generics with arbitrary depth</li>
+<li>Support standard Rust type syntax including paths</li>
+</ul>
+<h4 id="10-dynamic-role-count-support"><a class="header" href="#10-dynamic-role-count-support">10. Dynamic Role Count Support</a></h4>
+<p>The system supports dynamic role parameterization for runtime-determined participant counts, enabling threshold protocols, consensus algorithms, and other scenarios with variable participants.</p>
+<p><strong>Runtime-determined role counts:</strong></p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>choreography ThresholdProtocol {
+    roles: Coordinator, Signers[*];
+
+    Coordinator -&gt; Signers[*]: Request;
+    Signers[0..threshold] -&gt; Coordinator: Response;
+}
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Symbolic parameters for compile-time flexibility:</strong></p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>choreography ConsensusProtocol {
+    roles: Leader, Followers[N];
+
+    Leader -&gt; Followers[*]: Proposal;
+    Followers[i] -&gt; Leader: Vote;
+}
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Range-based role selection:</strong></p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>choreography PartialBroadcast {
+    roles: Broadcaster, Receivers[*];
+
+    Broadcaster -&gt; Receivers[0..count]: Message;
+    Receivers[0..threshold] -&gt; Broadcaster: Ack;
+}
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Static arrays (existing functionality):</strong></p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>choreography StaticWorkers {
+    roles: Master, Worker[3];
+
+    Master -&gt; Worker[0]: Task1;
+    Master -&gt; Worker[1]: Task2;
+    Worker[0] -&gt; Master: Result1;
+}
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Dynamic role features:</strong></p>
+<ul>
+<li>Runtime role counts (<code>Worker[*]</code>)</li>
+<li>Symbolic parameters (<code>Worker[N]</code>)</li>
+<li>Range expressions (<code>Worker[0..threshold]</code>)</li>
+<li>Wildcard references (<code>Worker[*]</code>)</li>
+<li>Security constraints with overflow protection (max 10,000 roles)</li>
+<li>Comprehensive runtime validation</li>
+</ul>
+<p><strong>Runtime binding example:</strong></p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use rumpsteak_aura_choreography::compiler::{parse_choreography_str, codegen::generate_choreography_code_with_dynamic_roles};
+
+let dsl = r#"
+choreography Threshold {
+    roles: Coordinator, Signers[*];
+    Coordinator -&gt; Signers[*]: Request;
+}
+"#;
+
+let choreo = parse_choreography_str(dsl)?;
+let code = generate_choreography_code_with_dynamic_roles(&amp;choreo, &amp;local_types);
+
+// Generated code includes ThresholdRuntime for role binding:
+let mut runtime = ThresholdRuntime::new();
+runtime.bind_role_count("Signers", 5)?; // 5 signers
+runtime.map_signers_instances(vec!["alice", "bob", "charlie", "dave", "eve"])?;
+<span class="boring">}</span></code></pre></pre>
+<p>The system provides comprehensive security through bounds checking, preventing overflow attacks and ensuring memory safety.</p>
+<h4 id="11-string-based-protocol-definition"><a class="header" href="#11-string-based-protocol-definition">11. String-based Protocol Definition</a></h4>
+<p>The current implementation uses <code>parse_choreography_str</code> to parse choreographic protocols from string literals, with support for namespaces, annotations, and dynamic roles.</p>
+<p><strong>Basic usage:</strong></p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use rumpsteak_aura_choreography::compiler::parser::parse_choreography_str;
+
+let protocol = r#"
+    choreography PingPong {
+        roles: Alice, Bob;
+
+        Alice -&gt; Bob: Ping;
+        Bob -&gt; Alice: Pong;
+    }
+"#;
+
+let choreography = parse_choreography_str(protocol)?;
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Namespaced protocols:</strong></p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let protocol = r#"
+    #[namespace = "secure_messaging"]
+    choreography EncryptedProtocol {
+        roles: Sender, Receiver;
+
+        [@encrypt = "aes256"]
+        Sender -&gt; Receiver: SecureMessage;
+    }
+"#;
+
+let choreography = parse_choreography_str(protocol)?;
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Dynamic roles with annotations:</strong></p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let protocol = r#"
+    #[namespace = "consensus"]
+    choreography ByzantineFaultTolerant {
+        roles: Leader, Replicas[*];
+
+        [@phase = "prepare", @timeout = 5000]
+        Leader -&gt; Replicas[*]: Prepare;
+
+        Replicas[0..quorum] -&gt; Leader: PrepareOk;
+    }
+"#;
+
+let choreography = parse_choreography_str(protocol)?;
+<span class="boring">}</span></code></pre></pre>
+<p>The parser:</p>
+<ul>
+<li>Parses choreographic protocol specifications from strings</li>
+<li>Builds AST representation for further processing</li>
+<li>Supports full protocol syntax including annotations and dynamic roles</li>
+<li>Provides detailed error reporting with span information</li>
+<li>Enables runtime protocol generation and analysis</li>
+</ul>
+<p><strong>Generated AST can be used for:</strong></p>
+<ul>
+<li>Protocol projection to local types</li>
+<li>Code generation for session types</li>
+<li>Runtime analysis and validation</li>
+<li>Dynamic role binding and management</li>
+</ul>
+<p>This approach allows for flexible protocol definition and runtime manipulation of choreographic specifications.</p>
+<h2 id="implementation-details"><a class="header" href="#implementation-details">Implementation Details</a></h2>
+<h3 id="parser-stack"><a class="header" href="#parser-stack">Parser Stack</a></h3>
+<ol>
+<li>
+<p><strong>Pest Grammar</strong> (<code>choreography.pest</code>)</p>
+<ul>
+<li>Formal grammar definition using PEG syntax</li>
+<li>Handles lexing and initial parsing</li>
+<li>Supports comments, whitespace, and various token types</li>
+</ul>
+</li>
+<li>
+<p><strong>Parser Module</strong> (<code>parser.rs</code>)</p>
+<ul>
+<li>Processes Pest parse tree into AST</li>
+<li>Validates role declarations</li>
+<li>Constructs Protocol AST from statements</li>
+<li>Comprehensive error handling</li>
+</ul>
+</li>
+<li>
+<p><strong>Error Types</strong> (<code>ParseError</code>)</p>
+<ul>
+<li>Syntax errors with location information</li>
+<li>Undefined role errors</li>
+<li>Duplicate role declarations</li>
+<li>Invalid message or condition formats</li>
+</ul>
+</li>
+</ol>
+<h3 id="parse-pipeline"><a class="header" href="#parse-pipeline">Parse Pipeline</a></h3>
+<pre><code>Input String
+    ↓
+Pest Grammar Parsing
+    ↓
+Parse Tree (Pest Pairs)
+    ↓
+Statement AST Construction
+    ↓
+Role Validation
+    ↓
+Protocol AST Generation
+    ↓
+Choreography Object
+</code></pre>
+<h2 id="api"><a class="header" href="#api">API</a></h2>
+<h3 id="primary-functions"><a class="header" href="#primary-functions">Primary Functions</a></h3>
+<h4 id="parse_choreography_strinput-str---resultchoreography-parseerror"><a class="header" href="#parse_choreography_strinput-str---resultchoreography-parseerror"><code>parse_choreography_str(input: &amp;str) -&gt; Result&lt;Choreography, ParseError&gt;</code></a></h4>
+<p>Parse a choreographic DSL string into a Choreography AST.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use rumpsteak_aura_choreography::compiler::parser::parse_choreography_str;
+
+let choreo = parse_choreography_str(r#"
+choreography Example {
+    roles: A, B
+    A -&gt; B: Hello
+}
+"#)?;
+<span class="boring">}</span></code></pre></pre>
+<h4 id="parse_choreography_filepath-path---resultchoreography-parseerror"><a class="header" href="#parse_choreography_filepath-path---resultchoreography-parseerror"><code>parse_choreography_file(path: &amp;Path) -&gt; Result&lt;Choreography, ParseError&gt;</code></a></h4>
+<p>Parse a choreographic DSL from a file.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use std::path::Path;
+use rumpsteak_aura_choreography::compiler::parser::parse_choreography_file;
+
+let choreo = parse_choreography_file(Path::new("protocol.choreo"))?;
+<span class="boring">}</span></code></pre></pre>
+<h4 id="parse_dslinput-str---resultchoreography-parseerror"><a class="header" href="#parse_dslinput-str---resultchoreography-parseerror"><code>parse_dsl(input: &amp;str) -&gt; Result&lt;Choreography, ParseError&gt;</code></a></h4>
+<p>Alias for <code>parse_choreography_str</code> for compatibility.</p>
+<h3 id="error-handling"><a class="header" href="#error-handling">Error Handling</a></h3>
+<p>The parser provides detailed error messages:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>match parse_choreography_str(input) {
+    Ok(choreo) =&gt; {
+        // Use choreography
+    }
+    Err(ParseError::UndefinedRole(role)) =&gt; {
+        eprintln!("Role '{}' used but not declared", role);
+    }
+    Err(ParseError::DuplicateRole(role)) =&gt; {
+        eprintln!("Role '{}' declared multiple times", role);
+    }
+    Err(ParseError::Syntax { location, message }) =&gt; {
+        eprintln!("Syntax error at {}: {}", location, message);
+    }
+    Err(e) =&gt; {
+        eprintln!("Parse error: {}", e);
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="grammar-details"><a class="header" href="#grammar-details">Grammar Details</a></h2>
+<h3 id="tokens"><a class="header" href="#tokens">Tokens</a></h3>
+<ul>
+<li>Identifiers: <code>[a-zA-Z][a-zA-Z0-9_]*</code></li>
+<li>Integers: <code>[0-9]+</code></li>
+<li>Strings: <code>"..."</code> (for custom conditions)</li>
+<li>Keywords: <code>choreography</code>, <code>roles</code>, <code>choice</code>, <code>loop</code>, <code>parallel</code>, <code>rec</code>, <code>count</code>, <code>decides</code>, <code>custom</code></li>
+<li>Operators: <code>-&gt;</code> (send), <code>-&gt;*</code> (broadcast), <code>:</code>, <code>,</code>, <code>{</code>, <code>}</code>, <code>(</code>, <code>)</code>, <code>|</code></li>
+</ul>
+<h3 id="comments"><a class="header" href="#comments">Comments</a></h3>
+<ul>
+<li>Single-line: <code>// comment</code></li>
+<li>Multi-line: <code>/* comment */</code></li>
+</ul>
+<h3 id="whitespace"><a class="header" href="#whitespace">Whitespace</a></h3>
+<p>Whitespace (spaces, tabs, newlines) is ignored and can be used freely for formatting.</p>
+<h2 id="validation"><a class="header" href="#validation">Validation</a></h2>
+<p>The parser performs the following validations:</p>
+<ol>
+<li>Role Declaration: All used roles must be declared in the <code>roles:</code> section</li>
+<li>Role Uniqueness: Roles cannot be declared multiple times</li>
+<li>Syntax Correctness: All statements must follow the grammar</li>
+<li>Non-Empty Roles: At least one role must be declared</li>
+</ol>
+<p>Additional semantic validation is performed by the <code>choreography.validate()</code> method after parsing.</p>
+<h2 id="error-messages"><a class="header" href="#error-messages">Error Messages</a></h2>
+<p>The parser now provides Rust-style error messages with precise span information.</p>
+<h3 id="features"><a class="header" href="#features">Features</a></h3>
+<ul>
+<li><strong>Line and column numbers</strong>: Exact location of errors</li>
+<li><strong>Code snippets</strong>: Shows the problematic line</li>
+<li><strong>Visual indicators</strong>: Underlines the specific error location</li>
+<li><strong>Contextual messages</strong>: Clear explanation of what went wrong</li>
+</ul>
+<h3 id="example-error-output"><a class="header" href="#example-error-output">Example Error Output</a></h3>
+<pre><code>Undefined role 'Charlie'
+  --&gt; input:5:14
+    |
+  5 |     Alice -&gt; Charlie: Hello
+                   ^^^^^^^
+</code></pre>
+<pre><code>Duplicate role declaration 'Alice'
+  --&gt; input:3:33
+    |
+  3 |     roles: Alice, Bob, Charlie, Alice
+                                      ^^^^^
+</code></pre>
+<h3 id="error-types"><a class="header" href="#error-types">Error Types</a></h3>
+<ul>
+<li><code>ParseError::UndefinedRole</code>: Role used but not declared</li>
+<li><code>ParseError::DuplicateRole</code>: Role declared more than once</li>
+<li><code>ParseError::UndefinedProtocol</code>: Protocol called but not defined</li>
+<li><code>ParseError::DuplicateProtocol</code>: Protocol defined multiple times</li>
+<li><code>ParseError::Syntax</code>: Grammar or syntax violations</li>
+<li><code>ParseError::InvalidCondition</code>: Loop condition problems</li>
+<li><code>ParseError::InvalidMessage</code>: Message format issues</li>
+<li><code>ParseError::Pest</code>: Low-level parsing errors</li>
+</ul>
+<p>See <code>choreography/examples/error_demo.rs</code> for more examples.</p>
+<h2 id="examples"><a class="header" href="#examples">Examples</a></h2>
+<h3 id="simple-two-party-protocol"><a class="header" href="#simple-two-party-protocol">Simple Two-Party Protocol</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let input = r#"
+choreography PingPong {
+    roles: Alice, Bob
+
+    Alice -&gt; Bob: Ping
+    Bob -&gt; Alice: Pong
+}
+"#;
+
+let choreo = parse_choreography_str(input)?;
+assert_eq!(choreo.roles.len(), 2);
+<span class="boring">}</span></code></pre></pre>
+<h3 id="protocol-with-choice"><a class="header" href="#protocol-with-choice">Protocol with Choice</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let input = r#"
+choreography Negotiation {
+    roles: Buyer, Seller
+
+    Buyer -&gt; Seller: Offer
+
+    choice Seller {
+        accept: {
+            Seller -&gt; Buyer: Accept
+        }
+        reject: {
+            Seller -&gt; Buyer: Reject
+        }
+    }
+}
+"#;
+
+let choreo = parse_choreography_str(input)?;
+<span class="boring">}</span></code></pre></pre>
+<h3 id="complex-e-commerce-protocol"><a class="header" href="#complex-e-commerce-protocol">Complex E-Commerce Protocol</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let input = r#"
+choreography ECommerce {
+    roles: Buyer, Seller, Shipper
+
+    Buyer -&gt; Seller: Inquiry
+    Seller -&gt; Buyer: Quote
+
+    choice Buyer {
+        order: {
+            Buyer -&gt; Seller: Order
+            Seller -&gt; Shipper: ShipRequest
+            Shipper -&gt; Buyer: Tracking
+
+            loop (decides: Buyer) {
+                Buyer -&gt; Shipper: StatusCheck
+                Shipper -&gt; Buyer: StatusUpdate
+            }
+
+            Shipper -&gt; Buyer: Delivered
+            Buyer -&gt; Seller: Confirmation
+        }
+        cancel: {
+            Buyer -&gt; Seller: Cancel
+        }
+    }
+}
+"#;
+
+let choreo = parse_choreography_str(input)?;
+<span class="boring">}</span></code></pre></pre>
+<h2 id="integration"><a class="header" href="#integration">Integration</a></h2>
+<h3 id="with-projection"><a class="header" href="#with-projection">With Projection</a></h3>
+<p>Parse and project to local types:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use rumpsteak_aura_choreography::compiler::{parser, projection};
+
+let choreo = parser::parse_choreography_str(input)?;
+
+for role in &amp;choreo.roles {
+    let local_type = projection::project(&amp;choreo, role)?;
+    println!("Local type for {}: {:?}", role.name, local_type);
+}
+<span class="boring">}</span></code></pre></pre>
+<h3 id="with-code-generation"><a class="header" href="#with-code-generation">With Code Generation</a></h3>
+<p>Parse and generate Rumpsteak session types:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use rumpsteak_aura_choreography::compiler::{parser, projection, codegen};
+
+let choreo = parser::parse_choreography_str(input)?;
+let mut local_types = Vec::new();
+
+for role in &amp;choreo.roles {
+    let local_type = projection::project(&amp;choreo, role)?;
+    local_types.push((role.clone(), local_type));
+}
+
+let code = codegen::generate_choreography_code(
+    &amp;choreo.name.to_string(),
+    &amp;choreo.roles,
+    &amp;local_types,
+);
+<span class="boring">}</span></code></pre></pre>
+<h2 id="testing"><a class="header" href="#testing">Testing</a></h2>
+<p>The parser includes comprehensive test coverage:</p>
+<ul>
+<li><strong>Basic parsing</strong>: Simple protocols with sends</li>
+<li><strong>Choice constructs</strong>: 2-way, 3-way, and nested choices</li>
+<li><strong>Loop constructs</strong>: All condition types</li>
+<li><strong>Parallel composition</strong>: Multiple concurrent branches</li>
+<li><strong>Error cases</strong>: Undefined roles, duplicate roles, syntax errors</li>
+<li><strong>Edge cases</strong>: Empty protocols, whitespace variations, comments</li>
+<li><strong>Integration</strong>: With projection and validation</li>
+</ul>
+<p>Run tests with:</p>
+<pre><code class="language-bash">cargo test --package rumpsteak-aura-choreography parser
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="choreographic-projection-patterns"><a class="header" href="#choreographic-projection-patterns">Choreographic Projection Patterns</a></h1>
+<p>The projection algorithm transforms global choreographic protocols into local session types for each participating role. The algorithm has been enhanced to support three additional patterns beyond the basic send/receive operations.</p>
+<h2 id="supported-patterns"><a class="header" href="#supported-patterns">Supported Patterns</a></h2>
+<h3 id="1-basic-sendreceive"><a class="header" href="#1-basic-sendreceive">1. Basic Send/Receive</a></h3>
+<p><strong>Global Protocol:</strong></p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>Protocol::Send {
+    from: alice,
+    to: bob,
+    message: Data,
+    continuation: End,
+}
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Alice's Projection:</strong></p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>LocalType::Send {
+    to: bob,
+    message: Data,
+    continuation: End,
+}
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Bob's Projection:</strong></p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>LocalType::Receive {
+    from: alice,
+    message: Data,
+    continuation: End,
+}
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Charlie's Projection (uninvolved):</strong></p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>LocalType::End
+<span class="boring">}</span></code></pre></pre>
+<hr />
+<h3 id="2-communicated-choice"><a class="header" href="#2-communicated-choice">2. Communicated Choice</a></h3>
+<p><strong>Global Protocol:</strong></p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>Protocol::Choice {
+    role: alice,
+    branches: vec![
+        Branch {
+            label: "yes",
+            protocol: Send { from: alice, to: bob, ... },
+        },
+        Branch {
+            label: "no",
+            protocol: Send { from: alice, to: bob, ... },
+        },
+    ],
+}
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Alice's Projection (chooser):</strong></p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>LocalType::Select {
+    to: bob,
+    branches: vec![
+        ("yes", ...),
+        ("no", ...),
+    ],
+}
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Bob's Projection (receiver):</strong></p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>LocalType::Branch {
+    from: alice,
+    branches: vec![
+        ("yes", ...),
+        ("no", ...),
+    ],
+}
+<span class="boring">}</span></code></pre></pre>
+<hr />
+<h3 id="3-local-choice-no-communication"><a class="header" href="#3-local-choice-no-communication">3. Local Choice (No Communication)</a></h3>
+<p>Supports choice branches that don't start with <code>Send</code>, allowing for local decisions.</p>
+<p><strong>Global Protocol:</strong></p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>Protocol::Choice {
+    role: alice,
+    branches: vec![
+        Branch {
+            label: "option1",
+            protocol: End,  // No Send!
+        },
+        Branch {
+            label: "option2",
+            protocol: End,
+        },
+    ],
+}
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Alice's Projection:</strong></p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>LocalType::LocalChoice {
+    branches: vec![
+        ("option1", End),
+        ("option2", End),
+    ],
+}
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Key Difference:</strong> <code>LocalChoice</code> vs <code>Select</code>:</p>
+<ul>
+<li><strong>Select</strong>: Communicated choice (sends selection to another role)</li>
+<li><strong>LocalChoice</strong>: Local decision (no communication)</li>
+</ul>
+<hr />
+<h3 id="4-loop-with-conditions"><a class="header" href="#4-loop-with-conditions">4. Loop with Conditions</a></h3>
+<p>Loop conditions are now preserved in the projected local types.</p>
+<p><strong>Global Protocol:</strong></p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>Protocol::Loop {
+    condition: Some(Condition::Count(5)),
+    body: Send { from: alice, to: bob, ... },
+}
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Alice's Projection:</strong></p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>LocalType::Loop {
+    condition: Some(Condition::Count(5)),
+    body: Send { to: bob, ... },
+}
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Supported Conditions:</strong></p>
+<ul>
+<li><code>Condition::Count(n)</code> - Fixed iteration count</li>
+<li><code>Condition::RoleDecides(role)</code> - Loop while a role decides</li>
+<li><code>Condition::Custom(expr)</code> - Custom boolean expression</li>
+<li><code>None</code> - Infinite loop (must be terminated externally)</li>
+</ul>
+<hr />
+<h3 id="5-parallel-composition"><a class="header" href="#5-parallel-composition">5. Parallel Composition</a></h3>
+<p>Parallel merging with conflict detection.</p>
+<h4 id="compatible-parallel-no-conflict"><a class="header" href="#compatible-parallel-no-conflict">Compatible Parallel (No Conflict)</a></h4>
+<p><strong>Global Protocol:</strong></p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>Protocol::Parallel {
+    protocols: vec![
+        Send { from: alice, to: bob, ... },
+        Send { from: alice, to: charlie, ... },  // Different recipient
+    ],
+}
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Alice's Projection:</strong></p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Merged sequentially (order non-deterministic at runtime)
+LocalType::Send {
+    to: bob,
+    continuation: Send {
+        to: charlie,
+        continuation: End,
+    },
+}
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Result:</strong> <strong>Success</strong> - Different recipients, no conflict</p>
+<h4 id="conflicting-parallel-error"><a class="header" href="#conflicting-parallel-error">Conflicting Parallel (Error)</a></h4>
+<p><strong>Global Protocol:</strong></p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>Protocol::Parallel {
+    protocols: vec![
+        Send { from: alice, to: bob, ... },
+        Send { from: alice, to: bob, ... },  // Same recipient!
+    ],
+}
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Alice's Projection:</strong></p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>Err(ProjectionError::InconsistentParallel)
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Result:</strong> <strong>Error</strong> - Cannot send to same recipient in parallel</p>
+<p><strong>Conflict Detection Rules:</strong></p>
+<ul>
+<li>Multiple sends to the same role → <strong>Conflict</strong></li>
+<li>Multiple receives from the same role → <strong>Conflict</strong></li>
+<li>Multiple selects to the same role → <strong>Conflict</strong></li>
+<li>Multiple branches from the same role → <strong>Conflict</strong></li>
+<li>Operations on different roles → <strong>OK</strong></li>
+</ul>
+<hr />
+<h2 id="projection-rules-summary"><a class="header" href="#projection-rules-summary">Projection Rules Summary</a></h2>
+<h3 id="choosers-view"><a class="header" href="#choosers-view">Chooser's View</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Branch Pattern</th><th>Projection</th></tr></thead><tbody>
+<tr><td>All branches start with <code>Send</code></td><td><code>Select</code> (communicated)</td></tr>
+<tr><td>Branches don't start with <code>Send</code></td><td><code>LocalChoice</code> (local)</td></tr>
+</tbody></table>
+</div>
+<h3 id="receivers-view"><a class="header" href="#receivers-view">Receiver's View</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Participation</th><th>Projection</th></tr></thead><tbody>
+<tr><td>Receives the choice</td><td><code>Branch</code></td></tr>
+<tr><td>Not involved</td><td>Merge continuations</td></tr>
+</tbody></table>
+</div>
+<h3 id="parallel-composition"><a class="header" href="#parallel-composition">Parallel Composition</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Role Participation</th><th>Projection</th></tr></thead><tbody>
+<tr><td>Appears in 0 branches</td><td><code>End</code></td></tr>
+<tr><td>Appears in 1 branch</td><td>Use that projection</td></tr>
+<tr><td>Appears in 2+ branches</td><td>Merge if compatible, error if conflict</td></tr>
+</tbody></table>
+</div>
+<hr />
+<h2 id="implementation-notes"><a class="header" href="#implementation-notes">Implementation Notes</a></h2>
+<h3 id="localtype-variants"><a class="header" href="#localtype-variants">LocalType Variants</a></h3>
+<p>The enhanced projection algorithm uses these <code>LocalType</code> variants:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub enum LocalType {
+    Send { to, message, continuation },
+    Receive { from, message, continuation },
+    Select { to, branches },
+    Branch { from, branches },
+    LocalChoice { branches },
+    Loop { condition, body },
+    Rec { label, body },
+    Var(label),
+    End,
+}
+<span class="boring">}</span></code></pre></pre>
+<h3 id="code-generation"><a class="header" href="#code-generation">Code Generation</a></h3>
+<p>The <code>generate_type_expr</code> function in <code>codegen.rs</code> handles all variants including the new <code>LocalChoice</code> and <code>Loop</code> types.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="effect-handlers-1"><a class="header" href="#effect-handlers-1">Effect Handlers</a></h1>
+<h2 id="overview-2"><a class="header" href="#overview-2">Overview</a></h2>
+<p>The effect handler system decouples protocol logic from transport implementation. Handlers interpret choreographic effects into actual communication operations.</p>
+<p>A protocol executes by calling handler methods for each operation. Different handlers provide different execution strategies without changing protocol code.</p>
+<h2 id="choreohandler-trait"><a class="header" href="#choreohandler-trait">ChoreoHandler Trait</a></h2>
+<p>All handlers implement this trait:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub trait ChoreoHandler {
+    type Role: RoleId;
+    type Endpoint;
+    
+    async fn send&lt;M: Serialize + Send + Sync&gt;(
+        &amp;mut self, ep: &amp;mut Self::Endpoint, to: Self::Role, msg: &amp;M
+    ) -&gt; Result&lt;()&gt;;
+    
+    async fn recv&lt;M: DeserializeOwned + Send&gt;(
+        &amp;mut self, ep: &amp;mut Self::Endpoint, from: Self::Role
+    ) -&gt; Result&lt;M&gt;;
+    
+    async fn choose(
+        &amp;mut self, ep: &amp;mut Self::Endpoint, who: Self::Role, label: Label
+    ) -&gt; Result&lt;()&gt;;
+    
+    async fn offer(
+        &amp;mut self, ep: &amp;mut Self::Endpoint, from: Self::Role
+    ) -&gt; Result&lt;Label&gt;;
+}
+<span class="boring">}</span></code></pre></pre>
+<p>The <code>send</code> method transmits a message to another role. The <code>recv</code> method waits for a message from another role. The <code>choose</code> method makes a branch selection. The <code>offer</code> method receives a branch selection.</p>
+<p>The <code>Endpoint</code> associated type holds connection state. Different handlers use different endpoint types.</p>
+<h3 id="send-bounds-and-portability"><a class="header" href="#send-bounds-and-portability">Send bounds and portability</a></h3>
+<p>The trait requires messages (<code>Serialize + Send + Sync</code> for <code>send</code>, <code>DeserializeOwned + Send</code> for <code>recv</code>) and handler futures (<code>F: Future + Send</code> in <code>with_timeout</code>) to be <code>Send</code>. This matches the requirements of the runtimes we target (tokio on native, single-thread executors on WASM) and keeps middleware stacks interchangeable between single- and multi-threaded deployments. Even on WASM the bounds remain, so code that is written for browsers compiles unchanged for native binaries that move work across threads.</p>
+<h2 id="built-in-handlers"><a class="header" href="#built-in-handlers">Built-in Handlers</a></h2>
+<h3 id="inmemoryhandler"><a class="header" href="#inmemoryhandler">InMemoryHandler</a></h3>
+<p>Location: <code>choreography/src/effects/handlers/in_memory.rs</code></p>
+<p>Provides fast local message passing for testing. Uses futures channels internally.</p>
+<p>Usage:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use rumpsteak_aura_choreography::InMemoryHandler;
+
+let mut handler = InMemoryHandler::new(Role::Alice);
+<span class="boring">}</span></code></pre></pre>
+<p>For coordinated testing between roles:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let channels = Arc::new(Mutex::new(HashMap::new()));
+let choice_channels = Arc::new(Mutex::new(HashMap::new()));
+
+let alice = InMemoryHandler::with_channels(Role::Alice, channels.clone(), choice_channels.clone());
+let bob = InMemoryHandler::with_channels(Role::Bob, channels.clone(), choice_channels.clone());
+<span class="boring">}</span></code></pre></pre>
+<p>The shared channels enable communication between handlers in the same process.</p>
+<h3 id="rumpsteakhandler"><a class="header" href="#rumpsteakhandler">RumpsteakHandler</a></h3>
+<p>Location: <code>choreography/src/effects/handlers/rumpsteak.rs</code></p>
+<p>Provides production-ready session-typed channels. Uses the core Rumpsteak library for type-safe communication.</p>
+<p>This handler enforces session types at runtime and provides strong guarantees about protocol compliance.</p>
+<p>See <a href="06_rumpsteak_handler.html">Using Rumpsteak Handlers</a> for complete documentation.</p>
+<h3 id="recordinghandler"><a class="header" href="#recordinghandler">RecordingHandler</a></h3>
+<p>Location: <code>choreography/src/effects/handlers/recording.rs</code></p>
+<p>Records all operations for verification and testing. Stores a log of send, recv, choose, and offer calls.</p>
+<p>Usage:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use rumpsteak_aura_choreography::RecordingHandler;
+
+let mut handler = RecordingHandler::new(Role::Alice);
+// ... execute protocol ...
+let events = handler.events();
+assert_eq!(events[0], RecordedEvent::Send { to: Role::Bob, ... });
+<span class="boring">}</span></code></pre></pre>
+<p>The recorded events can be inspected in tests to verify protocol behavior.</p>
+<h3 id="noophandler"><a class="header" href="#noophandler">NoOpHandler</a></h3>
+<p>Location: <code>choreography/src/effects/handler.rs</code></p>
+<p>Implements all operations as no-ops. Useful for testing protocol structure without actual communication.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let handler = NoOpHandler::&lt;MyRole&gt;::new();
+<span class="boring">}</span></code></pre></pre>
+<p>All operations succeed immediately without side effects.</p>
+<h2 id="middleware-1"><a class="header" href="#middleware-1">Middleware</a></h2>
+<p>Middleware wraps handlers to add cross-cutting functionality. Multiple middleware can compose around a single handler.</p>
+<h3 id="trace"><a class="header" href="#trace">Trace</a></h3>
+<p>Location: <code>choreography/src/effects/middleware/mod.rs</code></p>
+<p>Logs all operations for debugging. Outputs send, recv, choose, and offer calls with role and message details.</p>
+<p>Usage:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use rumpsteak_aura_choreography::middleware::Trace;
+
+let base_handler = InMemoryHandler::new(role);
+let mut handler = Trace::new(base_handler, "Alice".to_string());
+<span class="boring">}</span></code></pre></pre>
+<p>Each operation logs before delegating to the inner handler.</p>
+<h3 id="metrics"><a class="header" href="#metrics">Metrics</a></h3>
+<p>Location: <code>choreography/src/effects/middleware/metrics.rs</code></p>
+<p>Counts operations for monitoring. Tracks send_count, recv_count, choose_count, and offer_count.</p>
+<p>Usage:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use rumpsteak_aura_choreography::middleware::Metrics;
+
+let base_handler = InMemoryHandler::new(role);
+let mut handler = Metrics::new(base_handler);
+// ... execute protocol ...
+println!("Sends: {}", handler.send_count());
+<span class="boring">}</span></code></pre></pre>
+<p>Metrics accumulate over the handler lifetime.</p>
+<h3 id="retry"><a class="header" href="#retry">Retry</a></h3>
+<p>Location: <code>choreography/src/effects/middleware/retry.rs</code></p>
+<p>Retries failed operations with exponential backoff. Only retries send operations since recv changes protocol state.</p>
+<p>Usage:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use rumpsteak_aura_choreography::middleware::Retry;
+use std::time::Duration;
+
+let base_handler = InMemoryHandler::new(role);
+let mut handler = Retry::new(base_handler, 3, Duration::from_millis(100));
+<span class="boring">}</span></code></pre></pre>
+<p>The handler retries up to 3 times with delays of 100ms, 200ms, 400ms.</p>
+<h3 id="faultinjection"><a class="header" href="#faultinjection">FaultInjection</a></h3>
+<p>Location: <code>choreography/src/effects/middleware/fault_injection.rs</code></p>
+<p>Requires the <code>test-utils</code> feature. Injects random failures and delays for testing fault tolerance.</p>
+<p>Usage:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use rumpsteak_aura_choreography::middleware::FaultInjection;
+use std::time::Duration;
+
+let base_handler = InMemoryHandler::new(role);
+let mut handler = FaultInjection::new(base_handler)
+    .with_failure_rate(0.1)  // 10% failure rate
+    .with_delay_range(Duration::from_millis(10), Duration::from_millis(100));
+<span class="boring">}</span></code></pre></pre>
+<p>Operations randomly fail or delay based on configured rates.</p>
+<h2 id="composing-middleware"><a class="header" href="#composing-middleware">Composing Middleware</a></h2>
+<p>Middleware can stack:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let handler = InMemoryHandler::new(role);
+let handler = Retry::new(handler, 3, Duration::from_millis(100));
+let handler = Trace::new(handler, "Alice".to_string());
+let handler = Metrics::new(handler);
+<span class="boring">}</span></code></pre></pre>
+<p>Operations flow through the stack: Metrics -&gt; Trace -&gt; Retry -&gt; InMemory.</p>
+<h2 id="creating-custom-handlers"><a class="header" href="#creating-custom-handlers">Creating Custom Handlers</a></h2>
+<p>Implement <code>ChoreoHandler</code> for your transport:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct MyHandler {
+    role: MyRole,
+    connections: HashMap&lt;MyRole, Connection&gt;,
+}
+
+#[async_trait]
+impl ChoreoHandler for MyHandler {
+    type Role = MyRole;
+    type Endpoint = MyEndpoint;
+    
+    async fn send&lt;M: Serialize + Send + Sync&gt;(
+        &amp;mut self, ep: &amp;mut Self::Endpoint, to: Self::Role, msg: &amp;M
+    ) -&gt; Result&lt;()&gt; {
+        let conn = self.connections.get_mut(&amp;to)?;
+        let bytes = bincode::serialize(msg)?;
+        conn.send(bytes).await?;
+        Ok(())
+    }
+    
+    async fn recv&lt;M: DeserializeOwned + Send&gt;(
+        &amp;mut self, ep: &amp;mut Self::Endpoint, from: Self::Role
+    ) -&gt; Result&lt;M&gt; {
+        let conn = self.connections.get_mut(&amp;from)?;
+        let bytes = conn.recv().await?;
+        let msg = bincode::deserialize(&amp;bytes)?;
+        Ok(msg)
+    }
+    
+    // Implement choose and offer...
+}
+<span class="boring">}</span></code></pre></pre>
+<p>The handler manages connection state and serialization. The endpoint type holds per-role state if needed.</p>
+<h2 id="handler-selection-guide"><a class="header" href="#handler-selection-guide">Handler Selection Guide</a></h2>
+<p>Use InMemoryHandler for local testing and simple protocols.</p>
+<p>Use RumpsteakHandler for production deployments with session type guarantees.</p>
+<p>Use RecordingHandler for test verification and debugging.</p>
+<p>Use NoOpHandler for protocol structure testing.</p>
+<p>Use middleware to add logging, metrics, retries, or fault injection to any handler.</p>
+<h2 id="wasm-considerations"><a class="header" href="#wasm-considerations">WASM Considerations</a></h2>
+<p>InMemoryHandler and RumpsteakHandler both work in WASM environments using futures channels.</p>
+<p>For WASM network communication, implement a custom handler using web-sys WebSocket or fetch APIs. See <a href="07_wasm_guide.html">WASM Guide</a> for details.</p>
+<h2 id="effect-interpretation"><a class="header" href="#effect-interpretation">Effect Interpretation</a></h2>
+<p>Handlers interpret effect programs:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let program = Program::new()
+    .send(Role::Bob, msg)
+    .recv::&lt;Response&gt;(Role::Bob)
+    .end();
+
+let result = interpret(&amp;mut handler, &amp;mut endpoint, program).await?;
+<span class="boring">}</span></code></pre></pre>
+<p>The <code>interpret</code> function walks the effect tree and calls handler methods for each operation. The result contains received messages and execution status.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="using-rumpsteak-handlers"><a class="header" href="#using-rumpsteak-handlers">Using Rumpsteak Handlers</a></h1>
+<h2 id="overview-3"><a class="header" href="#overview-3">Overview</a></h2>
+<p>The <code>RumpsteakHandler</code> provides a production-ready implementation of choreographic effects using session-typed channels. This guide covers everything you need to know to use it effectively in your applications.</p>
+<h2 id="quick-start"><a class="header" href="#quick-start">Quick Start</a></h2>
+<h3 id="basic-two-party-protocol"><a class="header" href="#basic-two-party-protocol">Basic Two-Party Protocol</a></h3>
+<pre><pre class="playground"><code class="language-rust">use rumpsteak_choreography::effects::{
+    ChoreoHandler,
+    handlers::rumpsteak::{RumpsteakHandler, RumpsteakEndpoint, SimpleChannel},
+};
+
+// Define roles
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+enum Role { Alice, Bob }
+
+impl rumpsteak_aura::Role for Role {
+    type Message = MyMessage;
+    fn seal(&amp;mut self) {}
+    fn is_sealed(&amp;self) -&gt; bool { false }
+}
+
+// Define messages
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct MyMessage {
+    content: String,
+}
+
+impl rumpsteak_aura::Message&lt;Box&lt;dyn std::any::Any + Send&gt;&gt; for MyMessage {
+    fn upcast(msg: Box&lt;dyn std::any::Any + Send&gt;) -&gt; Self {
+        *msg.downcast::&lt;MyMessage&gt;().unwrap()
+    }
+    fn downcast(self) -&gt; Result&lt;Box&lt;dyn std::any::Any + Send&gt;, Self&gt; {
+        Ok(Box::new(self))
+    }
+}
+
+#[tokio::main]
+async fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    // Create endpoints
+    let mut alice_ep = RumpsteakEndpoint::new(Role::Alice);
+    let mut bob_ep = RumpsteakEndpoint::new(Role::Bob);
+    
+    // Setup channels
+    let (alice_ch, bob_ch) = SimpleChannel::pair();
+    alice_ep.register_channel(Role::Bob, alice_ch);
+    bob_ep.register_channel(Role::Alice, bob_ch);
+    
+    // Create handlers
+    let mut alice_handler = RumpsteakHandler::&lt;Role, MyMessage&gt;::new();
+    let mut bob_handler = RumpsteakHandler::&lt;Role, MyMessage&gt;::new();
+    
+    // Send and receive
+    let msg = MyMessage { content: "Hello!".to_string() };
+    alice_handler.send(&amp;mut alice_ep, Role::Bob, &amp;msg).await?;
+    
+    let received: MyMessage = bob_handler.recv(&amp;mut bob_ep, Role::Alice).await?;
+    println!("Received: {}", received.content);
+    
+    Ok(())
+}</code></pre></pre>
+<hr />
+<h2 id="core-concepts-1"><a class="header" href="#core-concepts-1">Core Concepts</a></h2>
+<h3 id="roles-1"><a class="header" href="#roles-1">Roles</a></h3>
+<p>Roles represent participants in the choreography. They must implement:</p>
+<ul>
+<li><code>rumpsteak_aura::Role</code></li>
+<li><code>Clone</code>, <code>Copy</code>, <code>Debug</code>, <code>PartialEq</code>, <code>Eq</code>, <code>Hash</code></li>
+</ul>
+<h3 id="messages-1"><a class="header" href="#messages-1">Messages</a></h3>
+<p>Messages are the data exchanged between roles. They must:</p>
+<ul>
+<li>Implement <code>Serialize</code> and <code>Deserialize</code> (via serde)</li>
+<li>Implement <code>rumpsteak_aura::Message</code></li>
+<li>Be <code>Send</code> and <code>Sync</code></li>
+</ul>
+<h3 id="endpoints"><a class="header" href="#endpoints">Endpoints</a></h3>
+<p><code>RumpsteakEndpoint&lt;R&gt;</code> manages the channels and session state for a role:</p>
+<ul>
+<li>One endpoint per role in the protocol</li>
+<li>Contains channels to all peers</li>
+<li>Tracks session metadata (operation counts, state descriptions)</li>
+</ul>
+<h3 id="channels"><a class="header" href="#channels">Channels</a></h3>
+<p><code>SimpleChannel</code> provides bidirectional async message passing:</p>
+<ul>
+<li>Created in pairs: <code>SimpleChannel::pair()</code></li>
+<li>Uses mpsc unbounded channels internally</li>
+<li>Automatically serializes/deserializes messages</li>
+</ul>
+<h3 id="handlers"><a class="header" href="#handlers">Handlers</a></h3>
+<p><code>RumpsteakHandler&lt;R, M&gt;</code> interprets choreographic effects:</p>
+<ul>
+<li>Stateless (can be shared across operations)</li>
+<li>Implements <code>ChoreoHandler</code> trait</li>
+<li>Provides send, recv, choose, offer operations</li>
+</ul>
+<hr />
+<h2 id="api-reference"><a class="header" href="#api-reference">API Reference</a></h2>
+<h3 id="rumpsteakendpoint"><a class="header" href="#rumpsteakendpoint">RumpsteakEndpoint</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>impl&lt;R: Role + Eq + Hash + Clone&gt; RumpsteakEndpoint&lt;R&gt;
+<span class="boring">}</span></code></pre></pre>
+<h4 id="constructor"><a class="header" href="#constructor">Constructor</a></h4>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn new(local_role: R) -&gt; Self
+<span class="boring">}</span></code></pre></pre>
+<p>Create a new endpoint for a role.</p>
+<h4 id="channel-management"><a class="header" href="#channel-management">Channel Management</a></h4>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn register_channel&lt;T&gt;(&amp;mut self, peer: R, channel: T)
+<span class="boring">}</span></code></pre></pre>
+<p>Register a channel with a peer role.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn register_session(&amp;mut self, peer: R, session: RumpsteakSession)
+<span class="boring">}</span></code></pre></pre>
+<p>Register a dynamically dispatched session (for example one produced via
+<code>RumpsteakSession::from_simple_channel</code> or
+<code>RumpsteakSession::from_sink_stream</code>). Use this when you need additional
+transport logic such as WebSockets, recording, or custom middleware stacks.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn has_channel(&amp;self, peer: &amp;R) -&gt; bool
+<span class="boring">}</span></code></pre></pre>
+<p>Check if a channel exists for a peer.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn close_channel(&amp;mut self, peer: &amp;R) -&gt; bool
+<span class="boring">}</span></code></pre></pre>
+<p>Close a specific channel.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn close_all_channels(&amp;mut self) -&gt; usize
+<span class="boring">}</span></code></pre></pre>
+<p>Close all channels and return count.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn active_channel_count(&amp;self) -&gt; usize
+<span class="boring">}</span></code></pre></pre>
+<p>Get number of active channels.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn is_all_closed(&amp;self) -&gt; bool
+<span class="boring">}</span></code></pre></pre>
+<p>Check if all channels are closed.</p>
+<h4 id="metadata-access"><a class="header" href="#metadata-access">Metadata Access</a></h4>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn get_metadata(&amp;self, peer: &amp;R) -&gt; Option&lt;&amp;SessionMetadata&gt;
+<span class="boring">}</span></code></pre></pre>
+<p>Get session metadata for a peer.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn all_metadata(&amp;self) -&gt; Vec&lt;(R, &amp;SessionMetadata)&gt;
+<span class="boring">}</span></code></pre></pre>
+<p>Get metadata for all sessions.</p>
+<h3 id="rumpsteakhandler-1"><a class="header" href="#rumpsteakhandler-1">RumpsteakHandler</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>impl&lt;R, M&gt; RumpsteakHandler&lt;R, M&gt;
+<span class="boring">}</span></code></pre></pre>
+<h4 id="constructor-1"><a class="header" href="#constructor-1">Constructor</a></h4>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn new() -&gt; Self
+<span class="boring">}</span></code></pre></pre>
+<p>Create a new handler.</p>
+<h4 id="choreohandler-implementation"><a class="header" href="#choreohandler-implementation">ChoreoHandler Implementation</a></h4>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>async fn send&lt;Msg&gt;(&amp;mut self, ep: &amp;mut Endpoint, to: Role, msg: &amp;Msg) -&gt; Result&lt;()&gt;
+where Msg: Serialize + Send + Sync
+<span class="boring">}</span></code></pre></pre>
+<p>Send a message to a role.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>async fn recv&lt;Msg&gt;(&amp;mut self, ep: &amp;mut Endpoint, from: Role) -&gt; Result&lt;Msg&gt;
+where Msg: DeserializeOwned + Send
+<span class="boring">}</span></code></pre></pre>
+<p>Receive a message from a role.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>async fn choose(&amp;mut self, ep: &amp;mut Endpoint, who: Role, label: Label) -&gt; Result&lt;()&gt;
+<span class="boring">}</span></code></pre></pre>
+<p>Make a choice (internal choice).</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>async fn offer(&amp;mut self, ep: &amp;mut Endpoint, from: Role) -&gt; Result&lt;Label&gt;
+<span class="boring">}</span></code></pre></pre>
+<p>Offer a choice (external choice).</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>async fn with_timeout&lt;F, T&gt;(&amp;mut self, ep: &amp;mut Endpoint, at: Role, dur: Duration, body: F) -&gt; Result&lt;T&gt;
+where F: Future&lt;Output = Result&lt;T&gt;&gt; + Send
+<span class="boring">}</span></code></pre></pre>
+<p>Execute operation with timeout.</p>
+<h3 id="simplechannel"><a class="header" href="#simplechannel">SimpleChannel</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct SimpleChannel
+<span class="boring">}</span></code></pre></pre>
+<h4 id="constructor-2"><a class="header" href="#constructor-2">Constructor</a></h4>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn pair() -&gt; (Self, Self)
+<span class="boring">}</span></code></pre></pre>
+<p>Create a connected pair of channels.</p>
+<h4 id="operations"><a class="header" href="#operations">Operations</a></h4>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub async fn send(&amp;mut self, msg: Vec&lt;u8&gt;) -&gt; Result&lt;(), String&gt;
+<span class="boring">}</span></code></pre></pre>
+<p>Send raw bytes.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub async fn recv(&amp;mut self) -&gt; Result&lt;Vec&lt;u8&gt;, String&gt;
+<span class="boring">}</span></code></pre></pre>
+<p>Receive raw bytes.</p>
+<h3 id="rumpsteaksession-builders"><a class="header" href="#rumpsteaksession-builders">RumpsteakSession Builders</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>RumpsteakSession::from_simple_channel(channel: SimpleChannel)
+<span class="boring">}</span></code></pre></pre>
+<p>Wraps a legacy channel in the new dynamic session API.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>RumpsteakSession::from_sink_stream(sender, receiver)
+<span class="boring">}</span></code></pre></pre>
+<p>Accepts any async sink/stream pair carrying <code>Vec&lt;u8&gt;</code> payloads (e.g. WebSocket/
+Fetch bridges, QUIC streams, etc.) and exposes them to the handler. This is the
+recommended entry point for custom transports; once wrapped, call
+<code>endpoint.register_session(peer, session)</code>.</p>
+<h3 id="sessionmetadata"><a class="header" href="#sessionmetadata">SessionMetadata</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct SessionMetadata {
+    pub state_description: String,
+    pub is_complete: bool,
+    pub operation_count: usize,
+}
+<span class="boring">}</span></code></pre></pre>
+<p>Tracks session progression:</p>
+<ul>
+<li><code>state_description</code>: Human-readable current state</li>
+<li><code>is_complete</code>: Whether session has completed</li>
+<li><code>operation_count</code>: Number of operations performed</li>
+</ul>
+<hr />
+<h2 id="usage-patterns"><a class="header" href="#usage-patterns">Usage Patterns</a></h2>
+<h3 id="pattern-1-request-response"><a class="header" href="#pattern-1-request-response">Pattern 1: Request-Response</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Client side
+let request = Request { query: "data".to_string() };
+handler.send(&amp;mut endpoint, Role::Server, &amp;request).await?;
+let response: Response = handler.recv(&amp;mut endpoint, Role::Server).await?;
+<span class="boring">}</span></code></pre></pre>
+<h3 id="pattern-2-choice-with-branches"><a class="header" href="#pattern-2-choice-with-branches">Pattern 2: Choice with Branches</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Sender
+let decision = if condition {
+    Label("accept")
+} else {
+    Label("reject")
+};
+handler.choose(&amp;mut endpoint, Role::Other, decision).await?;
+
+// Receiver
+let choice = handler.offer(&amp;mut endpoint, Role::Other).await?;
+match choice.0 {
+    "accept" =&gt; {
+        // Handle accept branch
+    }
+    "reject" =&gt; {
+        // Handle reject branch
+    }
+    _ =&gt; unreachable!(),
+}
+<span class="boring">}</span></code></pre></pre>
+<h3 id="pattern-3-sequential-messages"><a class="header" href="#pattern-3-sequential-messages">Pattern 3: Sequential Messages</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>for item in items {
+    handler.send(&amp;mut endpoint, Role::Peer, &amp;item).await?;
+    let ack: Ack = handler.recv(&amp;mut endpoint, Role::Peer).await?;
+}
+<span class="boring">}</span></code></pre></pre>
+<h3 id="pattern-4-multi-party-coordination"><a class="header" href="#pattern-4-multi-party-coordination">Pattern 4: Multi-Party Coordination</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Coordinator
+let offer: Offer = handler.recv(&amp;mut endpoint, Role::Buyer).await?;
+handler.send(&amp;mut endpoint, Role::Seller, &amp;offer).await?;
+
+let response: Response = handler.recv(&amp;mut endpoint, Role::Seller).await?;
+handler.send(&amp;mut endpoint, Role::Buyer, &amp;response).await?;
+<span class="boring">}</span></code></pre></pre>
+<h3 id="pattern-5-timeout-protection"><a class="header" href="#pattern-5-timeout-protection">Pattern 5: Timeout Protection</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let result = handler.with_timeout(
+    &amp;mut endpoint,
+    Role::Self_,
+    Duration::from_secs(5),
+    async {
+        handler.recv(&amp;mut endpoint, Role::Peer).await
+    }
+).await;
+
+match result {
+    Ok(msg) =&gt; {
+        // Process message
+    }
+    Err(ChoreographyError::Timeout(_)) =&gt; {
+        // Handle timeout
+    }
+    Err(e) =&gt; {
+        // Handle other errors
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="best-practices"><a class="header" href="#best-practices">Best Practices</a></h2>
+<h3 id="1-resource-management"><a class="header" href="#1-resource-management">1. Resource Management</a></h3>
+<p><strong>DO</strong>:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Close channels explicitly when done
+endpoint.close_all_channels();
+<span class="boring">}</span></code></pre></pre>
+<p><strong>DO</strong>:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Use Drop to ensure cleanup
+{
+    let mut endpoint = RumpsteakEndpoint::new(role);
+    // ... use endpoint ...
+} // Drop ensures cleanup
+<span class="boring">}</span></code></pre></pre>
+<p><strong>DON'T</strong>:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Don't forget to clean up resources
+let mut endpoint = RumpsteakEndpoint::new(role);
+// ... use endpoint ...
+// Forgot to close!
+<span class="boring">}</span></code></pre></pre>
+<h3 id="2-error-handling"><a class="header" href="#2-error-handling">2. Error Handling</a></h3>
+<p><strong>DO</strong>:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>match handler.send(&amp;mut ep, role, &amp;msg).await {
+    Ok(()) =&gt; { /* success */ }
+    Err(ChoreographyError::Transport(e)) =&gt; {
+        // Handle transport error
+        tracing::error!("Send failed: {}", e);
+    }
+    Err(e) =&gt; {
+        // Handle other errors
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<p><strong>DON'T</strong>:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Don't ignore errors
+handler.send(&amp;mut ep, role, &amp;msg).await.unwrap();
+<span class="boring">}</span></code></pre></pre>
+<h3 id="3-channel-setup"><a class="header" href="#3-channel-setup">3. Channel Setup</a></h3>
+<p><strong>DO</strong>:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Setup all channels before starting protocol
+let (ch1, ch2) = SimpleChannel::pair();
+alice_ep.register_channel(Role::Bob, ch1);
+bob_ep.register_channel(Role::Alice, ch2);
+
+// Then start protocol
+protocol_run().await?;
+<span class="boring">}</span></code></pre></pre>
+<p><strong>DON'T</strong>:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Don't register channels mid-protocol
+handler.send(&amp;mut ep, role, &amp;msg).await?; // Might not have channel!
+ep.register_channel(role, channel); // Too late!
+<span class="boring">}</span></code></pre></pre>
+<h3 id="4-metadata-usage"><a class="header" href="#4-metadata-usage">4. Metadata Usage</a></h3>
+<p><strong>DO</strong>:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Use metadata for debugging and monitoring
+if let Some(meta) = endpoint.get_metadata(&amp;peer) {
+    tracing::info!(
+        peer = ?peer,
+        operations = meta.operation_count,
+        state = %meta.state_description,
+        "Session status"
+    );
+}
+<span class="boring">}</span></code></pre></pre>
+<h3 id="5-testing"><a class="header" href="#5-testing">5. Testing</a></h3>
+<p><strong>DO</strong>:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[tokio::test]
+async fn test_protocol() {
+    // Setup test environment
+    let mut alice_ep = RumpsteakEndpoint::new(Role::Alice);
+    let mut bob_ep = RumpsteakEndpoint::new(Role::Bob);
+    
+    let (alice_ch, bob_ch) = SimpleChannel::pair();
+    alice_ep.register_channel(Role::Bob, alice_ch);
+    bob_ep.register_channel(Role::Alice, bob_ch);
+    
+    // Test protocol
+    let msg = TestMessage { data: vec![1, 2, 3] };
+    handler.send(&amp;mut alice_ep, Role::Bob, &amp;msg).await.unwrap();
+    
+    let received: TestMessage = handler.recv(&amp;mut bob_ep, Role::Alice).await.unwrap();
+    assert_eq!(received.data, vec![1, 2, 3]);
+}
+<span class="boring">}</span></code></pre></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="wasm-guide"><a class="header" href="#wasm-guide">WASM Guide</a></h1>
+<h2 id="overview-4"><a class="header" href="#overview-4">Overview</a></h2>
+<p>Rumpsteak's choreographic programming system compiles to WebAssembly. The core library and effect handlers work in browser environments.</p>
+<p>WASM support enables choreographic protocols in web applications, browser-based distributed systems, and serverless edge computing.</p>
+<h2 id="what-works-in-wasm"><a class="header" href="#what-works-in-wasm">What Works in WASM</a></h2>
+<p>The following features compile and run in WASM:</p>
+<p>Core session types and choreography system work fully. The InMemoryHandler provides local message passing for testing protocols. RumpsteakHandler now compiles for WASM and can be used with custom network transports (WebSocket, fetch API, etc.). All middleware (Trace, Metrics, Retry, FaultInjection) functions correctly. Effect system and interpreter execute normally. Timeouts use wasm-timer for cross-platform support.</p>
+<h2 id="what-does-not-work-in-wasm"><a class="header" href="#what-does-not-work-in-wasm">What Does Not Work in WASM</a></h2>
+<p>The caching example uses Redis and Hyper which are not WASM compatible.</p>
+<p>Multi-threading is unavailable since WASM runs single-threaded.</p>
+<p>Native file system access requires browser File APIs.</p>
+<h2 id="building-for-wasm"><a class="header" href="#building-for-wasm">Building for WASM</a></h2>
+<p>Add the wasm feature to your dependencies:</p>
+<pre><code class="language-toml">[dependencies]
+rumpsteak-choreography = { version = "0.1", features = ["wasm"] }
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+</code></pre>
+<p>Build using wasm-pack:</p>
+<pre><code class="language-bash">wasm-pack build --target web
+</code></pre>
+<p>This generates a pkg directory with JavaScript bindings.</p>
+<h2 id="example-protocol"><a class="header" href="#example-protocol">Example Protocol</a></h2>
+<p>The wasm-ping-pong example demonstrates a complete browser protocol:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use wasm_bindgen::prelude::*;
+use rumpsteak_choreography::{InMemoryHandler, Program, interpret};
+
+#[wasm_bindgen]
+pub async fn run_protocol(message: String) -&gt; Result&lt;String, JsValue&gt; {
+    let mut handler = InMemoryHandler::new(Role::Alice);
+    
+    let program = Program::new()
+        .send(Role::Bob, Message::Ping(message))
+        .recv::&lt;Message&gt;(Role::Bob)
+        .end();
+    
+    let mut endpoint = ();
+    let result = interpret(&amp;mut handler, &amp;mut endpoint, program).await
+        .map_err(|e| JsValue::from_str(&amp;format!("{:?}", e)))?;
+    
+    match result.received_values.first() {
+        Some(Message::Pong(response)) =&gt; Ok(response.clone()),
+        _ =&gt; Err(JsValue::from_str("Expected Pong message")),
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<p>The wasm_bindgen attribute exposes the function to JavaScript.</p>
+<p>Build and run the example:</p>
+<pre><code class="language-bash">cd examples/wasm-ping-pong
+./build.sh
+python3 -m http.server 8000
+</code></pre>
+<p>Open http://localhost:8000 in a browser to run the protocol.</p>
+<h2 id="using-rumpsteakhandler-in-wasm"><a class="header" href="#using-rumpsteakhandler-in-wasm">Using RumpsteakHandler in WASM</a></h2>
+<p>RumpsteakHandler now compiles for WASM. To use it with real network transport:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use wasm_bindgen::prelude::*;
+use rumpsteak_choreography::{RumpsteakHandler, RumpsteakEndpoint, SimpleChannel};
+
+#[wasm_bindgen]
+pub async fn run_distributed_protocol() -&gt; Result&lt;(), JsValue&gt; {
+    // Create endpoints
+    let mut alice_ep = RumpsteakEndpoint::new(Role::Alice);
+    let mut bob_ep = RumpsteakEndpoint::new(Role::Bob);
+    
+    // Option 1: use SimpleChannel (works natively and in WASM)
+    let (alice_ch, bob_ch) = SimpleChannel::pair();
+    alice_ep.register_channel(Role::Bob, alice_ch);
+    bob_ep.register_channel(Role::Alice, bob_ch);
+
+    // Option 2: wrap browser transports directly
+    // let ws_session = RumpsteakSession::from_sink_stream(ws_writer, ws_reader);
+    // alice_ep.register_session(Role::Bob, ws_session);
+    
+    // Create handler
+    let mut handler = RumpsteakHandler::new();
+    
+    // Use with choreography operations
+    handler.send(&amp;mut alice_ep, Role::Bob, &amp;message).await?;
+    let response = handler.recv(&amp;mut bob_ep, Role::Alice).await?;
+    
+    Ok(())
+}
+<span class="boring">}</span></code></pre></pre>
+<p>SimpleChannel uses futures::channel::mpsc which is WASM-compatible. For distributed WASM applications, implement custom channels using browser APIs.</p>
+<h3 id="async-traits-in-wasm"><a class="header" href="#async-traits-in-wasm">Async traits in WASM</a></h3>
+<p>The handler traits continue to use the <code>async_trait</code> macro rather than native <code>async fn</code> in traits. This keeps the traits object-safe (needed for middleware stacks such as <code>Trace&lt;Retry&lt;H&gt;&gt;</code>) and lets us share a single implementation strategy across native and WASM targets. The generated futures are still <code>Send</code>, so handlers that run under multithreaded executors behave the same way as handlers compiled for single-threaded WASM.</p>
+<h2 id="custom-network-transport"><a class="header" href="#custom-network-transport">Custom Network Transport</a></h2>
+<p>InMemoryHandler works for single-context protocols. Real distributed WASM applications need network transport.</p>
+<p>Implement ChoreoHandler with WebSocket or fetch APIs:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use web_sys::WebSocket;
+use wasm_bindgen::JsCast;
+
+pub struct WebSocketHandler {
+    role: Role,
+    socket: WebSocket,
+    incoming: mpsc::UnboundedReceiver&lt;Vec&lt;u8&gt;&gt;,
+}
+
+impl WebSocketHandler {
+    pub fn new(role: Role, url: &amp;str) -&gt; Result&lt;Self, JsValue&gt; {
+        let socket = WebSocket::new(url)?;
+        let (tx, rx) = mpsc::unbounded();
+        
+        let onmessage = Closure::wrap(Box::new(move |e: MessageEvent| {
+            // Handle incoming messages
+            if let Ok(buffer) = e.data().dyn_into::&lt;js_sys::ArrayBuffer&gt;() {
+                let bytes = js_sys::Uint8Array::new(&amp;buffer).to_vec();
+                tx.unbounded_send(bytes).ok();
+            }
+        }) as Box&lt;dyn FnMut(MessageEvent)&gt;);
+        
+        socket.set_onmessage(Some(onmessage.as_ref().unchecked_ref()));
+        onmessage.forget();
+        
+        Ok(Self { role, socket, incoming: rx })
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<p>With the Phase 3 handler you can skip the custom <code>ChoreoHandler</code>—wrap this
+<code>WebSocketHandler</code> with <code>RumpsteakSession::from_sink_stream</code> and register it on
+the endpoint instead.</p>
+<p>For HTTP-based protocols, use the fetch API:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use web_sys::window;
+
+async fn send_http(to: Role, msg: &amp;Message) -&gt; Result&lt;()&gt; {
+    let window = window().ok_or("no window")?;
+    let resp = JsFuture::from(
+        window.fetch_with_str(&amp;format!("http://server/{}", to))
+    ).await?;
+    Ok(())
+}
+<span class="boring">}</span></code></pre></pre>
+<p>The pattern is the same: implement ChoreoHandler using browser APIs for your transport.</p>
+<h2 id="platform-differences"><a class="header" href="#platform-differences">Platform Differences</a></h2>
+<p>The runtime module provides platform-specific functions:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use rumpsteak_choreography::runtime::{spawn, spawn_local};
+
+spawn(async { /* task */ });  // Works on native and WASM
+<span class="boring">}</span></code></pre></pre>
+<p>On native targets, spawn uses tokio. On WASM, it uses wasm-bindgen-futures.</p>
+<p>Timeouts use conditional compilation:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Native
+tokio::time::timeout(duration, future).await
+
+// WASM
+use wasm_timer::Delay;
+futures::select! {
+    result = future =&gt; result,
+    _ = Delay::new(duration) =&gt; Err(Timeout),
+}
+<span class="boring">}</span></code></pre></pre>
+<p>The library handles this automatically. Your code works on both platforms.</p>
+<h2 id="testing-in-wasm"><a class="header" href="#testing-in-wasm">Testing in WASM</a></h2>
+<p>Use wasm-bindgen-test for browser tests:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use wasm_bindgen_test::*;
+
+wasm_bindgen_test_configure!(run_in_browser);
+
+#[wasm_bindgen_test]
+async fn test_protocol() {
+    let mut handler = InMemoryHandler::new(Role::Alice);
+    let program = Program::new().send(Role::Bob, Message::Test).end();
+    let mut endpoint = ();
+    let result = interpret(&amp;mut handler, &amp;mut endpoint, program).await;
+    assert!(result.is_ok());
+}
+<span class="boring">}</span></code></pre></pre>
+<p>Run tests with wasm-pack:</p>
+<pre><code class="language-bash">wasm-pack test --headless --chrome
+</code></pre>
+<p>The tests execute in a headless browser.</p>
+<h2 id="deployment"><a class="header" href="#deployment">Deployment</a></h2>
+<p>For production WASM deployments:</p>
+<p>Build with release optimizations:</p>
+<pre><code class="language-bash">wasm-pack build --target web --release
+</code></pre>
+<p>The generated WASM is optimized for size and performance.</p>
+<p>Serve the pkg directory with your web application. Import the JavaScript bindings:</p>
+<pre><code class="language-html">&lt;script type="module"&gt;
+    import init, { run_protocol } from './pkg/my_protocol.js';
+    
+    async function main() {
+        await init();
+        const result = await run_protocol("data");
+        console.log(result);
+    }
+    
+    main();
+&lt;/script&gt;
+</code></pre>
+<p>The init function loads the WASM module. Protocol functions then become available.</p>
+<h2 id="browser-compatibility"><a class="header" href="#browser-compatibility">Browser Compatibility</a></h2>
+<p>WASM support works in modern browsers:</p>
+<p>Chrome/Chromium 90+, Firefox 88+, Safari 14+, Edge 90+.</p>
+<p>Older browsers may require polyfills or transpilation.</p>
+<h2 id="performance"><a class="header" href="#performance">Performance</a></h2>
+<p>WASM execution is near-native speed for computation. Network operations have typical browser fetch/WebSocket latency.</p>
+<p>InMemoryHandler has negligible overhead in WASM. Custom network handlers add latency from browser APIs.</p>
+<p>The generated WASM binary size is approximately 200-300KB after optimization.</p>
+<h2 id="limitations"><a class="header" href="#limitations">Limitations</a></h2>
+<p>WASM is single-threaded. Parallel protocol execution uses async concurrency, not OS threads.</p>
+<p>Browser security restricts some operations. Cross-origin requests need CORS configuration. WebSocket connections require proper server setup.</p>
+<p>File system access uses browser APIs which differ from native file operations.</p>
+<h2 id="example-projects"><a class="header" href="#example-projects">Example Projects</a></h2>
+<p>The examples/wasm-ping-pong directory contains a complete working example.</p>
+<p>See the build script for compilation details and the README for deployment instructions.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="examples-1"><a class="header" href="#examples-1">Examples</a></h1>
+<h2 id="example-index"><a class="header" href="#example-index">Example Index</a></h2>
+<h3 id="basic-protocols"><a class="header" href="#basic-protocols">Basic Protocols</a></h3>
+<p>adder.rs: Simple addition service with client and server roles.</p>
+<p>alternating_bit.rs: Alternating bit protocol for reliable message delivery.</p>
+<p>client_server_log.rs: Client-server interaction with logging.</p>
+<p>ring.rs: Ring topology with sequential message passing.</p>
+<h3 id="advanced-protocols"><a class="header" href="#advanced-protocols">Advanced Protocols</a></h3>
+<p>three_adder.rs: Three-party protocol with coordination.</p>
+<p>oauth.rs: OAuth authentication flow between client, authorization server, and resource server.</p>
+<p>double_buffering.rs: Producer-consumer with double buffering.</p>
+<p>elevator.rs: Multi-floor elevator control protocol.</p>
+<p>fft.rs: Distributed Fast Fourier Transform computation.</p>
+<h3 id="choice-and-branching"><a class="header" href="#choice-and-branching">Choice and Branching</a></h3>
+<p>ring_choice.rs: Ring topology with choice points.</p>
+<p>choreography.rs: Protocol demonstrating choice constructs.</p>
+<h3 id="wasm"><a class="header" href="#wasm">WASM</a></h3>
+<p>wasm-ping-pong: Browser-based ping-pong protocol. See examples/wasm-ping-pong/README.md for details.</p>
+<p><code>RumpsteakEndpoint</code> supports either <code>register_channel</code> (SimpleChannel) or
+<code>register_session</code>. Use <code>RumpsteakSession::from_sink_stream</code> when an example
+needs to speak over WebSockets or other custom transports.</p>
+<h2 id="common-patterns"><a class="header" href="#common-patterns">Common Patterns</a></h2>
+<h3 id="request-response"><a class="header" href="#request-response">Request-Response</a></h3>
+<p>Client sends request to server. Server processes and sends response back.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let program = Program::new()
+    .send(Role::Server, Request { query: "data" })
+    .recv::&lt;Response&gt;(Role::Server)
+    .end();
+<span class="boring">}</span></code></pre></pre>
+<p>Use this pattern for synchronous operations where client waits for server.</p>
+<h3 id="choice"><a class="header" href="#choice">Choice</a></h3>
+<p>One role decides between branches. Other roles react to the decision.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let program = Program::new()
+    .choose(Role::Server, Label("accept"))
+    .send(Role::Server, Confirmation)
+    .end();
+<span class="boring">}</span></code></pre></pre>
+<p>The chooser calls choose with a label. Other participants use offer to learn the choice.</p>
+<h3 id="sequential-messages"><a class="header" href="#sequential-messages">Sequential Messages</a></h3>
+<p>Send multiple messages in sequence. Each message may depend on previous responses.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let program = Program::new()
+    .send(Role::Peer, Message1)
+    .recv::&lt;Ack&gt;(Role::Peer)
+    .send(Role::Peer, Message2)
+    .recv::&lt;Ack&gt;(Role::Peer)
+    .end();
+<span class="boring">}</span></code></pre></pre>
+<p>This pattern provides acknowledgment after each step.</p>
+<h3 id="multi-party-coordination"><a class="header" href="#multi-party-coordination">Multi-Party Coordination</a></h3>
+<p>Three or more roles coordinate. Messages flow between different pairs.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let program = Program::new()
+    .recv::&lt;Offer&gt;(Role::Buyer)
+    .send(Role::Seller, Offer)
+    .recv::&lt;Response&gt;(Role::Seller)
+    .send(Role::Buyer, Response)
+    .end();
+<span class="boring">}</span></code></pre></pre>
+<p>The coordinator role mediates between other participants.</p>
+<h3 id="loops"><a class="header" href="#loops">Loops</a></h3>
+<p>Repeat protocol steps. Loop condition determines when to stop.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let loop_body = Program::new()
+    .send(Role::Server, Request)
+    .recv::&lt;Response&gt;(Role::Server);
+
+let program = Program::new()
+    .with_loop(loop_body, 5)  // Repeat 5 times
+    .end();
+<span class="boring">}</span></code></pre></pre>
+<p>Use loops for batch processing or iterative protocols.</p>
+<h3 id="parallel-composition-1"><a class="header" href="#parallel-composition-1">Parallel Composition</a></h3>
+<p>Execute independent protocol branches concurrently.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let branch1 = Program::new()
+    .send(Role::Worker1, Task)
+    .end();
+
+let branch2 = Program::new()
+    .send(Role::Worker2, Task)
+    .end();
+
+let program = Program::new()
+    .parallel(vec![branch1, branch2])
+    .end();
+<span class="boring">}</span></code></pre></pre>
+<p>Branches must not conflict. Different recipients allow parallel execution.</p>
+<h3 id="timeout-protection"><a class="header" href="#timeout-protection">Timeout Protection</a></h3>
+<p>Wrap operations with timeouts to handle unresponsive peers.</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let inner = Program::new()
+    .recv::&lt;Message&gt;(Role::Peer)
+    .end();
+
+let program = Program::new()
+    .with_timeout(Role::Self_, Duration::from_secs(5), inner)
+    .end();
+<span class="boring">}</span></code></pre></pre>
+<p>The operation fails with Timeout error if duration elapses.</p>
+<h2 id="testing-patterns"><a class="header" href="#testing-patterns">Testing Patterns</a></h2>
+<h3 id="unit-test-with-inmemoryhandler"><a class="header" href="#unit-test-with-inmemoryhandler">Unit Test with InMemoryHandler</a></h3>
+<p>Test protocol logic without network:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[tokio::test]
+async fn test_protocol() {
+    let mut handler = InMemoryHandler::new(Role::Alice);
+    let program = Program::new()
+        .send(Role::Bob, TestMessage)
+        .end();
+    
+    let mut endpoint = ();
+    let result = interpret(&amp;mut handler, &amp;mut endpoint, program).await;
+    assert!(result.is_ok());
+}
+<span class="boring">}</span></code></pre></pre>
+<p>InMemoryHandler provides fast deterministic testing.</p>
+<h3 id="integration-test-with-rumpsteakhandler"><a class="header" href="#integration-test-with-rumpsteakhandler">Integration Test with RumpsteakHandler</a></h3>
+<p>Test actual session-typed communication:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[tokio::test]
+async fn test_session_types() {
+    let (alice_ch, bob_ch) = SimpleChannel::pair();
+    
+    let mut alice_ep = RumpsteakEndpoint::new(Role::Alice);
+    alice_ep.register_channel(Role::Bob, alice_ch);
+    
+    let mut bob_ep = RumpsteakEndpoint::new(Role::Bob);
+    bob_ep.register_channel(Role::Alice, bob_ch);
+    
+    // Run protocol with both endpoints
+}
+<span class="boring">}</span></code></pre></pre>
+<p>This tests real message passing with session type checking.</p>
+<h3 id="verification-with-recordinghandler"><a class="header" href="#verification-with-recordinghandler">Verification with RecordingHandler</a></h3>
+<p>Verify protocol execution sequence:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let mut handler = RecordingHandler::new(Role::Alice);
+// ... execute protocol ...
+
+let events = handler.events();
+assert_eq!(events[0], RecordedEvent::Send { to: Role::Bob, ... });
+assert_eq!(events[1], RecordedEvent::Recv { from: Role::Bob, ... });
+<span class="boring">}</span></code></pre></pre>
+<p>RecordingHandler captures operation history for assertions.</p>
+<h3 id="fault-injection-testing"><a class="header" href="#fault-injection-testing">Fault Injection Testing</a></h3>
+<p>Test error handling with FaultInjection middleware:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let base = InMemoryHandler::new(Role::Alice);
+let mut handler = FaultInjection::new(base)
+    .with_failure_rate(0.1);
+
+// Protocol should handle 10% random failures
+<span class="boring">}</span></code></pre></pre>
+<p>Use this to verify retry logic and error recovery.</p>
+<h2 id="running-examples"><a class="header" href="#running-examples">Running Examples</a></h2>
+<p>Navigate to the example and run with cargo:</p>
+<pre><code class="language-bash">cargo run --example adder
+</code></pre>
+<p>Some examples require specific setup. Check comments at the top of each file.</p>
+<p>The wasm-ping-pong example has its own build script:</p>
+<pre><code class="language-bash">cd examples/wasm-ping-pong
+./build.sh
+</code></pre>
+<p>See individual example files for detailed documentation.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="api-reference-1"><a class="header" href="#api-reference-1">API Reference</a></h1>
+<h2 id="core-types"><a class="header" href="#core-types">Core Types</a></h2>
+<h3 id="choreography"><a class="header" href="#choreography">Choreography</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct Choreography {
+    pub name: Ident,
+    pub roles: Vec&lt;Role&gt;,
+    pub protocol: Protocol,
+    pub attrs: HashMap&lt;String, String&gt;,
+}
+<span class="boring">}</span></code></pre></pre>
+<p>Represents a complete choreography. The name identifies the protocol. Roles list all participants. Protocol contains the interaction tree. Attrs hold annotations like optimize or verify.</p>
+<h3 id="protocol"><a class="header" href="#protocol">Protocol</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub enum Protocol {
+    Send { from: Role, to: Role, message: MessageType, continuation: Box&lt;Protocol&gt; },
+    Choice { role: Role, branches: Vec&lt;(Label, Protocol)&gt; },
+    Loop { condition: Option&lt;Condition&gt;, body: Box&lt;Protocol&gt; },
+    Parallel { protocols: Vec&lt;Protocol&gt; },
+    Rec { name: Ident, body: Box&lt;Protocol&gt; },
+    Var(Ident),
+    End,
+}
+<span class="boring">}</span></code></pre></pre>
+<p>Protocol represents the global choreography as a tree. Send describes message transmission. Choice represents branching. Loop contains iteration. Parallel holds concurrent branches. Rec defines recursion points. Var references recursion. End terminates the protocol.</p>
+<h3 id="localtype"><a class="header" href="#localtype">LocalType</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub enum LocalType {
+    Send { to: Role, message: MessageType, continuation: Box&lt;LocalType&gt; },
+    Receive { from: Role, message: MessageType, continuation: Box&lt;LocalType&gt; },
+    Select { to: Role, branches: Vec&lt;(Label, LocalType)&gt; },
+    Branch { from: Role, branches: Vec&lt;(Label, LocalType)&gt; },
+    LocalChoice { branches: Vec&lt;(Label, LocalType)&gt; },
+    Loop { condition: Option&lt;Condition&gt;, body: Box&lt;LocalType&gt; },
+    Rec { label: String, body: Box&lt;LocalType&gt; },
+    Var(String),
+    End,
+}
+<span class="boring">}</span></code></pre></pre>
+<p>LocalType is the projected view for a single role. Send and Receive represent communication. Select makes a choice. Branch receives a choice. LocalChoice is internal branching. Loop, Rec, Var handle iteration. End terminates.</p>
+<h3 id="role"><a class="header" href="#role">Role</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct Role {
+    pub name: Ident,
+    pub index: Option&lt;usize&gt;,
+    pub param: Option&lt;TokenStream&gt;,
+    pub array_size: Option&lt;TokenStream&gt;,
+}
+<span class="boring">}</span></code></pre></pre>
+<p>Role identifies a participant. Name is the role identifier. Index holds concrete indices for indexed roles (e.g., <code>Worker[0]</code>). Param contains symbolic parameter expressions (e.g., <code>N</code> in <code>Worker[N]</code>). Array_size specifies the size of parameterized role arrays.</p>
+<h3 id="messagetype"><a class="header" href="#messagetype">MessageType</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct MessageType {
+    pub name: Ident,
+    pub payload: Option&lt;Vec&lt;Field&gt;&gt;,
+    pub type_annotation: Option&lt;TokenStream&gt;,
+}
+<span class="boring">}</span></code></pre></pre>
+<p>MessageType describes a message. Name is the message identifier. Payload lists fields. Type_annotation contains optional Rust type annotations like <code>&lt;String&gt;</code> or <code>&lt;Vec&lt;i32&gt;&gt;</code>.</p>
+<h2 id="parser-api"><a class="header" href="#parser-api">Parser API</a></h2>
+<h3 id="parse_choreography_str"><a class="header" href="#parse_choreography_str">parse_choreography_str</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn parse_choreography_str(input: &amp;str) -&gt; Result&lt;Choreography, ParseError&gt;
+<span class="boring">}</span></code></pre></pre>
+<p>Parses a choreography from a string. Returns ParseError if syntax is invalid or roles are undefined.</p>
+<h3 id="parse_choreography_file"><a class="header" href="#parse_choreography_file">parse_choreography_file</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn parse_choreography_file(path: &amp;Path) -&gt; Result&lt;Choreography, ParseError&gt;
+<span class="boring">}</span></code></pre></pre>
+<p>Parses a choreography from a file. Reads the file and delegates to parse_choreography_str.</p>
+<h3 id="parseerror"><a class="header" href="#parseerror">ParseError</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub enum ParseError {
+    UndefinedRole(String),
+    DuplicateRole(String),
+    UndefinedProtocol(String),
+    DuplicateProtocol(String),
+    Syntax { location: String, message: String },
+    InvalidCondition(String),
+    InvalidMessage(String),
+    Pest(Box&lt;pest::error::Error&lt;Rule&gt;&gt;),
+}
+<span class="boring">}</span></code></pre></pre>
+<p>ParseError describes parsing failures. Each variant includes context about the error location and cause.</p>
+<h2 id="projection-api"><a class="header" href="#projection-api">Projection API</a></h2>
+<h3 id="project"><a class="header" href="#project">project</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn project(choreography: &amp;Choreography, role: &amp;Role) -&gt; Result&lt;LocalType, ProjectionError&gt;
+<span class="boring">}</span></code></pre></pre>
+<p>Projects a global choreography to a local type for one role. Returns ProjectionError if projection fails due to conflicts or invalid patterns.</p>
+<h3 id="projectionerror"><a class="header" href="#projectionerror">ProjectionError</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub enum ProjectionError {
+    InconsistentParallel(String),
+    UndefinedRole(String),
+    InvalidChoice(String),
+    InvalidLoop(String),
+    RecursionError(String),
+}
+<span class="boring">}</span></code></pre></pre>
+<p>ProjectionError indicates projection failures. InconsistentParallel means conflicting parallel branches. Other variants describe specific issues.</p>
+<h2 id="code-generation-api"><a class="header" href="#code-generation-api">Code Generation API</a></h2>
+<h3 id="generate_session_types"><a class="header" href="#generate_session_types">generate_session_types</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn generate_session_types(choreography: &amp;Choreography) -&gt; TokenStream
+<span class="boring">}</span></code></pre></pre>
+<p>Generates Rumpsteak session types from a choreography. Projects to local types and converts to Rust type definitions.</p>
+<h3 id="generate_effects_protocol"><a class="header" href="#generate_effects_protocol">generate_effects_protocol</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn generate_effects_protocol(choreography: &amp;Choreography) -&gt; TokenStream
+<span class="boring">}</span></code></pre></pre>
+<p>Generates effect-based protocol implementations. Creates effect programs that handlers can interpret.</p>
+<h2 id="effect-system-api"><a class="header" href="#effect-system-api">Effect System API</a></h2>
+<h3 id="program"><a class="header" href="#program">Program</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct Program&lt;R, M&gt; {
+    pub effects: Vec&lt;Effect&lt;R, M&gt;&gt;,
+}
+<span class="boring">}</span></code></pre></pre>
+<p>Program is a sequence of effects representing a protocol. Effects lists the operations to execute.</p>
+<p>Methods:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn new() -&gt; Self
+pub fn send(self, to: R, msg: M) -&gt; Self
+pub fn recv&lt;T&gt;(self, from: R) -&gt; Self
+pub fn choose(self, who: R, label: Label) -&gt; Self
+pub fn offer(self, from: R) -&gt; Self
+pub fn with_timeout(self, at: R, dur: Duration, body: Program&lt;R, M&gt;) -&gt; Self
+pub fn parallel(self, programs: Vec&lt;Program&lt;R, M&gt;&gt;) -&gt; Self
+pub fn end(self) -&gt; Self
+<span class="boring">}</span></code></pre></pre>
+<p>Builder methods chain to construct programs.</p>
+<h3 id="effect"><a class="header" href="#effect">Effect</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub enum Effect&lt;R, M&gt; {
+    Send { to: R, msg: M },
+    Recv { from: R },
+    Choose { who: R, label: Label },
+    Offer { from: R },
+    WithTimeout { at: R, dur: Duration, body: Box&lt;Program&lt;R, M&gt;&gt; },
+    Parallel { programs: Vec&lt;Program&lt;R, M&gt;&gt; },
+    End,
+}
+<span class="boring">}</span></code></pre></pre>
+<p>Effect represents a single operation. Send, Recv, Choose, Offer are basic actions. WithTimeout wraps a sub-program. Parallel executes branches. End terminates.</p>
+<h3 id="interpret"><a class="header" href="#interpret">interpret</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub async fn interpret&lt;H, R, M&gt;(
+    handler: &amp;mut H,
+    endpoint: &amp;mut H::Endpoint,
+    program: Program&lt;R, M&gt;,
+) -&gt; Result&lt;InterpretResult&lt;M&gt;&gt;
+where
+    H: ChoreoHandler&lt;Role = R&gt;,
+    R: RoleId,
+    M: ProgramMessage + Serialize + DeserializeOwned + 'static,
+<span class="boring">}</span></code></pre></pre>
+<p>Interprets a program using a handler. Executes each effect by calling handler methods. Returns InterpretResult with received messages and status.</p>
+<h3 id="interpretresult"><a class="header" href="#interpretresult">InterpretResult</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct InterpretResult&lt;M&gt; {
+    pub received_values: Vec&lt;M&gt;,
+    pub final_state: InterpreterState,
+}
+<span class="boring">}</span></code></pre></pre>
+<p>InterpretResult contains execution results. Received_values holds messages from recv operations. Final_state indicates Completed, Failed, or Timeout.</p>
+<h3 id="choreohandler"><a class="header" href="#choreohandler">ChoreoHandler</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub trait ChoreoHandler {
+    type Role: RoleId;
+    type Endpoint;
+    
+    async fn send&lt;M: Serialize + Send + Sync&gt;(
+        &amp;mut self, ep: &amp;mut Self::Endpoint, to: Self::Role, msg: &amp;M
+    ) -&gt; Result&lt;()&gt;;
+    
+    async fn recv&lt;M: DeserializeOwned + Send&gt;(
+        &amp;mut self, ep: &amp;mut Self::Endpoint, from: Self::Role
+    ) -&gt; Result&lt;M&gt;;
+    
+    async fn choose(
+        &amp;mut self, ep: &amp;mut Self::Endpoint, who: Self::Role, label: Label
+    ) -&gt; Result&lt;()&gt;;
+    
+    async fn offer(
+        &amp;mut self, ep: &amp;mut Self::Endpoint, from: Self::Role
+    ) -&gt; Result&lt;Label&gt;;
+}
+<span class="boring">}</span></code></pre></pre>
+<p>ChoreoHandler trait defines handler interface. Implement this trait to create custom handlers.</p>
+<h3 id="choreographyerror"><a class="header" href="#choreographyerror">ChoreographyError</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub enum ChoreographyError {
+    Transport(String),
+    Serialization(String),
+    Timeout(Duration),
+    ProtocolViolation(String),
+    Other(String),
+}
+<span class="boring">}</span></code></pre></pre>
+<p>ChoreographyError describes execution failures. Transport covers network errors. Serialization handles encoding issues. Timeout indicates operation exceeded duration. ProtocolViolation means session type mismatch.</p>
+<h2 id="handler-apis"><a class="header" href="#handler-apis">Handler APIs</a></h2>
+<h3 id="inmemoryhandler-1"><a class="header" href="#inmemoryhandler-1">InMemoryHandler</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct InMemoryHandler&lt;R: RoleId&gt;
+<span class="boring">}</span></code></pre></pre>
+<p>Constructor:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn new(role: R) -&gt; Self
+pub fn with_channels(
+    role: R,
+    channels: Arc&lt;Mutex&lt;HashMap&lt;(R, R), MessageChannelPair&gt;&gt;&gt;,
+    choice_channels: Arc&lt;Mutex&lt;HashMap&lt;(R, R), ChoiceChannelPair&gt;&gt;&gt;,
+) -&gt; Self
+<span class="boring">}</span></code></pre></pre>
+<p>The new constructor creates an isolated handler. With_channels shares channels between handlers for coordinated testing.</p>
+<h3 id="rumpsteakhandler-2"><a class="header" href="#rumpsteakhandler-2">RumpsteakHandler</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct RumpsteakHandler&lt;R, M&gt;
+<span class="boring">}</span></code></pre></pre>
+<p>Constructor:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn new() -&gt; Self
+<span class="boring">}</span></code></pre></pre>
+<p>Requires RumpsteakEndpoint for connection management. See <a href="06_rumpsteak_handler.html">Using Rumpsteak Handlers</a> for complete API.</p>
+<h3 id="recordinghandler-1"><a class="header" href="#recordinghandler-1">RecordingHandler</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct RecordingHandler&lt;R: RoleId&gt;
+<span class="boring">}</span></code></pre></pre>
+<p>Constructor:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn new(role: R) -&gt; Self
+<span class="boring">}</span></code></pre></pre>
+<p>Methods:</p>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn events(&amp;self) -&gt; &amp;[RecordedEvent&lt;R&gt;]
+<span class="boring">}</span></code></pre></pre>
+<p>Returns the list of recorded operations.</p>
+<h2 id="runtime-api"><a class="header" href="#runtime-api">Runtime API</a></h2>
+<h3 id="spawn"><a class="header" href="#spawn">spawn</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn spawn&lt;F&gt;(future: F)
+where F: Future&lt;Output = ()&gt; + Send + 'static
+<span class="boring">}</span></code></pre></pre>
+<p>Spawns a task on the platform runtime. Uses tokio on native targets. Uses wasm-bindgen-futures on WASM.</p>
+<h3 id="spawn_local"><a class="header" href="#spawn_local">spawn_local</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn spawn_local&lt;F&gt;(future: F)
+where F: Future&lt;Output = ()&gt; + 'static
+<span class="boring">}</span></code></pre></pre>
+<p>Spawns a local task without Send bound. Useful for WASM where Send is not required.</p>
+<h2 id="macro-api"><a class="header" href="#macro-api">Macro API</a></h2>
+<h3 id="choreography-1"><a class="header" href="#choreography-1">choreography!</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>choreography! {
+    ProtocolName {
+        roles: Role1, Role2
+        Role1 -&gt; Role2: Message
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<p>Procedural macro for inline choreographies. Parses the DSL and generates role types, message types, and session types.</p>
+<p>Supports both inline syntax and string literals.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="mermaid.min.js"></script>
+        <script src="mermaid-init.js"></script>
+
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+
+    </div>
+    </body>
+</html>
