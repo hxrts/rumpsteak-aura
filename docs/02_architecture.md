@@ -14,35 +14,65 @@ The architecture has four main layers:
 ## Component Diagram
 
 ```mermaid
-graph TD
-    DSL["Choreography DSL"]
-    Parser["Parser"]
-    AST["AST<br/>(Choreography, Protocol)"]
-    Projection["Projection"]
-    LocalType["LocalType per Role"]
-    CodeGen["Code Generation"]
-    SessionTypes["Session Types +<br/>Effect Programs"]
-    EffectInterp["Effect Interpreter +<br/>Handler"]
-    Execution["Execution"]
+graph TB
+    subgraph Input["Developer Input (Compile-Time)"]
+        DSL["Choreography DSL<br/>Global Protocol Specification"]
+    end
+    
+    subgraph Layer1["Layer 1: Parsing & AST Construction"]
+        Parser["Parser<br/>(Pest Grammar)"]
+        AST["AST<br/>Choreography + Protocol Tree"]
+    end
+    
+    subgraph Layer2["Layer 2: Projection"]
+        Proj["Projection Algorithm"]
+        LT["Local Types<br/>(Per Role)"]
+    end
+    
+    subgraph Layer3["Layer 3: Code Generation"]
+        CodeGen["Code Generator"]
+        Session["Generated Session Types"]
+        Effects["Generated Effect Programs"]
+    end
+    
+    subgraph Layer4["Layer 4: Runtime Execution"]
+        Handler["Effect Handler<br/>(InMemory / Rumpsteak)"]
+        Transport["Transport Layer<br/>(Channels / Network)"]
+        Exec["Running Protocol"]
+    end
     
     DSL --> Parser
     Parser --> AST
-    AST --> Projection
-    Projection --> LocalType
-    LocalType --> CodeGen
-    CodeGen --> SessionTypes
-    SessionTypes --> EffectInterp
-    EffectInterp --> Execution
+    AST --> Proj
+    Proj --> LT
+    LT --> CodeGen
+    CodeGen --> Session
+    CodeGen --> Effects
+    Session --> Handler
+    Effects --> Handler
+    Handler --> Transport
+    Transport --> Exec
     
-    style DSL fill:#e1f5ff
-    style Parser fill:#e1f5ff
-    style AST fill:#fff3e0
-    style Projection fill:#f3e5f5
-    style LocalType fill:#f3e5f5
-    style CodeGen fill:#e8f5e9
-    style SessionTypes fill:#e8f5e9
-    style EffectInterp fill:#fce4ec
-    style Execution fill:#fce4ec
+    style Input fill:#f0f0f0,stroke:#333,stroke-width:2px
+    style DSL fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    
+    style Layer1 fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    style Parser fill:#ffe0b2
+    style AST fill:#ffcc80
+    
+    style Layer2 fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    style Proj fill:#e1bee7
+    style LT fill:#ce93d8
+    
+    style Layer3 fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
+    style CodeGen fill:#c8e6c9
+    style Session fill:#a5d6a7
+    style Effects fill:#a5d6a7
+    
+    style Layer4 fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+    style Handler fill:#f8bbd0
+    style Transport fill:#f48fb1
+    style Exec fill:#f06292
 ```
 
 ## Core Components
