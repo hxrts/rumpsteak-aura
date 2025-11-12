@@ -86,7 +86,7 @@ let mut endpoint = ();
 let result = interpret(&mut handler, &mut endpoint, program).await?;
 ```
 
-The choreography macro generates role types, message types, and session types automatically. The effect handler system decouples protocol logic from transport. Use `InMemoryHandler` for testing or `RumpsteakHandler` for production. `RumpsteakHandler` now accepts either the built-in `SimpleChannel` pairs via `register_channel` **or** any custom sink/stream transport via `RumpsteakSession::from_sink_stream` + `register_session`, so you can drop in WebSockets, QUIC streams, or other runtimes without writing a new handler. See `docs/` for guides.
+The choreography macro generates role types, message types, and session types automatically. The effect handler system decouples protocol logic from transport. Use `InMemoryHandler` for testing or `RumpsteakHandler` for production. `RumpsteakHandler` now accepts either the built-in `SimpleChannel` pairs via `register_channel` or any custom sink/stream transport via `RumpsteakSession::from_sink_stream` + `register_session`, so you can drop in WebSockets, QUIC streams, or other runtimes without writing a new handler. See `docs/` for guides.
 
 ## Workspace Structure
 
