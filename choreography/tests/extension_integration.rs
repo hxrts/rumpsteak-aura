@@ -39,18 +39,16 @@ impl ExtensionEffect for TestExtension {
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 enum TestRole {
     Alice,
-    Bob,
 }
 
 // Test handler with extension support
 struct TestHandler {
-    role: TestRole,
     registry: ExtensionRegistry<()>,
     executed_extensions: Arc<Mutex<Vec<u32>>>,
 }
 
 impl TestHandler {
-    fn new(role: TestRole) -> Self {
+    fn new(_role: TestRole) -> Self {
         let executed_extensions = Arc::new(Mutex::new(Vec::new()));
         let mut registry = ExtensionRegistry::new();
 
@@ -73,7 +71,6 @@ impl TestHandler {
         });
 
         Self {
-            role,
             registry,
             executed_extensions,
         }

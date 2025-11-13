@@ -424,6 +424,10 @@ fn authentication_workflow() -> Program<Role, String> {
             cost: 25,
             role: Role::Database,
         })
+        .ext(LogEvent {
+            message: "Database query cost exceeds threshold".into(),
+            level: LogLevel::Error,
+        })
         .send(Role::Server, "user_data".into())
         // Server sends response to client
         .ext(ChargeFlowCost {
