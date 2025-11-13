@@ -1,18 +1,16 @@
-
 # Choreographic DSL Parser
 
 ## Current Status
 
-The parser module (`choreography/src/compiler/parser.rs`) provides an implementation of a choreographic DSL parser using the Pest parser generator.
-
+The parser module is located in `choreography/src/compiler/parser.rs`. It provides an implementation of a choreographic DSL parser. The parser uses the Pest parser generator.
 
 ## Overview
 
-The parser translates choreographic protocol specifications from a high-level DSL into the internal AST representation (`Choreography`, `Protocol`, etc.).
+The parser translates choreographic protocol specifications from a high-level DSL. The output is the internal AST representation including `Choreography` and `Protocol` types.
 
 ## Choreographic DSL Syntax
 
-The choreographic DSL follows this syntax:
+The choreographic DSL follows this syntax.
 
 ```rust
 choreography MyProtocol {
@@ -32,9 +30,11 @@ choreography MyProtocol {
 }
 ```
 
+This example shows role declarations, message passing, and choice constructs.
+
 ### Namespaces
 
-Choreographies can be namespaced to avoid conflicts when multiple protocols are defined in the same crate:
+Choreographies can be namespaced to avoid conflicts. Multiple protocols in the same crate can use different namespaces.
 
 ```rust
 let threshold_dsl = r#"
@@ -47,7 +47,9 @@ let threshold_dsl = r#"
 let choreo = parse_choreography_str(threshold_dsl)?;
 ```
 
-This generates the protocol within a `threshold_ceremony` module. Multiple choreographies with different namespaces can coexist by parsing them separately and using the namespace for code generation:
+This generates the protocol within a `threshold_ceremony` module.
+
+Multiple choreographies with different namespaces can coexist. Parse them separately and use the namespace for code generation.
 
 ```rust
 let consensus_dsl = r#"
@@ -70,22 +72,31 @@ let consensus_choreo = parse_choreography_str(consensus_dsl)?;
 let recovery_choreo = parse_choreography_str(recovery_dsl)?;
 ```
 
+Each choreography is parsed independently.
+
 ### Supported Constructs
 
 #### 1. Send Statement
+
 ```rust
 Role1 -> Role2: MessageName
 Role1 -> Role2: MessageWithPayload(data: String, count: i32)
 ```
 
+The send statement transfers a message from one role to another.
+
 #### 2. Broadcast Statement
+
 ```rust
 Leader ->* : Announcement
 ```
 
+The broadcast statement sends a message to all other roles.
+
 #### 3. Choice Statement
 
-Basic choice:
+Basic choice syntax allows a role to select between alternatives.
+
 ```rust
 choice DeciderRole {
     option1: {
@@ -97,7 +108,10 @@ choice DeciderRole {
 }
 ```
 
-With guards:
+The deciding role selects one branch.
+
+Guards can be added to choice branches.
+
 ```rust
 choice Client {
     buy when (balance > price): {
@@ -109,11 +123,12 @@ choice Client {
 }
 ```
 
-Guards are optional conditions that can be attached to choice branches. The guard expression is any valid Rust boolean expression.
+Guards are optional conditions attached to choice branches. The guard expression is any valid Rust boolean expression.
 
 #### 4. Loop Statement
 
-With count:
+Loops can have a fixed count.
+
 ```rust
 loop (count: 5) {
     A -> B: Request
@@ -121,7 +136,10 @@ loop (count: 5) {
 }
 ```
 
-With role decision:
+This executes the body 5 times.
+
+Loops can use role decision.
+
 ```rust
 loop (decides: Client) {
     Client -> Server: Request
@@ -129,21 +147,30 @@ loop (decides: Client) {
 }
 ```
 
-With custom condition:
+The Client role decides when to exit the loop.
+
+Loops can use custom conditions.
+
 ```rust
 loop (custom: "has_more_data") {
     A -> B: Data
 }
 ```
 
-Without condition (infinite):
+Custom conditions are evaluated at runtime.
+
+Loops can be infinite.
+
 ```rust
 loop {
     A -> B: Tick
 }
 ```
 
+Infinite loops continue until explicitly broken.
+
 #### 5. Parallel Statement
+
 ```rust
 parallel {
     A -> B: Msg1
@@ -152,16 +179,21 @@ parallel {
 }
 ```
 
+Parallel composition executes multiple protocols concurrently.
+
 #### 6. Recursive Protocol
+
 ```rust
 rec LoopLabel {
     A -> B: Data
 }
 ```
 
-#### 7. Protocol Composition (Sub-protocols)
+Recursive protocols enable unbounded repetition with labeled recursion points.
 
-Define and reuse protocol fragments
+#### 7. Protocol Composition
+
+Define and reuse protocol fragments.
 
 ```rust
 choreography Main {
@@ -183,18 +215,14 @@ choreography Main {
 }
 ```
 
-Protocol definitions are:
-- Defined before the main protocol body
-- Inlined at call sites (no runtime overhead)
-- Can be called multiple times
-- Can be nested (protocols can call other protocols)
-- Can be used within choice branches, loops, etc.
+Protocol definitions are defined before the main protocol body. They are inlined at call sites with no runtime overhead. Protocols can be called multiple times. Nesting is supported where protocols can call other protocols. Protocols can be used within choice branches and loops.
 
 #### 8. Enhanced Annotations
 
-Annotations provide meta-information for optimization, verification, cost analysis, and other protocol properties. The system supports both statement-level and role-specific annotations.
+Annotations provide meta-information for optimization and verification. The system supports statement-level and role-specific annotations.
 
-**Statement-level annotations:**
+Statement-level annotations attach metadata to protocol actions.
+
 ```rust
 choreography EnhancedProtocol {
     roles: A, B, C;
@@ -207,7 +235,10 @@ choreography EnhancedProtocol {
 }
 ```
 
-**Role-specific annotations:**
+These annotations specify cost and timeout values.
+
+Role-specific annotations attach metadata to individual roles.
+
 ```rust
 choreography RoleAnnotatedProtocol {
     roles: Coordinator, Worker[*];
@@ -217,7 +248,10 @@ choreography RoleAnnotatedProtocol {
 }
 ```
 
-**Multiple annotation types:**
+The coordinator role has a cost annotation.
+
+Multiple annotation types can be combined.
+
 ```rust
 choreography FullyAnnotated {
     roles: Client, Server, Database;
@@ -232,23 +266,16 @@ choreography FullyAnnotated {
 }
 ```
 
-**Supported annotation keys:**
-- `@cost` - Execution cost (integer value)
-- `@priority` - Priority level ("high", "medium", "low")
-- `@timeout` - Timeout in milliseconds (integer)
-- `@retry` - Retry count (integer)
-- `@critical` - Mark critical operations (boolean)
-- `@buffered` - Enable message buffering (boolean)
-- `@audit_log` - Enable audit logging (boolean)
-- `@compress` - Compression type (string value)
+Annotations are accessible through the generated code. Runtime systems can use them for optimization, monitoring, and policy enforcement.
 
-Annotations are accessible through the generated code and can be used by runtime systems for optimization, monitoring, and policy enforcement.
+Supported annotation keys include `@cost` for execution cost. Use `@priority` for priority levels. The `@timeout` key specifies timeout in milliseconds. The `@retry` key sets retry count. Mark critical operations with `@critical`. Enable buffering with `@buffered`. Use `@audit_log` for audit logging. The `@compress` key specifies compression type.
 
 #### 9. Type Annotations for Messages
 
-Messages can include explicit type annotations to specify the types of data being transmitted.
+Messages can include explicit type annotations. This specifies the types of data being transmitted.
 
-**Simple types:**
+Simple types use single type parameters.
+
 ```rust
 choreography TypedMessages {
     roles: A, B
@@ -258,40 +285,49 @@ choreography TypedMessages {
 }
 ```
 
-**Multiple types:**
+The request carries a String. The response carries an i32.
+
+Multiple types can be specified.
+
 ```rust
 A -> B: Data<String, i32, bool>
 ```
 
-**Generic types:**
+This message carries three typed values.
+
+Generic types are supported.
+
 ```rust
 A -> B: Container<Vec<String>>
 B -> A: Result<i32, Error>
 ```
 
-**Path types:**
+Nested generics work with arbitrary depth.
+
+Path types can be used for fully qualified types.
+
 ```rust
 A -> B: Data<std::string::String>
 B -> A: Result<std::vec::Vec<i32>>
 ```
 
-**Type annotations with payloads:**
+These use the full module path.
+
+Type annotations can be combined with payloads.
+
 ```rust
 A -> B: Request<String>(data)
 B -> A: Response<i32>(result)
 ```
 
-Type annotations are:
-- Optional - messages without types are still valid
-- Stored as `TokenStream` in the AST for flexibility
-- Can be nested generics with arbitrary depth
-- Support standard Rust type syntax including paths
+Type annotations are optional. Messages without types are valid. Annotations are stored as `TokenStream` in the AST. This provides flexibility for code generation.
 
 #### 10. Dynamic Role Count Support
 
-The system supports dynamic role parameterization for runtime-determined participant counts, enabling threshold protocols, consensus algorithms, and other scenarios with variable participants.
+The system supports dynamic role parameterization. Participant counts can be determined at runtime. This enables threshold protocols, consensus algorithms, and scenarios with variable participants.
 
-**Runtime-determined role counts:**
+Runtime-determined role counts use the wildcard syntax.
+
 ```rust
 choreography ThresholdProtocol {
     roles: Coordinator, Signers[*];
@@ -301,7 +337,10 @@ choreography ThresholdProtocol {
 }
 ```
 
-**Symbolic parameters for compile-time flexibility:**
+The number of signers is determined at runtime.
+
+Symbolic parameters provide compile-time flexibility.
+
 ```rust
 choreography ConsensusProtocol {
     roles: Leader, Followers[N];
@@ -311,7 +350,10 @@ choreography ConsensusProtocol {
 }
 ```
 
-**Range-based role selection:**
+The parameter N is resolved during code generation.
+
+Range-based role selection targets subsets of roles.
+
 ```rust
 choreography PartialBroadcast {
     roles: Broadcaster, Receivers[*];
@@ -321,7 +363,10 @@ choreography PartialBroadcast {
 }
 ```
 
-**Static arrays (existing functionality):**
+Only roles in the specified range participate.
+
+Static arrays use fixed counts.
+
 ```rust
 choreography StaticWorkers {
     roles: Master, Worker[3];
@@ -332,15 +377,12 @@ choreography StaticWorkers {
 }
 ```
 
-**Dynamic role features:**
-- Runtime role counts (`Worker[*]`)
-- Symbolic parameters (`Worker[N]`)
-- Range expressions (`Worker[0..threshold]`)
-- Wildcard references (`Worker[*]`)
-- Security constraints with overflow protection (max 10,000 roles)
-- Comprehensive runtime validation
+This creates exactly 3 worker roles.
 
-**Runtime binding example:**
+Dynamic role features include runtime role counts using `Worker[*]`. Symbolic parameters use `Worker[N]`. Range expressions use `Worker[0..threshold]`. Wildcard references use `Worker[*]`. Security constraints prevent overflow with a maximum of 10,000 roles. Comprehensive runtime validation ensures safety.
+
+Runtime binding example shows how to use dynamic roles.
+
 ```rust
 use rumpsteak_aura_choreography::compiler::{parse_choreography_str, codegen::generate_choreography_code_with_dynamic_roles};
 
@@ -354,19 +396,19 @@ choreography Threshold {
 let choreo = parse_choreography_str(dsl)?;
 let code = generate_choreography_code_with_dynamic_roles(&choreo, &local_types);
 
-// Generated code includes ThresholdRuntime for role binding:
 let mut runtime = ThresholdRuntime::new();
-runtime.bind_role_count("Signers", 5)?; // 5 signers
+runtime.bind_role_count("Signers", 5)?;
 runtime.map_signers_instances(vec!["alice", "bob", "charlie", "dave", "eve"])?;
 ```
 
-The system provides comprehensive security through bounds checking, preventing overflow attacks and ensuring memory safety.
+The generated code includes runtime support for role binding.
 
 #### 11. String-based Protocol Definition
 
-The current implementation uses `parse_choreography_str` to parse choreographic protocols from string literals, with support for namespaces, annotations, and dynamic roles.
+The current implementation uses `parse_choreography_str` to parse protocols. Protocols are defined as string literals. The parser supports namespaces, annotations, and dynamic roles.
 
-**Basic usage:**
+Basic usage parses a simple protocol.
+
 ```rust
 use rumpsteak_aura_choreography::compiler::parser::parse_choreography_str;
 
@@ -382,7 +424,10 @@ let protocol = r#"
 let choreography = parse_choreography_str(protocol)?;
 ```
 
-**Namespaced protocols:**
+This creates a PingPong choreography.
+
+Namespaced protocols avoid conflicts.
+
 ```rust
 let protocol = r#"
     #[namespace = "secure_messaging"]
@@ -397,7 +442,10 @@ let protocol = r#"
 let choreography = parse_choreography_str(protocol)?;
 ```
 
-**Dynamic roles with annotations:**
+The namespace isolates this protocol.
+
+Dynamic roles with annotations enable complex protocols.
+
 ```rust
 let protocol = r#"
     #[namespace = "consensus"]
@@ -414,66 +462,33 @@ let protocol = r#"
 let choreography = parse_choreography_str(protocol)?;
 ```
 
-The parser:
-- Parses choreographic protocol specifications from strings
-- Builds AST representation for further processing
-- Supports full protocol syntax including annotations and dynamic roles
-- Provides detailed error reporting with span information
-- Enables runtime protocol generation and analysis
+This defines a consensus protocol with timeout annotations.
 
-**Generated AST can be used for:**
-- Protocol projection to local types
-- Code generation for session types
-- Runtime analysis and validation
-- Dynamic role binding and management
+The parser processes choreographic protocol specifications from strings. It builds AST representation for further processing. Full protocol syntax is supported including annotations and dynamic roles. Detailed error reporting provides span information. Runtime protocol generation and analysis are enabled.
 
-This approach allows for flexible protocol definition and runtime manipulation of choreographic specifications.
+Generated AST can be used for protocol projection to local types. Code generation for session types is supported. Runtime analysis and validation are possible. Dynamic role binding and management are enabled.
 
 ## Implementation Details
 
 ### Parser Stack
 
-1. **Pest Grammar** (`choreography.pest`)
-   - Formal grammar definition using PEG syntax
-   - Handles lexing and initial parsing
-   - Supports comments, whitespace, and various token types
+The Pest Grammar is defined in `choreography.pest`. It provides formal grammar definition using PEG syntax. It handles lexing and initial parsing. Comments, whitespace, and various token types are supported.
 
-2. **Parser Module** (`parser.rs`)
-   - Processes Pest parse tree into AST
-   - Validates role declarations
-   - Constructs Protocol AST from statements
-   - Comprehensive error handling
+The Parser Module is in `parser.rs`. It processes Pest parse tree into AST. It validates role declarations. Protocol AST is constructed from statements. Comprehensive error handling is provided.
 
-3. **Error Types** (`ParseError`)
-   - Syntax errors with location information
-   - Undefined role errors
-   - Duplicate role declarations
-   - Invalid message or condition formats
+Error Types include `ParseError` variants. Syntax errors include location information. Undefined role errors are reported. Duplicate role declarations are caught. Invalid message or condition formats are detected.
 
 ### Parse Pipeline
 
-```
-Input String
-    ↓
-Pest Grammar Parsing
-    ↓
-Parse Tree (Pest Pairs)
-    ↓
-Statement AST Construction
-    ↓
-Role Validation
-    ↓
-Protocol AST Generation
-    ↓
-Choreography Object
-```
+The parse pipeline transforms input through several stages.
+
+Input String is parsed by Pest Grammar. This produces a Parse Tree of Pest Pairs. Statement AST Construction builds intermediate structures. Role Validation checks all roles are declared. Protocol AST Generation creates the final tree. The Choreography Object is returned.
 
 ## API
 
 ### Primary Functions
 
-#### `parse_choreography_str(input: &str) -> Result<Choreography, ParseError>`
-Parse a choreographic DSL string into a Choreography AST.
+The function `parse_choreography_str` parses a choreographic DSL string into a Choreography AST.
 
 ```rust
 use rumpsteak_aura_choreography::compiler::parser::parse_choreography_str;
@@ -486,8 +501,9 @@ choreography Example {
 "#)?;
 ```
 
-#### `parse_choreography_file(path: &Path) -> Result<Choreography, ParseError>`
-Parse a choreographic DSL from a file.
+This creates a choreography from a string literal.
+
+The function `parse_choreography_file` parses a choreographic DSL from a file.
 
 ```rust
 use std::path::Path;
@@ -496,12 +512,13 @@ use rumpsteak_aura_choreography::compiler::parser::parse_choreography_file;
 let choreo = parse_choreography_file(Path::new("protocol.choreo"))?;
 ```
 
-#### `parse_dsl(input: &str) -> Result<Choreography, ParseError>`
-Alias for `parse_choreography_str` for compatibility.
+This reads and parses a file.
+
+The function `parse_dsl` is an alias for `parse_choreography_str`. It provides compatibility with older code.
 
 ### Error Handling
 
-The parser provides detailed error messages:
+The parser provides detailed error messages.
 
 ```rust
 match parse_choreography_str(input) {
@@ -523,48 +540,41 @@ match parse_choreography_str(input) {
 }
 ```
 
+Error handling catches different error types.
+
 ## Grammar Details
 
 ### Tokens
 
-- Identifiers: `[a-zA-Z][a-zA-Z0-9_]*`
-- Integers: `[0-9]+`
-- Strings: `"..."` (for custom conditions)
-- Keywords: `choreography`, `roles`, `choice`, `loop`, `parallel`, `rec`, `count`, `decides`, `custom`
-- Operators: `->` (send), `->*` (broadcast), `:`, `,`, `{`, `}`, `(`, `)`, `|`
+Identifiers match `[a-zA-Z][a-zA-Z0-9_]*`. Integers match `[0-9]+`. Strings match `"..."` for custom conditions.
+
+Keywords include `choreography`, `roles`, `choice`, `loop`, `parallel`, and `rec`. Additional keywords are `count`, `decides`, and `custom`.
+
+Operators include `->` for send. The `->*` operator indicates broadcast. Other operators are `:`, `,`, `{`, `}`, `(`, `)`, and `|`.
 
 ### Comments
 
-- Single-line: `// comment`
-- Multi-line: `/* comment */`
+Single-line comments use `//`. Multi-line comments use `/* comment */`.
 
 ### Whitespace
 
-Whitespace (spaces, tabs, newlines) is ignored and can be used freely for formatting.
+Whitespace includes spaces, tabs, and newlines. It is ignored and can be used freely for formatting.
 
 ## Validation
 
-The parser performs the following validations:
+The parser performs validations during parsing.
 
-1. Role Declaration: All used roles must be declared in the `roles:` section
-2. Role Uniqueness: Roles cannot be declared multiple times
-3. Syntax Correctness: All statements must follow the grammar
-4. Non-Empty Roles: At least one role must be declared
+Role Declaration validation ensures all used roles are declared in the `roles:` section. Role Uniqueness validation prevents roles from being declared multiple times. Syntax Correctness validation ensures all statements follow the grammar. Non-Empty Roles validation requires at least one role declaration.
 
 Additional semantic validation is performed by the `choreography.validate()` method after parsing.
 
 ## Error Messages
 
-The parser now provides Rust-style error messages with precise span information.
+The parser provides Rust-style error messages with precise span information.
 
-### Features
+Features include line and column numbers for exact error location. Code snippets show the problematic line. Visual indicators underline the specific error location. Contextual messages provide clear explanations.
 
-- **Line and column numbers**: Exact location of errors
-- **Code snippets**: Shows the problematic line
-- **Visual indicators**: Underlines the specific error location
-- **Contextual messages**: Clear explanation of what went wrong
-
-### Example Error Output
+Example error output shows undefined role.
 
 ```
 Undefined role 'Charlie'
@@ -574,6 +584,10 @@ Undefined role 'Charlie'
                    ^^^^^^^
 ```
 
+This indicates where Charlie is used but not declared.
+
+Example error for duplicate role.
+
 ```
 Duplicate role declaration 'Alice'
   --> input:3:33
@@ -582,16 +596,9 @@ Duplicate role declaration 'Alice'
                                       ^^^^^
 ```
 
-### Error Types
+This shows Alice declared twice.
 
-- `ParseError::UndefinedRole`: Role used but not declared
-- `ParseError::DuplicateRole`: Role declared more than once
-- `ParseError::UndefinedProtocol`: Protocol called but not defined
-- `ParseError::DuplicateProtocol`: Protocol defined multiple times
-- `ParseError::Syntax`: Grammar or syntax violations
-- `ParseError::InvalidCondition`: Loop condition problems
-- `ParseError::InvalidMessage`: Message format issues
-- `ParseError::Pest`: Low-level parsing errors
+Error types include `ParseError::UndefinedRole` for roles used but not declared. `ParseError::DuplicateRole` handles roles declared more than once. `ParseError::UndefinedProtocol` catches protocols called but not defined. `ParseError::DuplicateProtocol` detects protocols defined multiple times. `ParseError::Syntax` reports grammar or syntax violations. `ParseError::InvalidCondition` handles loop condition problems. `ParseError::InvalidMessage` reports message format issues. `ParseError::Pest` captures low-level parsing errors.
 
 See `choreography/examples/error_demo.rs` for more examples.
 
@@ -612,6 +619,8 @@ choreography PingPong {
 let choreo = parse_choreography_str(input)?;
 assert_eq!(choreo.roles.len(), 2);
 ```
+
+This creates a simple ping-pong protocol.
 
 ### Protocol with Choice
 
@@ -635,6 +644,8 @@ choreography Negotiation {
 
 let choreo = parse_choreography_str(input)?;
 ```
+
+The seller chooses to accept or reject.
 
 ### Complex E-Commerce Protocol
 
@@ -670,11 +681,13 @@ choreography ECommerce {
 let choreo = parse_choreography_str(input)?;
 ```
 
+This protocol includes choice, loops, and multiple roles.
+
 ## Integration
 
 ### With Projection
 
-Parse and project to local types:
+Parse and project to local types.
 
 ```rust
 use rumpsteak_aura_choreography::compiler::{parser, projection};
@@ -687,9 +700,11 @@ for role in &choreo.roles {
 }
 ```
 
+Each role gets its own local type.
+
 ### With Code Generation
 
-Parse and generate Rumpsteak session types:
+Parse and generate Rumpsteak session types.
 
 ```rust
 use rumpsteak_aura_choreography::compiler::{parser, projection, codegen};
@@ -709,19 +724,18 @@ let code = codegen::generate_choreography_code(
 );
 ```
 
+This generates session types from the choreography.
+
 ## Testing
 
-The parser includes comprehensive test coverage:
+The parser includes comprehensive test coverage.
 
-- **Basic parsing**: Simple protocols with sends
-- **Choice constructs**: 2-way, 3-way, and nested choices
-- **Loop constructs**: All condition types
-- **Parallel composition**: Multiple concurrent branches
-- **Error cases**: Undefined roles, duplicate roles, syntax errors
-- **Edge cases**: Empty protocols, whitespace variations, comments
-- **Integration**: With projection and validation
+Basic parsing tests cover simple protocols with sends. Choice construct tests include 2-way, 3-way, and nested choices. Loop construct tests cover all condition types. Parallel composition tests handle multiple concurrent branches. Error case tests validate undefined roles, duplicate roles, and syntax errors. Edge case tests check empty protocols, whitespace variations, and comments. Integration tests verify interaction with projection and validation.
 
-Run tests with:
+Run tests with this command.
+
 ```bash
 cargo test --package rumpsteak-aura-choreography parser
 ```
+
+This executes all parser tests.

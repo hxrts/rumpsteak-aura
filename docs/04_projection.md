@@ -1,12 +1,13 @@
 # Choreographic Projection Patterns
 
-The projection algorithm transforms global choreographic protocols into local session types for each participating role. The algorithm has been enhanced to support three additional patterns beyond the basic send/receive operations.
+The projection algorithm transforms global choreographic protocols into local session types. Each participating role receives their own local session type. The algorithm supports patterns beyond basic send and receive operations.
 
 ## Supported Patterns
 
 ### 1. Basic Send/Receive
 
-**Global Protocol:**
+The global protocol specifies a send operation.
+
 ```rust
 Protocol::Send {
     from: alice,
@@ -16,7 +17,10 @@ Protocol::Send {
 }
 ```
 
-**Alice's Projection:**
+This defines Alice sending to Bob.
+
+Alice's projection shows a send operation.
+
 ```rust
 LocalType::Send {
     to: bob,
@@ -25,7 +29,10 @@ LocalType::Send {
 }
 ```
 
-**Bob's Projection:**
+Alice sends Data to Bob.
+
+Bob's projection shows a receive operation.
+
 ```rust
 LocalType::Receive {
     from: alice,
@@ -34,16 +41,20 @@ LocalType::Receive {
 }
 ```
 
-**Charlie's Projection (uninvolved):**
+Bob receives Data from Alice.
+
+Charlie's projection shows no participation.
+
 ```rust
 LocalType::End
 ```
 
----
+Charlie is uninvolved in this exchange.
 
 ### 2. Communicated Choice
 
-**Global Protocol:**
+The global protocol specifies a choice.
+
 ```rust
 Protocol::Choice {
     role: alice,
@@ -60,7 +71,10 @@ Protocol::Choice {
 }
 ```
 
-**Alice's Projection (chooser):**
+Alice chooses between yes and no branches.
+
+Alice's projection shows selection.
+
 ```rust
 LocalType::Select {
     to: bob,
@@ -71,7 +85,10 @@ LocalType::Select {
 }
 ```
 
-**Bob's Projection (receiver):**
+Alice selects one branch and communicates it to Bob.
+
+Bob's projection shows branching.
+
 ```rust
 LocalType::Branch {
     from: alice,
@@ -82,20 +99,21 @@ LocalType::Branch {
 }
 ```
 
----
+Bob waits for Alice's choice.
 
-### 3. Local Choice (No Communication)
+### 3. Local Choice
 
-Supports choice branches that don't start with `Send`, allowing for local decisions.
+Local choice supports branches that do not start with send operations. This allows for local decisions without communication.
 
-**Global Protocol:**
+The global protocol defines a local choice.
+
 ```rust
 Protocol::Choice {
     role: alice,
     branches: vec![
         Branch {
             label: "option1",
-            protocol: End,  // No Send!
+            protocol: End,
         },
         Branch {
             label: "option2",
@@ -105,7 +123,10 @@ Protocol::Choice {
 }
 ```
 
-**Alice's Projection:**
+No send operation appears in the branches.
+
+Alice's projection shows local choice.
+
 ```rust
 LocalType::LocalChoice {
     branches: vec![
@@ -115,17 +136,16 @@ LocalType::LocalChoice {
 }
 ```
 
-**Key Difference:** `LocalChoice` vs `Select`:
-- **Select**: Communicated choice (sends selection to another role)
-- **LocalChoice**: Local decision (no communication)
+Alice makes a local decision.
 
----
+The key difference is between `LocalChoice` and `Select`. Select indicates communicated choice where the selection is sent to another role. LocalChoice indicates local decision with no communication.
 
 ### 4. Loop with Conditions
 
-Loop conditions are now preserved in the projected local types.
+Loop conditions are preserved in the projected local types.
 
-**Global Protocol:**
+The global protocol includes a loop.
+
 ```rust
 Protocol::Loop {
     condition: Some(Condition::Count(5)),
@@ -133,7 +153,10 @@ Protocol::Loop {
 }
 ```
 
-**Alice's Projection:**
+The loop executes 5 times.
+
+Alice's projection preserves the condition.
+
 ```rust
 LocalType::Loop {
     condition: Some(Condition::Count(5)),
@@ -141,33 +164,30 @@ LocalType::Loop {
 }
 ```
 
-**Supported Conditions:**
-- `Condition::Count(n)` - Fixed iteration count
-- `Condition::RoleDecides(role)` - Loop while a role decides
-- `Condition::Custom(expr)` - Custom boolean expression
-- `None` - Infinite loop (must be terminated externally)
+The count condition is maintained.
 
----
+Supported conditions include `Condition::Count(n)` for fixed iteration count. Use `Condition::RoleDecides(role)` for loops controlled by a role. Custom boolean expressions use `Condition::Custom(expr)`. Infinite loops use `None` and must be terminated externally.
 
 ### 5. Parallel Composition
 
-Parallel merging with conflict detection.
+Parallel merging includes conflict detection.
 
-#### Compatible Parallel (No Conflict)
+Compatible parallel composition has no conflicts.
 
-**Global Protocol:**
 ```rust
 Protocol::Parallel {
     protocols: vec![
         Send { from: alice, to: bob, ... },
-        Send { from: alice, to: charlie, ... },  // Different recipient
+        Send { from: alice, to: charlie, ... },
     ],
 }
 ```
 
-**Alice's Projection:**
+Different recipients avoid conflicts.
+
+Alice's projection merges the operations.
+
 ```rust
-// Merged sequentially (order non-deterministic at runtime)
 LocalType::Send {
     to: bob,
     continuation: Send {
@@ -177,67 +197,50 @@ LocalType::Send {
 }
 ```
 
-**Result:** **Success** - Different recipients, no conflict
+Operations are merged sequentially. Order is non-deterministic at runtime.
 
-#### Conflicting Parallel (Error)
+Conflicting parallel composition causes errors.
 
-**Global Protocol:**
 ```rust
 Protocol::Parallel {
     protocols: vec![
         Send { from: alice, to: bob, ... },
-        Send { from: alice, to: bob, ... },  // Same recipient!
+        Send { from: alice, to: bob, ... },
     ],
 }
 ```
 
-**Alice's Projection:**
+Same recipient creates a conflict.
+
+Alice's projection fails.
+
 ```rust
 Err(ProjectionError::InconsistentParallel)
 ```
 
-**Result:** **Error** - Cannot send to same recipient in parallel
+Cannot send to same recipient in parallel.
 
-**Conflict Detection Rules:**
-- Multiple sends to the same role → **Conflict**
-- Multiple receives from the same role → **Conflict**
-- Multiple selects to the same role → **Conflict**
-- Multiple branches from the same role → **Conflict**
-- Operations on different roles → **OK**
-
----
+Conflict detection rules prevent invalid projections. Multiple sends to the same role create a conflict. Multiple receives from the same role create a conflict. Multiple selects to the same role create a conflict. Multiple branches from the same role create a conflict. Operations on different roles are allowed.
 
 ## Projection Rules Summary
 
 ### Chooser's View
 
-| Branch Pattern | Projection |
-|----------------|------------|
-| All branches start with `Send` | `Select` (communicated) |
-| Branches don't start with `Send` | `LocalChoice` (local) |
+When all branches start with send operations, the projection is `Select`. This indicates communicated choice. When branches do not start with send operations, the projection is `LocalChoice`. This indicates local decision.
 
 ### Receiver's View
 
-| Participation | Projection |
-|---------------|------------|
-| Receives the choice | `Branch` |
-| Not involved | Merge continuations |
+When the role receives the choice, the projection is `Branch`. When the role is not involved, continuations are merged.
 
 ### Parallel Composition
 
-| Role Participation | Projection |
-|--------------------|------------|
-| Appears in 0 branches | `End` |
-| Appears in 1 branch | Use that projection |
-| Appears in 2+ branches | Merge if compatible, error if conflict |
-
----
+When a role appears in zero branches, the projection is `End`. When a role appears in one branch, that projection is used. When a role appears in two or more branches, projections are merged if compatible. An error occurs if conflicts exist.
 
 ## Implementation Notes
 
 ### LocalType Variants
 
-The enhanced projection algorithm uses these `LocalType` variants:
+The enhanced projection algorithm uses these `LocalType` variants.
 
 ```rust
 pub enum LocalType {
@@ -253,6 +256,8 @@ pub enum LocalType {
 }
 ```
 
+Each variant represents a different local type pattern.
+
 ### Code Generation
 
-The `generate_type_expr` function in `codegen.rs` handles all variants including the new `LocalChoice` and `Loop` types.
+The `generate_type_expr` function in `codegen.rs` handles all variants. This includes the new `LocalChoice` and `Loop` types. Code generation transforms local types into Rust session types.

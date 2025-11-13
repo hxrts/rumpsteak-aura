@@ -54,8 +54,6 @@ graph TB
     Transport --> Exec
 ```
 
-This diagram shows the data flow from choreography source to running protocol.
-
 ## Core Components
 
 ### AST Module
@@ -80,26 +78,26 @@ The `Protocol` enum defines all possible protocol actions.
 
 ```rust
 pub enum Protocol {
-    Send { 
-        from: Role, 
-        to: Role, 
-        message: MessageType, 
+    Send {
+        from: Role,
+        to: Role,
+        message: MessageType,
         continuation: Box<Protocol>,
         annotations: HashMap<String, String>,
         from_annotations: HashMap<String, String>,
         to_annotations: HashMap<String, String>,
     },
-    Broadcast { 
-        from: Role, 
-        to_all: Vec<Role>, 
-        message: MessageType, 
+    Broadcast {
+        from: Role,
+        to_all: Vec<Role>,
+        message: MessageType,
         continuation: Box<Protocol>,
         annotations: HashMap<String, String>,
         from_annotations: HashMap<String, String>,
     },
-    Choice { 
-        role: Role, 
-        branches: Vec<Branch>, 
+    Choice {
+        role: Role,
+        branches: Vec<Branch>,
         annotations: HashMap<String, String>,
     },
     Loop { condition: Option<Condition>, body: Box<Protocol> },
@@ -298,32 +296,30 @@ Rumpsteak-Aura is organized as a Cargo workspace with multiple crates.
 
 ```
 rumpsteak-aura/
-├── src/                     Core session types library (rumpsteak-aura crate)
+├── src/                    Core session types library (rumpsteak-aura crate)
 │   ├── lib.rs              Session type primitives, channels, roles
 │   ├── channel.rs          Async channel implementations
 │   └── serialize.rs        Serialization support
-├── choreography/            Choreographic programming extensions
+├── choreography/           Choreographic programming extensions
 │   ├── src/
 │   │   ├── ast/            AST definitions
 │   │   ├── compiler/       Parser, projection, codegen
 │   │   ├── effects/        Effect system
-│   │   │   ├── handlers/  Handler implementations
+│   │   │   ├── handlers/   Handler implementations
 │   │   │   └── middleware/ Middleware implementations
 │   │   └── runtime.rs      Platform abstraction
 │   ├── tests/              Integration tests
 │   └── examples/           Example protocols
-├── fsm/                     Finite state machine support
+├── fsm/                    Finite state machine support
 │   └── src/                FSM types and subtyping verification
-├── macros/                  Procedural macros
+├── macros/                 Procedural macros
 │   └── src/                choreography! and other macros
-├── caching/                 HTTP cache case study
+├── caching/                HTTP cache case study
 │   └── src/                Redis-backed cache example
-├── examples/                Additional examples
+├── examples/               Additional examples
 │   └── wasm-ping-pong/     WASM browser example
-└── docs/                    Documentation
+└── docs/                   Documentation
 ```
-
-This tree shows the physical organization of the codebase.
 
 ### Crate Responsibilities
 

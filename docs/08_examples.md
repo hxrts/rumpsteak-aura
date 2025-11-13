@@ -4,39 +4,37 @@
 
 ### Basic Protocols
 
-adder.rs: Simple addition service with client and server roles.
+The `adder.rs` example shows a simple addition service. It uses client and server roles.
 
-alternating_bit.rs: Alternating bit protocol for reliable message delivery.
+The `alternating_bit.rs` example implements the alternating bit protocol. This provides reliable message delivery.
 
-client_server_log.rs: Client-server interaction with logging.
+The `client_server_log.rs` example demonstrates client-server interaction. It includes logging functionality.
 
-ring.rs: Ring topology with sequential message passing.
+The `ring.rs` example shows ring topology. Messages pass sequentially through the ring.
 
 ### Advanced Protocols
 
-three_adder.rs: Three-party protocol with coordination.
+The `three_adder.rs` example shows a three-party protocol. It includes coordination logic.
 
-oauth.rs: OAuth authentication flow between client, authorization server, and resource server.
+The `oauth.rs` example implements OAuth authentication flow. It uses client, authorization server, and resource server roles.
 
-double_buffering.rs: Producer-consumer with double buffering.
+The `double_buffering.rs` example shows producer-consumer pattern. It uses double buffering for efficiency.
 
-elevator.rs: Multi-floor elevator control protocol.
+The `elevator.rs` example implements multi-floor elevator control. The protocol coordinates elevator movements.
 
-fft.rs: Distributed Fast Fourier Transform computation.
+The `fft.rs` example shows distributed Fast Fourier Transform. Computation is distributed across roles.
 
 ### Choice and Branching
 
-ring_choice.rs: Ring topology with choice points.
+The `ring_choice.rs` example shows ring topology with choice points. Roles make decisions at each node.
 
-choreography.rs: Protocol demonstrating choice constructs.
+The `choreography.rs` example demonstrates choice constructs. It shows branching patterns.
 
 ### WASM
 
-wasm-ping-pong: Browser-based ping-pong protocol. See examples/wasm-ping-pong/README.md for details.
+The `wasm-ping-pong` example runs in browsers. It shows browser-based ping-pong protocol. See examples/wasm-ping-pong/README.md for details.
 
-`RumpsteakEndpoint` supports either `register_channel` (SimpleChannel) or
-`register_session`. Use `RumpsteakSession::from_sink_stream` when an example
-needs to speak over WebSockets or other custom transports.
+`RumpsteakEndpoint` supports two patterns. Use `register_channel` for `SimpleChannel`. Use `register_session` for custom transports. Call `RumpsteakSession::from_sink_stream` for WebSockets or other transports.
 
 ## Common Patterns
 
@@ -51,7 +49,7 @@ let program = Program::new()
     .end();
 ```
 
-Use this pattern for synchronous operations where client waits for server.
+Use this pattern for synchronous operations. Client waits for server response.
 
 ### Choice
 
@@ -106,11 +104,11 @@ let loop_body = Program::new()
     .recv::<Response>(Role::Server);
 
 let program = Program::new()
-    .with_loop(loop_body, 5)  // Repeat 5 times
+    .with_loop(loop_body, 5)
     .end();
 ```
 
-Use loops for batch processing or iterative protocols.
+Use loops for batch processing or iterative protocols. This example repeats 5 times.
 
 ### Parallel Composition
 
@@ -152,7 +150,7 @@ The operation fails with Timeout error if duration elapses.
 
 ### Unit Test with InMemoryHandler
 
-Test protocol logic without network:
+Test protocol logic without network.
 
 ```rust
 #[tokio::test]
@@ -172,7 +170,7 @@ InMemoryHandler provides fast deterministic testing.
 
 ### Integration Test with RumpsteakHandler
 
-Test actual session-typed communication:
+Test actual session-typed communication.
 
 ```rust
 #[tokio::test]
@@ -193,7 +191,7 @@ This tests real message passing with session type checking.
 
 ### Verification with RecordingHandler
 
-Verify protocol execution sequence:
+Verify protocol execution sequence.
 
 ```rust
 let mut handler = RecordingHandler::new(Role::Alice);
@@ -208,7 +206,7 @@ RecordingHandler captures operation history for assertions.
 
 ### Fault Injection Testing
 
-Test error handling with FaultInjection middleware:
+Test error handling with FaultInjection middleware.
 
 ```rust
 let base = InMemoryHandler::new(Role::Alice);
@@ -222,7 +220,7 @@ Use this to verify retry logic and error recovery.
 
 ## Running Examples
 
-Navigate to the example and run with cargo:
+Navigate to the example and run with cargo.
 
 ```bash
 cargo run --example adder
@@ -230,7 +228,7 @@ cargo run --example adder
 
 Some examples require specific setup. Check comments at the top of each file.
 
-The wasm-ping-pong example has its own build script:
+The wasm-ping-pong example has its own build script.
 
 ```bash
 cd examples/wasm-ping-pong
