@@ -7,20 +7,24 @@
 //! represented as data structures that can be analyzed, transformed, and interpreted.
 
 pub mod algebra;
+pub mod extension;
 pub mod handler;
 pub mod handlers;
 pub mod interpreter;
 pub mod middleware;
+pub mod registry;
 
 // Re-export core effect system types explicitly
 pub use algebra::{
     Effect, InterpretResult, InterpreterState, Program, ProgramError, ProgramMessage,
 };
+pub use extension::{ExtensionEffect, ExtensionError};
 pub use handler::{
     ChoreoHandler, ChoreoHandlerExt, ChoreographyError, Endpoint, Label, NoOpHandler, Result,
     RoleId,
 };
-pub use interpreter::interpret;
+pub use interpreter::{interpret, interpret_extensible};
+pub use registry::{ExtensibleHandler, ExtensionRegistry};
 
 // Re-export handler implementations for convenience
 pub use handlers::{InMemoryHandler, RecordedEvent, RecordingHandler};

@@ -34,6 +34,8 @@ use std::fmt::Debug;
 use std::time::Duration;
 use thiserror::Error;
 
+use crate::effects::registry::{ExtensibleHandler, ExtensionRegistry};
+
 /// Trait for role identifiers in choreographies
 ///
 /// Roles are typically generated as enums per choreography, but any type
@@ -242,6 +244,7 @@ pub trait ChoreoHandlerExt: ChoreoHandler {
 /// testing protocol logic without network overhead.
 pub struct NoOpHandler<R: RoleId> {
     _phantom: std::marker::PhantomData<R>,
+    registry: ExtensionRegistry<()>,
 }
 
 impl<R: RoleId> NoOpHandler<R> {
@@ -250,6 +253,7 @@ impl<R: RoleId> NoOpHandler<R> {
     pub fn new() -> Self {
         Self {
             _phantom: std::marker::PhantomData,
+            registry: ExtensionRegistry::new(),
         }
     }
 }
@@ -257,6 +261,15 @@ impl<R: RoleId> NoOpHandler<R> {
 impl<R: RoleId> Default for NoOpHandler<R> {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[async_trait]
+impl<R: RoleId + 'static> ExtensibleHandler for NoOpHandler<R> {
+    type Endpoint = ();
+
+    fn extension_registry(&self) -> &ExtensionRegistry<Self::Endpoint> {
+        &self.registry
     }
 }
 

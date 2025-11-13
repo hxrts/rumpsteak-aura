@@ -3,12 +3,14 @@
 // This module provides a data representation of choreographic programs
 // that can be analyzed, transformed, and interpreted separately from execution.
 
+use crate::effects::extension::ExtensionEffect;
 use crate::effects::{Label, RoleId};
+use std::any::TypeId;
 use std::collections::HashSet;
 use std::time::Duration;
 
 /// A choreographic effect that can be performed by a role
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub enum Effect<R: RoleId, M> {
     /// Send a message to another role
     Send { to: R, msg: M },
@@ -47,12 +49,29 @@ pub enum Effect<R: RoleId, M> {
     /// Execute multiple programs in parallel
     Parallel { programs: Vec<Program<R, M>> },
 
+    /// Extension effect for domain-specific operations
+    ///
+    /// Extensions are boxed trait objects that implement `ExtensionEffect`.
+    /// Use `Effect::ext()` or `Program::ext()` for construction.
+    ///
+    /// # Type Safety
+    ///
+    /// Extensions are identified by `TypeId` and use trait object downcasting
+    /// for type-safe access. Unknown extensions cause runtime errors (fail-fast).
+    ///
+    /// # Projection
+    ///
+    /// Extensions project based on `participating_roles()`:
+    /// - Empty roles → appears in all projections
+    /// - Non-empty → appears only in specified role projections
+    Extension(Box<dyn ExtensionEffect>),
+
     /// End of program
     End,
 }
 
 /// A choreographic program as a sequence of effects
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct Program<R: RoleId, M> {
     pub effects: Vec<Effect<R, M>>,
 }
@@ -158,6 +177,33 @@ impl<R: RoleId, M> Program<R, M> {
         Self::new().parallel(programs)
     }
 
+    /// Add a domain-specific extension effect
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// Program::new()
+    ///     .ext(ValidateCapability { capability: "send".into(), role: Alice })
+    ///     .send(Bob, Message("hello"))
+    ///     .ext(LogEvent { event: "message_sent".into() })
+    ///     .end()
+    /// ```
+    pub fn ext<E: ExtensionEffect + 'static>(mut self, extension: E) -> Self {
+        self.effects.push(Effect::Extension(Box::new(extension)));
+        self
+    }
+
+    /// Add multiple extension effects
+    pub fn exts<E: ExtensionEffect + 'static>(
+        mut self,
+        extensions: impl IntoIterator<Item = E>,
+    ) -> Self {
+        for ext in extensions {
+            self.effects.push(Effect::Extension(Box::new(ext)));
+        }
+        self
+    }
+
     /// Check if the program is empty
     #[must_use]
     pub fn is_empty(&self) -> bool {
@@ -174,6 +220,48 @@ impl<R: RoleId, M> Program<R, M> {
 impl<R: RoleId, M> Default for Program<R, M> {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+/// Extension effect helper methods
+impl<R: RoleId, M> Effect<R, M> {
+    /// Create an extension effect from any type implementing `ExtensionEffect`
+    pub fn ext<E: ExtensionEffect + 'static>(extension: E) -> Self {
+        Effect::Extension(Box::new(extension))
+    }
+
+    /// Check if this is an extension effect of a specific type
+    pub fn is_extension<E: ExtensionEffect + 'static>(&self) -> bool {
+        match self {
+            Effect::Extension(ext) => ext.type_id() == TypeId::of::<E>(),
+            _ => false,
+        }
+    }
+
+    /// Extract extension data with type checking
+    ///
+    /// Returns `Some(&E)` if this is an extension of type `E`, `None` otherwise.
+    pub fn as_extension<E: ExtensionEffect + 'static>(&self) -> Option<&E> {
+        match self {
+            Effect::Extension(ext) => ext.as_any().downcast_ref::<E>(),
+            _ => None,
+        }
+    }
+
+    /// Extract mutable extension data with type checking
+    pub fn as_extension_mut<E: ExtensionEffect + 'static>(&mut self) -> Option<&mut E> {
+        match self {
+            Effect::Extension(ext) => ext.as_any_mut().downcast_mut::<E>(),
+            _ => None,
+        }
+    }
+
+    /// Get the TypeId of an extension effect
+    pub fn extension_type_id(&self) -> Option<TypeId> {
+        match self {
+            Effect::Extension(ext) => Some(ext.type_id()),
+            _ => None,
+        }
     }
 }
 
@@ -221,6 +309,11 @@ impl<R: RoleId, M> Program<R, M> {
                 Effect::Parallel { programs } => {
                     for prog in programs {
                         prog.collect_roles(roles);
+                    }
+                }
+                Effect::Extension(ext) => {
+                    for role in ext.participating_roles::<R>() {
+                        roles.insert(role);
                     }
                 }
                 Effect::End => {}
@@ -304,6 +397,9 @@ impl<R: RoleId, M> Program<R, M> {
                     for prog in programs {
                         prog.validate()?;
                     }
+                }
+                Effect::Extension(_) => {
+                    // Extensions are always valid - validation happens at runtime
                 }
                 _ => {}
             }

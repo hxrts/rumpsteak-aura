@@ -10,6 +10,7 @@ use std::any::TypeId;
 use std::collections::HashMap;
 
 use crate::effects::algebra::{Effect, InterpretResult, InterpreterState, Program, ProgramMessage};
+use crate::effects::registry::ExtensibleHandler;
 use crate::effects::{ChoreoHandler, ChoreographyError, Result, RoleId};
 
 /// Interpret a choreographic program using a concrete handler
@@ -24,6 +25,24 @@ where
     M: ProgramMessage + Serialize + DeserializeOwned + 'static,
 {
     let mut interpreter = Interpreter::new();
+    interpreter.run(handler, endpoint, program).await
+}
+
+/// Interpret a choreographic program using an extensible handler
+///
+/// This version supports handlers that implement `ExtensibleHandler` and can
+/// dispatch extension effects to registered handlers.
+pub async fn interpret_extensible<H, R, M>(
+    handler: &mut H,
+    endpoint: &mut H::Endpoint,
+    program: Program<R, M>,
+) -> Result<InterpretResult<M>>
+where
+    H: ChoreoHandler<Role = R> + ExtensibleHandler<Endpoint = H::Endpoint> + Send,
+    R: RoleId,
+    M: ProgramMessage + Serialize + DeserializeOwned + 'static,
+{
+    let mut interpreter = ExtensibleInterpreter::new();
     interpreter.run(handler, endpoint, program).await
 }
 
@@ -288,6 +307,24 @@ impl<M> Interpreter<M> {
                 }
             }
 
+            Effect::Extension(ext) => {
+                // Dispatch extension to registered handler
+                // This requires the handler to implement ExtensibleHandler
+                tracing::debug!(
+                    type_name = ext.type_name(),
+                    type_id = ?ext.type_id(),
+                    "Executing extension effect"
+                );
+
+                // We need to check if handler implements ExtensibleHandler
+                // For now, we'll add a separate interpret function for extensible handlers
+                // and keep this one for backward compatibility
+                tracing::warn!(
+                    "Extension effect encountered but handler does not support extensions. \
+                     Use interpret_extensible() for handlers with extension support."
+                );
+            }
+
             Effect::End => {
                 // Nothing to do for end effect
             }
@@ -308,6 +345,88 @@ impl<M> Interpreter<M> {
         T: DeserializeOwned + Send,
     {
         handler.recv(endpoint, from).await
+    }
+}
+
+/// Extensible interpreter that supports extension effects
+struct ExtensibleInterpreter<M> {
+    base: Interpreter<M>,
+}
+
+impl<M> ExtensibleInterpreter<M> {
+    fn new() -> Self {
+        Self {
+            base: Interpreter::new(),
+        }
+    }
+
+    #[async_recursion]
+    async fn run<H, R>(
+        &mut self,
+        handler: &mut H,
+        endpoint: &mut H::Endpoint,
+        program: Program<R, M>,
+    ) -> Result<InterpretResult<M>>
+    where
+        H: ChoreoHandler<Role = R> + ExtensibleHandler<Endpoint = H::Endpoint> + Send,
+        R: RoleId,
+        M: ProgramMessage + Serialize + DeserializeOwned + 'static,
+    {
+        for effect in program.effects {
+            match self.execute_effect(handler, endpoint, effect).await {
+                Ok(()) => continue,
+                Err(ChoreographyError::Timeout(_)) => {
+                    return Ok(InterpretResult {
+                        received_values: self.base.received_values.clone(),
+                        final_state: InterpreterState::Timeout,
+                    });
+                }
+                Err(e) => {
+                    return Ok(InterpretResult {
+                        received_values: self.base.received_values.clone(),
+                        final_state: InterpreterState::Failed(e.to_string()),
+                    });
+                }
+            }
+        }
+
+        Ok(InterpretResult {
+            received_values: self.base.received_values.clone(),
+            final_state: InterpreterState::Completed,
+        })
+    }
+
+    #[async_recursion]
+    async fn execute_effect<H, R>(
+        &mut self,
+        handler: &mut H,
+        endpoint: &mut H::Endpoint,
+        effect: Effect<R, M>,
+    ) -> Result<()>
+    where
+        H: ChoreoHandler<Role = R> + ExtensibleHandler<Endpoint = H::Endpoint> + Send,
+        R: RoleId,
+        M: ProgramMessage + Serialize + DeserializeOwned + 'static,
+    {
+        // Handle extension effects
+        if let Effect::Extension(ref ext) = effect {
+            tracing::debug!(
+                type_name = ext.type_name(),
+                type_id = ?ext.type_id(),
+                "Dispatching extension effect to handler"
+            );
+
+            handler
+                .extension_registry()
+                .handle(endpoint, ext.as_ref())
+                .await
+                .map_err(|e| ChoreographyError::Transport(e.to_string()))?;
+
+            return Ok(());
+        }
+
+        // Delegate all non-extension effects to the base interpreter
+        self.base.execute_effect(handler, endpoint, effect).await
     }
 }
 
