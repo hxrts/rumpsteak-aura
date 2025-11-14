@@ -41,6 +41,74 @@ pub use runtime::{spawn, spawn_local};
 // Re-export macros from rumpsteak-macros
 pub use rumpsteak_aura_macros::choreography;
 
+// High-level API functions for extension-aware compilation
+
+/// Parse and generate choreography code with extension support
+pub fn parse_and_generate_with_extensions(
+    input: &str,
+    extension_registry: &ExtensionRegistry,
+) -> std::result::Result<proc_macro2::TokenStream, CompilationError> {
+    use compiler::codegen::generate_choreography_code_with_extensions;
+    use compiler::parser::parse_choreography_str_with_extensions;
+    use compiler::projection::project;
+
+    let (choreography, extensions) = parse_choreography_str_with_extensions(input, extension_registry)
+        .map_err(CompilationError::ParseError)?;
+
+    // Validate the choreography
+    choreography
+        .validate()
+        .map_err(|e| CompilationError::ValidationError(e.to_string()))?;
+
+    // Project to local types
+    let mut local_types = Vec::new();
+    for role in &choreography.roles {
+        let local_type = project(&choreography, role)
+            .map_err(|e| CompilationError::ProjectionError(e.to_string()))?;
+        local_types.push((role.clone(), local_type));
+    }
+
+    // Generate code with extensions
+    let generated_code = generate_choreography_code_with_extensions(&choreography, &local_types, &extensions);
+
+    Ok(generated_code)
+}
+
+/// Convenience function for compiling choreography with built-in extensions
+pub fn compile_choreography_with_extensions(
+    input: &str,
+) -> std::result::Result<proc_macro2::TokenStream, CompilationError> {
+    let registry = ExtensionRegistry::with_builtin_extensions();
+    parse_and_generate_with_extensions(input, &registry)
+}
+
+/// Parse choreography with extension support
+pub fn parse_choreography_with_extensions(
+    input: &str,
+    extension_registry: &ExtensionRegistry,
+) -> std::result::Result<(Choreography, Vec<Box<dyn ProtocolExtension>>), CompilationError> {
+    use compiler::parser::parse_choreography_str_with_extensions;
+
+    parse_choreography_str_with_extensions(input, extension_registry)
+        .map_err(CompilationError::ParseError)
+}
+
+/// Compilation errors that can occur during choreography processing
+#[derive(Debug, thiserror::Error)]
+pub enum CompilationError {
+    #[error("Parse error: {0}")]
+    ParseError(#[from] compiler::parser::ParseError),
+
+    #[error("Validation error: {0}")]
+    ValidationError(String),
+
+    #[error("Projection error: {0}")]
+    ProjectionError(String),
+
+    #[error("Code generation error: {0}")]
+    CodegenError(String),
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

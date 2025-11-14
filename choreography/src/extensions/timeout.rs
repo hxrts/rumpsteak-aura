@@ -45,6 +45,10 @@ impl StatementParser for TimeoutStatementParser {
         rule_name == "timeout_stmt"
     }
 
+    fn supported_rules(&self) -> Vec<String> {
+        vec!["timeout_stmt".to_string()]
+    }
+
     fn parse_statement(
         &self,
         rule_name: &str,

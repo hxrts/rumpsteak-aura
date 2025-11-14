@@ -191,6 +191,10 @@ mod tests {
             rule_name == "test_stmt"
         }
 
+        fn supported_rules(&self) -> Vec<String> {
+            vec!["test_stmt".to_string()]
+        }
+
         fn parse_statement(
             &self,
             _rule_name: &str,

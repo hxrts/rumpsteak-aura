@@ -12,9 +12,8 @@ Add rumpsteak-aura to your `Cargo.toml`.
 
 ```toml
 [dependencies]
-rumpsteak-aura = "*"
-rumpsteak-aura-choreography = "*"
-rumpsteak-aura-choreography-macros = "*"
+rumpsteak-aura = "0.5.0"
+rumpsteak-aura-choreography = "0.5.0"
 tokio = { version = "1", features = ["full"] }
 ```
 

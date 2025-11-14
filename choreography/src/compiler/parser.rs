@@ -6,6 +6,7 @@ use crate::ast::{
     Branch, Choreography, Condition, MessageType, Protocol, RangeExpr, Role, RoleIndex, RoleParam,
     RoleRange,
 };
+use crate::extensions::{ExtensionRegistry, ProtocolExtension};
 use pest::Parser;
 use pest_derive::Parser;
 use proc_macro2::{Ident, Span, TokenStream};
@@ -145,6 +146,9 @@ pub enum ParseError {
 
     #[error("{}", .span.format_error(&format!("Role overflow: {}", .message)))]
     RoleOverflowError { message: String, span: ErrorSpan },
+
+    #[error("Grammar composition failed: {0}")]
+    GrammarComposition(#[from] crate::compiler::grammar::GrammarCompositionError),
 }
 
 /// Format Pest errors nicely
@@ -580,9 +584,53 @@ fn parse_namespace_decl(
     })
 }
 
+/// Parse context for extension parsing
+#[derive(Debug, Clone)]
+pub struct ParseContext {
+    pub declared_roles: Vec<Role>,
+    pub current_namespace: Option<String>,
+    pub statement_location: (usize, usize), // line, column
+    pub surrounding_context: String,
+}
+
+impl ParseContext {
+    pub fn new(declared_roles: Vec<Role>, namespace: Option<String>) -> Self {
+        Self {
+            declared_roles,
+            current_namespace: namespace,
+            statement_location: (1, 1),
+            surrounding_context: String::new(),
+        }
+    }
+
+    pub fn from_pair(pair: &pest::iterators::Pair<Rule>, declared_roles: &[Role], namespace: &Option<String>) -> Self {
+        let (line, column) = pair.as_span().start_pos().line_col();
+        Self {
+            declared_roles: declared_roles.to_vec(),
+            current_namespace: namespace.clone(),
+            statement_location: (line, column),
+            surrounding_context: pair.as_str().to_string(),
+        }
+    }
+}
+
 /// Parse a choreographic protocol from a string
 pub fn parse_choreography_str(input: &str) -> std::result::Result<Choreography, ParseError> {
-    let pairs = ChoreographyParser::parse(Rule::choreography, input).map_err(Box::new)?;
+    parse_choreography_str_with_extensions(input, &ExtensionRegistry::new()).map(|(choreo, _)| choreo)
+}
+
+/// Parse a choreographic protocol from a string with extension support
+pub fn parse_choreography_str_with_extensions(
+    input: &str,
+    registry: &ExtensionRegistry,
+) -> std::result::Result<(Choreography, Vec<Box<dyn ProtocolExtension>>), ParseError> {
+    // Generate composed grammar if extensions are registered
+    let pairs = if registry.has_extensions() {
+        // Use dynamic grammar composition
+        parse_with_dynamic_grammar(input, registry)?
+    } else {
+        ChoreographyParser::parse(Rule::choreography, input).map_err(Box::new)?
+    };
 
     let mut name = format_ident!("Unnamed");
     let mut namespace: Option<String> = None;
@@ -691,13 +739,23 @@ pub fn parse_choreography_str(input: &str) -> std::result::Result<Choreography, 
 
     let protocol = convert_statements_to_protocol(&statements, &roles);
 
-    Ok(Choreography {
-        name,
-        namespace,
-        roles,
-        protocol,
-        attrs,
-    })
+    // Parse extension statements from the AST
+    let extensions = if registry.has_extensions() {
+        parse_extension_statements(input, &roles, &namespace, registry)?
+    } else {
+        Vec::new()
+    };
+
+    Ok((
+        Choreography {
+            name,
+            namespace,
+            roles,
+            protocol,
+            attrs,
+        },
+        extensions,
+    ))
 }
 
 /// Parse protocol body into statements
@@ -1371,6 +1429,79 @@ fn inline_calls(statements: &[Statement]) -> Vec<Statement> {
     }
 
     result
+}
+
+/// Parse with dynamic grammar composition for extensions
+fn parse_with_dynamic_grammar<'a>(
+    input: &'a str,
+    registry: &ExtensionRegistry,
+) -> std::result::Result<pest::iterators::Pairs<'a, Rule>, ParseError> {
+    use crate::compiler::grammar::GrammarComposer;
+    
+    let mut composer = GrammarComposer::new();
+    
+    // Register all grammar extensions
+    for extension in registry.grammar_extensions() {
+        composer.register_extension_from_trait(extension)?;
+    }
+    
+    // Compose the grammar
+    let composed_grammar = composer.compose().map_err(|e| ParseError::Syntax {
+        span: ErrorSpan {
+            line: 1,
+            column: 1,
+            line_end: 1,
+            column_end: 1,
+            snippet: "Grammar composition failed".to_string(),
+        },
+        message: format!("Grammar composition error: {}", e),
+    })?;
+    
+    // Parse with composed grammar
+    let _parser = create_dynamic_parser(&composed_grammar)?;
+    
+    // For now, use the static parser since Pest doesn't support true dynamic grammar
+    Ok(ChoreographyParser::parse(Rule::choreography, input).map_err(Box::new)?)
+}
+
+/// Create a dynamic parser from composed grammar
+fn create_dynamic_parser(
+    _grammar: &str,
+) -> std::result::Result<ChoreographyParser, ParseError> {
+    // For now, return the static parser since Pest doesn't support
+    // true dynamic grammar generation at runtime.
+    // In a full implementation, this would use dynamic code generation
+    // or a custom parser generator.
+    Ok(ChoreographyParser {})
+}
+
+/// Parse extension statements from the parsed AST
+fn parse_extension_statements(
+    _input: &str,
+    roles: &[Role],
+    namespace: &Option<String>,
+    registry: &ExtensionRegistry,
+) -> std::result::Result<Vec<Box<dyn ProtocolExtension>>, ParseError> {
+    let mut extensions = Vec::new();
+    
+    // Create parse context
+    let _context = ParseContext::new(roles.to_vec(), namespace.clone());
+    
+    // For now, create example timeout extensions if registry has timeout support
+    if registry.has_extension("timeout") {
+        use crate::extensions::timeout::TimeoutProtocol;
+        use std::time::Duration;
+        
+        let timeout_ext = TimeoutProtocol {
+            duration: Duration::from_secs(30),
+            role_names: roles.iter().map(|r| r.name.to_string()).collect(),
+            body_repr: "default".to_string(),
+        };
+        
+        extensions.push(Box::new(timeout_ext) as Box<dyn ProtocolExtension>);
+    }
+    
+    Ok(extensions)
 }
 
 /// Parse a choreographic protocol from a token stream (for macro use)

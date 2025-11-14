@@ -1,6 +1,7 @@
 // Code generation from projected local types to Rumpsteak session types
 
 use crate::ast::{Choreography, LocalType, MessageType, Protocol, Role};
+use crate::extensions::ProtocolExtension;
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
 use std::collections::HashMap;
@@ -305,6 +306,66 @@ pub fn generate_choreography_code(
     quote! {
         #role_struct_defs
         #(#session_type_defs)*
+    }
+}
+
+/// Generate choreography code with extension support
+pub fn generate_choreography_code_with_extensions(
+    choreography: &Choreography,
+    local_types: &[(Role, LocalType)],
+    extensions: &[Box<dyn ProtocolExtension>],
+) -> TokenStream {
+    // Generate base choreography code
+    let base_code = generate_choreography_code(
+        &choreography.name.to_string(),
+        &choreography.roles,
+        local_types,
+    );
+
+    // Generate extension-specific code
+    let extension_code = generate_extension_code(extensions, choreography);
+
+    // Combine base and extension code
+    quote! {
+        #base_code
+        #extension_code
+    }
+}
+
+/// Generate code for protocol extensions
+fn generate_extension_code(
+    extensions: &[Box<dyn ProtocolExtension>],
+    choreography: &Choreography,
+) -> TokenStream {
+    if extensions.is_empty() {
+        return quote! {};
+    }
+
+    let mut extension_impls = Vec::new();
+
+    for extension in extensions {
+        let context = crate::extensions::CodegenContext {
+            choreography_name: &choreography.name.to_string(),
+            roles: &choreography.roles,
+            namespace: choreography.namespace.as_deref(),
+        };
+        let ext_code = extension.generate_code(&context);
+        extension_impls.push(ext_code);
+    }
+
+    quote! {
+        // Extension implementations
+        #(#extension_impls)*
+
+        // Extension registry setup
+        pub fn create_extension_registry() -> crate::extensions::ExtensionRegistry {
+            let mut registry = crate::extensions::ExtensionRegistry::new();
+            
+            // In a real implementation, this would register runtime extension handlers
+            // For now, we just return the empty registry
+            
+            registry
+        }
     }
 }
 

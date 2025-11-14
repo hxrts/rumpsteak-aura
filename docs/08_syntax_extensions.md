@@ -47,6 +47,10 @@ impl StatementParser for TimeoutStatementParser {
         rule_name == "timeout_stmt"
     }
     
+    fn supported_rules(&self) -> Vec<String> {
+        vec!["timeout_stmt".to_string()]
+    }
+    
     fn parse_statement(
         &self, rule_name: &str, content: &str, context: &ParseContext
     ) -> Result<Box<dyn ProtocolExtension>, ParseError> {
@@ -85,11 +89,10 @@ impl ProtocolExtension for TimeoutProtocol {
 }
 
 // 4. Register and use
-let parser = ExtensionParserBuilder::new()
-    .with_extension(TimeoutGrammarExtension, TimeoutStatementParser)
-    .build();
+use rumpsteak_aura_choreography::*;
 
-let choreography = parser.parse_with_extensions(r#"
+let registry = ExtensionRegistry::with_builtin_extensions();
+let (choreography, extensions) = parse_choreography_with_extensions(r#"
     choreography Example {
         roles: Alice, Bob;
         
@@ -98,10 +101,10 @@ let choreography = parser.parse_with_extensions(r#"
             Bob -> Alice: Response;
         }
     }
-"#)?;
+"#, &registry)?;
 ```
 
-This example demonstrates the complete extension workflow. The `TimeoutGrammarExtension` defines new grammar rules. The `TimeoutStatementParser` converts parsed content to protocol objects. The `TimeoutProtocol` implements projection and code generation. The `ExtensionParserBuilder` registers extensions and creates a parser.
+This example demonstrates the complete extension workflow. The `TimeoutGrammarExtension` defines new grammar rules. The `TimeoutStatementParser` converts parsed content to protocol objects. The `TimeoutProtocol` implements projection and code generation. The `parse_choreography_with_extensions()` function handles the parsing with extension support.
 
 ## Architecture
 
@@ -165,6 +168,10 @@ Handle parsing the matched grammar rules into your protocol extension:
 impl StatementParser for MyStatementParser {
     fn can_parse(&self, rule_name: &str) -> bool {
         rule_name == "my_stmt"
+    }
+    
+    fn supported_rules(&self) -> Vec<String> {
+        vec!["my_stmt".to_string()]
     }
     
     fn parse_statement(
@@ -245,10 +252,10 @@ impl ProtocolExtension for MyProtocol {
 The library includes a timeout extension as an example:
 
 ```rust
-use rumpsteak_aura_choreography::extensions::timeout::register_timeout_extension;
+use rumpsteak_aura_choreography::{ExtensionRegistry, extensions::timeout::*};
 
-let mut registry = ExtensionRegistry::new();
-register_timeout_extension(&mut registry);
+let registry = ExtensionRegistry::with_builtin_extensions();
+// This includes the timeout extension
 
 // Now you can use timeout syntax:
 // timeout 5000 { Alice -> Bob: Message; }

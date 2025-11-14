@@ -144,6 +144,10 @@ impl StatementParser for PriorityStatementParser {
         rule_name == "priority_stmt"
     }
 
+    fn supported_rules(&self) -> Vec<String> {
+        vec!["priority_stmt".to_string()]
+    }
+
     fn parse_statement(
         &self,
         _rule_name: &str,
@@ -265,6 +269,10 @@ struct LoggingStatementParser;
 impl StatementParser for LoggingStatementParser {
     fn can_parse(&self, rule_name: &str) -> bool {
         rule_name == "log_stmt"
+    }
+
+    fn supported_rules(&self) -> Vec<String> {
+        vec!["log_stmt".to_string()]
     }
 
     fn parse_statement(

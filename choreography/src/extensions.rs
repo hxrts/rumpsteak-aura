@@ -32,6 +32,9 @@ pub trait StatementParser: Send + Sync + Debug {
     /// Check if this parser can handle the given rule name
     fn can_parse(&self, rule_name: &str) -> bool;
 
+    /// Return all rules this parser supports
+    fn supported_rules(&self) -> Vec<String>;
+
     /// Parse a statement into a protocol extension
     ///
     /// # Arguments
@@ -136,6 +139,42 @@ impl ExtensionRegistry {
     /// Check if a rule is handled by an extension
     pub fn can_handle(&self, rule_name: &str) -> bool {
         self.rule_to_parser.contains_key(rule_name)
+    }
+
+    /// Check if any extensions are registered
+    pub fn has_extensions(&self) -> bool {
+        !self.grammar_extensions.is_empty() || !self.statement_parsers.is_empty()
+    }
+
+    /// Get all grammar extensions
+    pub fn grammar_extensions(&self) -> impl Iterator<Item = &dyn GrammarExtension> {
+        self.grammar_extensions.values().map(|e| e.as_ref())
+    }
+
+    /// Check if a specific extension is registered
+    pub fn has_extension(&self, extension_id: &str) -> bool {
+        self.grammar_extensions.contains_key(extension_id)
+    }
+
+    /// Get parser for a rule name
+    pub fn get_parser_for_rule(&self, rule_name: &str) -> Option<&str> {
+        self.rule_to_parser.get(rule_name).map(String::as_str)
+    }
+
+    /// Get statement parser by ID
+    pub fn get_statement_parser(&self, parser_id: &str) -> Option<&dyn StatementParser> {
+        self.statement_parsers.get(parser_id).map(|p| p.as_ref())
+    }
+
+    /// Create a registry with built-in extensions
+    pub fn with_builtin_extensions() -> Self {
+        let mut registry = Self::new();
+        
+        // Register timeout extension
+        registry.register_grammar(timeout::TimeoutGrammarExtension);
+        registry.register_parser(timeout::TimeoutStatementParser, "timeout".to_string());
+        
+        registry
     }
 }
 
