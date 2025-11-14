@@ -1,6 +1,6 @@
 # Background
 
-This document introduces the theoretical foundations of Rumpsteak-Aura. It covers multiparty session types, choreographic programming, and algebraic effects. Understanding these concepts helps explain how the system achieves type-safe distributed programming.
+This document provides a very light introduction to the theory behind [rumpsteak-aura](https://github.com/hxrts/aura). It covers multiparty session types, choreographic programming, and algebraic effects. Understanding these concepts helps explain how the system achieves type-safe distributed programming.
 
 ## Session Types
 
