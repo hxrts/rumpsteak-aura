@@ -196,6 +196,10 @@ impl<'a> Analyzer<'a> {
             }
 
             Protocol::Var(_) | Protocol::End => {}
+
+            Protocol::Extension { continuation, .. } => {
+                self.analyze_protocol(continuation);
+            }
         }
     }
 
@@ -250,6 +254,10 @@ impl<'a> Analyzer<'a> {
                 Self::extract_dependencies(continuation, deps);
             }
             Protocol::Var(_) | Protocol::End => {}
+
+            Protocol::Extension { continuation, .. } => {
+                Self::extract_dependencies(continuation, deps);
+            }
         }
     }
 
@@ -282,6 +290,8 @@ impl<'a> Analyzer<'a> {
             }
             Protocol::Var(_) => true, // Assume recursive calls are okay
             Protocol::Broadcast { continuation, .. } => Self::check_protocol_progress(continuation),
+
+            Protocol::Extension { continuation, .. } => Self::check_protocol_progress(continuation),
         }
     }
 
@@ -354,6 +364,8 @@ fn has_communication(protocol: &Protocol) -> bool {
         Protocol::Parallel { protocols } => protocols.iter().any(has_communication),
         Protocol::Rec { body, .. } => has_communication(body),
         Protocol::Var(_) | Protocol::End => false,
+
+        Protocol::Extension { continuation, .. } => has_communication(continuation),
     }
 }
 

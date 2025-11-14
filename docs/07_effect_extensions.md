@@ -1,6 +1,8 @@
-# Extension Architecture
+# DSL Extensions Part 1: Runtime Effect System  
 
-The extension system enables domain-specific choreographic effects. Extensions maintain type safety and compose with algebraic effects.
+The extension system enables domain-specific choreographic effects. This is Part 1 of the DSL extension guide, covering the runtime effect system that handles execution-time extensions like logging, validation, and metrics.
+
+**Part 2** ([DSL Extensions Part 2: Syntax Extensions](08_syntax_extensions.md)) covers syntax-level extensions that add new grammar rules and custom protocol constructs to the choreographic DSL.
 
 ## Overview
 
@@ -556,4 +558,11 @@ Complete examples demonstrate extension usage. See the `choreography/examples/` 
 
 ## Next Steps
 
-Learn choreographic projection in [Choreographic Projection Patterns](04_projection.md). Understand effect handlers in [Effect Handlers](05_effect_handlers.md). Build complete applications with [Composition Tutorial](08_extension_guide.md).
+This completes Part 1 of the DSL extension system. You now understand how to create runtime effects that execute during choreography interpretation.
+
+**Continue to Part 2:** [DSL Extensions Part 2: Syntax Extensions](08_syntax_extensions.md) to learn how to add custom syntax and grammar rules to the choreographic DSL.
+
+**Other related topics:**
+- [Choreographic Projection Patterns](04_projection.md) - Understanding how extensions project to different roles
+- [Effect Handlers](05_effect_handlers.md) - Core effect system concepts  
+- [Composition Tutorial](09_extension_guide.md) - Building complete applications with extensions

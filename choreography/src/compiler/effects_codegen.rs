@@ -163,6 +163,10 @@ fn collect_message_types(protocol: &Protocol, message_types: &mut HashSet<Messag
             collect_message_types(body, message_types);
         }
         Protocol::Var(_) | Protocol::End => {}
+
+        Protocol::Extension { continuation, .. } => {
+            collect_message_types(continuation, message_types);
+        }
     }
 }
 
@@ -461,6 +465,22 @@ fn generate_program_effects(protocol: &Protocol, role: &Role) -> TokenStream {
                 // 3. Maintain any accumulated state/messages
                 // For code generation, this is typically handled by the containing Rec block
                 // which wraps the body in an actual loop construct
+            }
+        }
+
+        Protocol::Extension {
+            extension,
+            continuation,
+            ..
+        } => {
+            // Generate code for the extension and then continue with the rest
+            let extension_effects =
+                extension.generate_code(&crate::extensions::CodegenContext::default());
+            let continuation_effects = generate_program_effects(continuation, role);
+
+            quote! {
+                #extension_effects
+                #continuation_effects
             }
         }
     }

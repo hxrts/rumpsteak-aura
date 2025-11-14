@@ -5,7 +5,7 @@
 //!
 //! This example demonstrates all the new functionality we've added:
 //! 1. Enhanced namespace support
-//! 2. Multiple annotations system  
+//! 2. Multiple annotations system
 //! 3. Dynamic role count support with overflow protection
 //! 4. Range syntax for dynamic roles
 //! 5. Role-level annotations
@@ -41,7 +41,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // 5. Cross-Feature Integration Demo
     demo_integration()?;
 
-    println!("✅ All new features demonstrated successfully!");
+    println!("All new features demonstrated successfully!");
     Ok(())
 }
 
@@ -52,7 +52,7 @@ fn demo_namespace_support() -> Result<(), Box<dyn std::error::Error>> {
         #[namespace = "authentication"]
         choreography LoginProtocol {
             roles: Client, Server, Database;
-            
+
             Client -> Server: LoginRequest;
             Server -> Database: ValidateCredentials;
             Database -> Server: ValidationResult;
@@ -64,7 +64,7 @@ fn demo_namespace_support() -> Result<(), Box<dyn std::error::Error>> {
         #[namespace = "payment"]
         choreography PaymentProtocol {
             roles: Client, Server, Database;
-            
+
             Client -> Server: PaymentRequest;
             Server -> Database: ProcessPayment;
             Database -> Server: PaymentResult;
@@ -75,10 +75,10 @@ fn demo_namespace_support() -> Result<(), Box<dyn std::error::Error>> {
     let choreo_a = parse_choreography_str(protocol_a)?;
     let choreo_b = parse_choreography_str(protocol_b)?;
 
-    println!("📦 Parsed two protocols with same role names in different namespaces:");
+    println!("Parsed two protocols with same role names in different namespaces:");
     println!("   • Protocol A: {}", choreo_a.qualified_name());
     println!("   • Protocol B: {}", choreo_b.qualified_name());
-    println!("   • No naming conflicts! ✨");
+    println!("   • No naming conflicts!");
     println!();
 
     Ok(())
@@ -90,22 +90,22 @@ fn demo_multiple_annotations() -> Result<(), Box<dyn std::error::Error>> {
     let protocol = r#"
         choreography AnnotatedProtocol {
             roles: Client, Server, Cache;
-            
+
             [@priority = "high", @timeout = 5000, @retry = 3]
             Client -> Server: ImportantRequest;
-            
+
             Server[@load_balance = "round_robin"] -> Cache[@ttl = 3600]: CacheQuery;
-            
+
             [@compress = "gzip", @encrypt = "aes256"]
             Cache -> Server: CachedData;
-            
+
             [@audit_log = "true", @alert_on_failure = "slack"]
             Server -> Client: Response;
         }
     "#;
 
     let choreo = parse_choreography_str(protocol)?;
-    println!("🏷️  Parsed protocol with multiple annotations:");
+    println!("Parsed protocol with multiple annotations:");
 
     // Extract and display annotations from the protocol
     if let Protocol::Send {
@@ -126,7 +126,7 @@ fn demo_multiple_annotations() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
-    println!("   • Annotations parsed and stored successfully! 📝");
+    println!("   • Annotations parsed and stored successfully!");
     println!();
 
     Ok(())
@@ -138,7 +138,7 @@ fn demo_dynamic_roles() -> Result<(), Box<dyn std::error::Error>> {
     let protocol = r#"
         choreography DynamicWorkflow {
             roles: Coordinator, Workers[*], Database;
-            
+
             Coordinator -> Workers[*]: StartWork;
             Workers[i] -> Database: QueryData;
             Database -> Workers[i]: ResultData;
@@ -147,7 +147,7 @@ fn demo_dynamic_roles() -> Result<(), Box<dyn std::error::Error>> {
     "#;
 
     let choreo = parse_choreography_str(protocol)?;
-    println!("⚡ Parsed dynamic role protocol:");
+    println!("Parsed dynamic role protocol:");
 
     for role in &choreo.roles {
         print!("   • {}: ", role.name);
@@ -166,9 +166,9 @@ fn demo_dynamic_roles() -> Result<(), Box<dyn std::error::Error>> {
     println!("   • Testing overflow protection...");
     match RoleParam::safe_static(MAX_ROLE_COUNT + 1) {
         Err(RoleValidationError::CountOverflow { .. }) => {
-            println!("   • ✅ Overflow protection working!");
+            println!("   • Overflow protection working!");
         }
-        _ => println!("   • ⚠️  Overflow protection not triggered"),
+        _ => println!("   • Overflow protection not triggered"),
     }
 
     println!();
@@ -181,7 +181,7 @@ fn demo_range_syntax() -> Result<(), Box<dyn std::error::Error>> {
     let protocol = r#"
         choreography ConsensusProtocol {
             roles: Leader, Followers[N];
-            
+
             Leader -> Followers[*]: PrepareRequest;
             Followers[0..quorum] -> Leader: PrepareResponse;
             Leader -> Followers[*]: CommitRequest;
@@ -190,7 +190,7 @@ fn demo_range_syntax() -> Result<(), Box<dyn std::error::Error>> {
     "#;
 
     let _choreo = parse_choreography_str(protocol)?;
-    println!("📊 Parsed protocol with range syntax:");
+    println!("Parsed protocol with range syntax:");
     println!("   • Followers[*] - all followers");
     println!("   • Followers[0..quorum] - first 'quorum' followers");
     println!("   • Followers[majority..N] - from 'majority' to N followers");
@@ -199,9 +199,9 @@ fn demo_range_syntax() -> Result<(), Box<dyn std::error::Error>> {
     println!("   • Testing range validation...");
     match RoleRange::safe_concrete(0, MAX_RANGE_SIZE + 1) {
         Err(RoleValidationError::RangeSizeOverflow { .. }) => {
-            println!("   • ✅ Range size validation working!");
+            println!("   • Range size validation working!");
         }
-        _ => println!("   • ⚠️  Range validation not triggered"),
+        _ => println!("   • Range validation not triggered"),
     }
 
     println!();
@@ -215,19 +215,19 @@ fn demo_integration() -> Result<(), Box<dyn std::error::Error>> {
         #[namespace = "distributed_consensus"]
         choreography ByzantineConsensus {
             roles: Leader, Followers[*], Auditor;
-            
+
             [@phase = "prepare", @byzantine_tolerance = "true"]
             Leader -> Followers[*]: PrepareRequest;
-            
+
             [@timeout = 10000, @min_responses = "2f+1"]
             Followers[0..byzantine_threshold] -> Leader: PrepareResponse;
-            
+
             [@phase = "commit", @audit_required = "true"]
             Leader -> Followers[*]: CommitRequest;
-            
+
             [@critical = "true", @consensus_threshold = "majority"]
             Followers[honest_majority] -> Leader: CommitResponse;
-            
+
             [@audit_log = "blockchain", @finality = "true"]
             Leader -> Auditor: ConsensusResult;
         }
@@ -235,10 +235,12 @@ fn demo_integration() -> Result<(), Box<dyn std::error::Error>> {
 
     let choreo = parse_choreography_str(complex_protocol)?;
 
-    println!("🚀 Parsed complex protocol with ALL features:");
+    println!("Parsed complex protocol with ALL features:");
     println!("   • Namespace: {}", choreo.qualified_name());
     println!("   • Roles: {} (including dynamic)", choreo.roles.len());
-    println!("   • Features: Annotations ✓, Dynamic Roles ✓, Ranges ✓, Namespaces ✓");
+    println!(
+        "   • Features: Annotations (yes), Dynamic Roles (yes), Ranges (yes), Namespaces (yes)"
+    );
 
     // Test projection
     println!("   • Testing projection...");
@@ -294,8 +296,8 @@ fn demo_error_handling() -> Result<(), Box<dyn std::error::Error>> {
     "#;
 
     match parse_choreography_str(bad_protocol) {
-        Err(err) => println!("✅ Correctly rejected bad protocol: {}", err),
-        Ok(_) => println!("⚠️  Bad protocol was accepted unexpectedly"),
+        Err(err) => println!("Correctly rejected bad protocol: {}", err),
+        Ok(_) => println!("Bad protocol was accepted unexpectedly"),
     }
 
     println!();

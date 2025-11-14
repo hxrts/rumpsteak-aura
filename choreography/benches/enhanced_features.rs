@@ -388,10 +388,10 @@ fn bench_memory_usage(c: &mut Criterion) {
     // Benchmark memory allocation during parsing
     group.bench_function("parse_allocation", |b| {
         b.iter(|| {
-            let choreo = parse_choreography_str(black_box(complex_protocol)).unwrap();
+            let _choreo = parse_choreography_str(black_box(complex_protocol)).unwrap();
 
-            // Force allocation by cloning
-            let _cloned = choreo.clone();
+            // Force allocation by parsing again since clone is no longer available
+            let _cloned = parse_choreography_str(black_box(complex_protocol)).unwrap();
         })
     });
 

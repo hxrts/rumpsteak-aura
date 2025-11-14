@@ -2,6 +2,7 @@
 
 use super::{MessageType, Role};
 use proc_macro2::Ident;
+use std::time::Duration;
 
 /// Local session type after projection
 #[derive(Debug, Clone)]
@@ -47,6 +48,12 @@ pub enum LocalType {
     /// Variable (reference to recursive type)
     Var(Ident),
 
+    /// Timeout wrapper for protocol extensions
+    Timeout {
+        duration: Duration,
+        body: Box<LocalType>,
+    },
+
     /// Type termination
     End,
 }
@@ -79,6 +86,7 @@ impl LocalType {
                 result
             }
             LocalType::Var(label) => rec_vars.contains(label),
+            LocalType::Timeout { body, .. } => body.check_well_formed(rec_vars),
             LocalType::End => true,
         }
     }

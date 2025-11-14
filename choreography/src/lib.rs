@@ -14,11 +14,16 @@
 pub mod ast;
 pub mod compiler;
 pub mod effects;
+pub mod extensions;
 pub mod runtime;
 
 // Re-export main APIs
 pub use ast::{Choreography, MessageType, Protocol, Role};
 pub use compiler::generate_effects_protocol;
+pub use compiler::{
+    create_standard_extension_parser, ExtensionParseError, ExtensionParser, ExtensionParserBuilder,
+    GrammarComposer, GrammarComposerBuilder, GrammarCompositionError,
+};
 pub use effects::middleware::{Metrics, Retry, Trace};
 pub use effects::NoOpHandler;
 pub use effects::{
@@ -27,6 +32,10 @@ pub use effects::{
 };
 pub use effects::{InMemoryHandler, RecordedEvent, RecordingHandler};
 pub use effects::{RumpsteakEndpoint, RumpsteakHandler, SimpleChannel};
+pub use extensions::{
+    CodegenContext, ExtensionRegistry, ExtensionValidationError, GrammarExtension, ParseContext,
+    ParseError, ProjectionContext, ProtocolExtension, StatementParser,
+};
 pub use runtime::{spawn, spawn_local};
 
 // Re-export macros from rumpsteak-macros

@@ -5,7 +5,7 @@ use proc_macro2::Ident;
 use std::collections::HashMap;
 
 /// A complete choreographic protocol specification
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Choreography {
     /// Protocol name
     pub name: Ident,

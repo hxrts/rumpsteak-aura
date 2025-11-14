@@ -45,7 +45,8 @@ fn unroll_type(mut ty: &mut Type) -> &mut Type {
 /// while excluding types that are already parameterized.
 fn augment_type(mut ty: &mut Type, exclude: &HashSet<Ident>) {
     while let Type::Path(path) = unroll_type(ty) {
-        if *path == parse_quote!(Self) {
+        // Check if this is a "Self" type path
+        if path.path.segments.len() == 1 && path.path.segments.first().unwrap().ident == "Self" {
             break;
         }
 

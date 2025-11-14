@@ -251,6 +251,11 @@ fn generate_type_expr(local_type: &LocalType) -> TokenStream {
         LocalType::End => {
             quote! { End }
         }
+
+        LocalType::Timeout { duration: _, body } => {
+            // Generate type for the body, ignoring timeout info for now
+            generate_type_expr(body)
+        }
     }
 }
 

@@ -200,7 +200,7 @@ impl WorkflowHandler {
                 }
 
                 println!(
-                    "✓ [{:?}] Validated capability: {}",
+                    "[{:?}] Validated capability: {}",
                     validate.role, validate.capability
                 );
                 Ok(())
@@ -229,7 +229,7 @@ impl WorkflowHandler {
 
                 *budget_lock -= cost.cost;
                 println!(
-                    "💰 [{:?}] Charged {} units (remaining: {})",
+                    "[{:?}] Charged {} units (remaining: {})",
                     cost.role, cost.cost, *budget_lock
                 );
                 Ok(())
@@ -247,9 +247,9 @@ impl WorkflowHandler {
                 )?;
 
                 match log.level {
-                    LogLevel::Info => println!("ℹ️  [INFO] {}", log.message),
-                    LogLevel::Warn => println!("⚠️  [WARN] {}", log.message),
-                    LogLevel::Error => println!("❌ [ERROR] {}", log.message),
+                    LogLevel::Info => println!("[INFO] {}", log.message),
+                    LogLevel::Warn => println!("[WARN] {}", log.message),
+                    LogLevel::Error => println!("[ERROR] {}", log.message),
                 }
                 Ok(())
             })
@@ -271,7 +271,7 @@ impl WorkflowHandler {
                     .lock()
                     .unwrap()
                     .push((metric.metric.clone(), metric.value));
-                println!("📊 Metric: {} = {}", metric.metric, metric.value);
+                println!("Metric: {} = {}", metric.metric, metric.value);
                 Ok(())
             })
         });
@@ -313,7 +313,7 @@ impl ChoreoHandler for WorkflowHandler {
         to: Self::Role,
         _msg: &M,
     ) -> Result<()> {
-        println!("📤 [{:?}] → [{:?}] Message sent", self.role, to);
+        println!("[{:?}] -> [{:?}] Message sent", self.role, to);
         Ok(())
     }
 
@@ -322,7 +322,7 @@ impl ChoreoHandler for WorkflowHandler {
         _ep: &mut Self::Endpoint,
         from: Self::Role,
     ) -> Result<M> {
-        println!("📥 [{:?}] ← [{:?}] Message received", self.role, from);
+        println!("[{:?}] <- [{:?}] Message received", self.role, from);
         Err(ChoreographyError::Transport(
             "recv not implemented in example".into(),
         ))
@@ -334,12 +334,12 @@ impl ChoreoHandler for WorkflowHandler {
         _who: Self::Role,
         label: Label,
     ) -> Result<()> {
-        println!("🔀 [{:?}] Choice: {}", self.role, label.0);
+        println!("[{:?}] Choice: {}", self.role, label.0);
         Ok(())
     }
 
     async fn offer(&mut self, _ep: &mut Self::Endpoint, from: Self::Role) -> Result<Label> {
-        println!("❓ [{:?}] Offering choice from {:?}", self.role, from);
+        println!("[{:?}] Offering choice from {:?}", self.role, from);
         Ok(Label("default"))
     }
 
@@ -486,13 +486,13 @@ async fn main() {
             println!("{}", "=".repeat(60));
             match result.final_state {
                 InterpreterState::Completed => {
-                    println!("✅ Protocol completed successfully");
+                    println!("Protocol completed successfully");
                 }
                 InterpreterState::Failed(err) => {
-                    println!("❌ Protocol failed: {}", err);
+                    println!("Protocol failed: {}", err);
                 }
                 InterpreterState::Timeout => {
-                    println!("⏱️  Protocol timed out");
+                    println!("Protocol timed out");
                 }
             }
 
@@ -506,7 +506,7 @@ async fn main() {
             println!("{}", "=".repeat(60));
         }
         Err(e) => {
-            println!("\n❌ Error: {}", e);
+            println!("\nError: {}", e);
         }
     }
 }

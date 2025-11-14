@@ -17,4 +17,7 @@ pub enum ValidationError {
 
     #[error("Role {0} is not used in protocol")]
     UnusedRole(String),
+
+    #[error("Extension error: {0}")]
+    ExtensionError(String),
 }

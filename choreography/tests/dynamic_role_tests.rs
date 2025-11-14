@@ -137,7 +137,7 @@ fn test_dynamic_role_projection() {
         payload: None,
     };
 
-    let protocol = Protocol::Send {
+    let _protocol = Protocol::Send {
         from: coordinator.clone(),
         to: signers.clone(),
         message: request_msg,
@@ -152,7 +152,19 @@ fn test_dynamic_role_projection() {
         name: format_ident!("TestProtocol"),
         namespace: None,
         roles: vec![coordinator.clone(), signers.clone()],
-        protocol: protocol.clone(),
+        protocol: Protocol::Send {
+            from: coordinator.clone(),
+            to: signers.clone(),
+            message: MessageType {
+                name: format_ident!("Request"),
+                type_annotation: Some(quote! { String }),
+                payload: None,
+            },
+            continuation: Box::new(Protocol::End),
+            annotations: HashMap::new(),
+            from_annotations: HashMap::new(),
+            to_annotations: HashMap::new(),
+        },
         attrs: HashMap::new(),
     };
 

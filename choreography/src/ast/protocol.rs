@@ -5,7 +5,7 @@ use proc_macro2::{Ident, TokenStream};
 use std::collections::HashMap;
 
 /// Protocol specification using choreographic constructs
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub enum Protocol {
     /// Message send: A -> B: Message
     Send {
@@ -56,12 +56,22 @@ pub enum Protocol {
     /// Reference to recursive label
     Var(Ident),
 
+    /// Protocol extension point for custom behaviors
+    Extension {
+        /// The extension implementation
+        extension: Box<dyn crate::extensions::ProtocolExtension>,
+        /// Continuation after this extension
+        continuation: Box<Protocol>,
+        /// Statement-level annotations
+        annotations: HashMap<String, String>,
+    },
+
     /// Protocol termination
     End,
 }
 
 /// A branch in a choice
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Branch {
     pub label: Ident,
     pub guard: Option<TokenStream>,
@@ -109,6 +119,11 @@ impl Protocol {
             Protocol::Loop { body, .. } => body.mentions_role(role),
             Protocol::Parallel { protocols } => protocols.iter().any(|p| p.mentions_role(role)),
             Protocol::Rec { body, .. } => body.mentions_role(role),
+            Protocol::Extension {
+                extension,
+                continuation,
+                ..
+            } => extension.mentions_role(role) || continuation.mentions_role(role),
             Protocol::Var(_) | Protocol::End => false,
         }
     }
@@ -172,6 +187,17 @@ impl Protocol {
                 Ok(())
             }
             Protocol::Rec { body, .. } => body.validate(roles),
+            Protocol::Extension {
+                extension,
+                continuation,
+                ..
+            } => {
+                // Validate the extension with the extension system's validation
+                extension.validate(roles).map_err(|e| {
+                    ValidationError::ExtensionError(format!("Extension validation failed: {}", e))
+                })?;
+                continuation.validate(roles)
+            }
             Protocol::Var(_) | Protocol::End => Ok(()),
         }
     }
@@ -182,6 +208,7 @@ impl Protocol {
             Protocol::Send { annotations, .. } => annotations,
             Protocol::Broadcast { annotations, .. } => annotations,
             Protocol::Choice { annotations, .. } => annotations,
+            Protocol::Extension { annotations, .. } => annotations,
             Protocol::Loop { .. }
             | Protocol::Parallel { .. }
             | Protocol::Rec { .. }
@@ -232,6 +259,7 @@ impl Protocol {
             Protocol::Send { annotations, .. } => Some(annotations),
             Protocol::Broadcast { annotations, .. } => Some(annotations),
             Protocol::Choice { annotations, .. } => Some(annotations),
+            Protocol::Extension { annotations, .. } => Some(annotations),
             Protocol::Loop { .. }
             | Protocol::Parallel { .. }
             | Protocol::Rec { .. }
@@ -446,6 +474,9 @@ impl Protocol {
             Protocol::Rec { body, .. } => {
                 body.collect_nodes_with_annotation(key, nodes);
             }
+            Protocol::Extension { continuation, .. } => {
+                continuation.collect_nodes_with_annotation(key, nodes);
+            }
             Protocol::Var(_) | Protocol::End => {
                 // Terminal nodes - no further traversal needed
             }
@@ -489,6 +520,9 @@ impl Protocol {
             Protocol::Rec { body, .. } => {
                 body.collect_nodes_with_annotation_value(key, value, nodes);
             }
+            Protocol::Extension { continuation, .. } => {
+                continuation.collect_nodes_with_annotation_value(key, value, nodes);
+            }
             Protocol::Var(_) | Protocol::End => {
                 // Terminal nodes - no further traversal needed
             }
@@ -521,6 +555,9 @@ impl Protocol {
             }
             Protocol::Rec { body, .. } => {
                 count += body.deep_annotation_count();
+            }
+            Protocol::Extension { continuation, .. } => {
+                count += continuation.deep_annotation_count();
             }
             Protocol::Var(_) | Protocol::End => {
                 // Terminal nodes - no additional annotations
@@ -562,6 +599,9 @@ impl Protocol {
             Protocol::Rec { body, .. } => {
                 body.visit_annotated_nodes(f);
             }
+            Protocol::Extension { continuation, .. } => {
+                continuation.visit_annotated_nodes(f);
+            }
             Protocol::Var(_) | Protocol::End => {
                 // Terminal nodes
             }
@@ -599,6 +639,9 @@ impl Protocol {
             }
             Protocol::Rec { body, .. } => {
                 body.visit_annotated_nodes_mut(f);
+            }
+            Protocol::Extension { continuation, .. } => {
+                continuation.visit_annotated_nodes_mut(f);
             }
             Protocol::Var(_) | Protocol::End => {
                 // Terminal nodes

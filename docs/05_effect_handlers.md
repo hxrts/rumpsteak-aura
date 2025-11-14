@@ -248,7 +248,7 @@ Use middleware to add logging, metrics, retries, or fault injection. Middleware 
 
 InMemoryHandler and RumpsteakHandler both work in WASM environments. They use futures channels for communication.
 
-For WASM network communication, implement a custom handler. Use web-sys WebSocket or fetch APIs. See [WASM Guide](07_wasm_guide.md) for details.
+For WASM network communication, implement a custom handler. Use web-sys WebSocket or fetch APIs. See [WASM Guide](10_wasm_guide.md) for details.
 
 ## Effect Interpretation
 

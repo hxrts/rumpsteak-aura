@@ -1,11 +1,9 @@
 #![allow(clippy::unwrap_used)]
 #![allow(clippy::expect_used)]
-
 // WASM compatibility tests for choreography system
 //
 // These tests verify that core choreographic programming features
 // work correctly when compiled to WASM.
-
 #![cfg(target_arch = "wasm32")]
 
 use rumpsteak_aura_choreography::{

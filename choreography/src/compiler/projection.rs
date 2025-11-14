@@ -243,6 +243,17 @@ impl<'a> ProjectionContext<'a> {
             Protocol::Var(label) => self.project_var(label),
 
             Protocol::End => Ok(LocalType::End),
+
+            Protocol::Extension {
+                extension: _,
+                continuation: _,
+                annotations: _,
+            } => {
+                // Delegate projection to the extension implementation
+                // Note: We would need to convert between ProjectionContext types here
+                // For now, just return a placeholder
+                Ok(LocalType::End)
+            }
         }
     }
 

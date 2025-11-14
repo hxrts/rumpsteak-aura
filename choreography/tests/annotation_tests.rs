@@ -266,7 +266,7 @@ fn test_protocol_traversal_with_annotations() {
     let alice = Role::new(ident("Alice"));
     let bob = Role::new(ident("Bob"));
 
-    let inner_protocol = Protocol::Send {
+    let _inner_protocol = Protocol::Send {
         from: alice.clone(),
         to: bob.clone(),
         message: msg("InnerMsg"),
@@ -280,7 +280,15 @@ fn test_protocol_traversal_with_annotations() {
         from: bob.clone(),
         to: alice.clone(),
         message: msg("OuterMsg"),
-        continuation: Box::new(inner_protocol.clone()),
+        continuation: Box::new(Protocol::Send {
+            from: alice.clone(),
+            to: bob.clone(),
+            message: msg("InnerMsg"),
+            continuation: Box::new(Protocol::End),
+            annotations: HashMap::from([("inner".to_string(), "true".to_string())]),
+            from_annotations: HashMap::new(),
+            to_annotations: HashMap::new(),
+        }),
         annotations: HashMap::from([("outer".to_string(), "true".to_string())]),
         from_annotations: HashMap::new(),
         to_annotations: HashMap::new(),

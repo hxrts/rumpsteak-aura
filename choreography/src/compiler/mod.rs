@@ -6,6 +6,8 @@
 pub mod analysis;
 pub mod codegen;
 pub mod effects_codegen;
+pub mod extension_parser;
+pub mod grammar;
 pub mod parser;
 pub mod projection;
 
@@ -19,6 +21,11 @@ pub use codegen::{
     generate_role_implementations, generate_session_type,
 };
 pub use effects_codegen::generate_effects_protocol;
+pub use extension_parser::{
+    create_standard_extension_parser, ExtensionParseError, ExtensionParser, ExtensionParserBuilder,
+    ExtensionStats,
+};
+pub use grammar::{GrammarComposer, GrammarComposerBuilder, GrammarCompositionError};
 pub use parser::{
     choreography_macro, parse_choreography, parse_choreography_file, parse_choreography_str,
     parse_dsl,
