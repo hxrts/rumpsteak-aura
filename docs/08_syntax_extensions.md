@@ -16,20 +16,18 @@ The rumpsteak-aura extension system provides a clean, elegant way for 3rd party 
 
 The extension system uses a preprocessing approach that provides clean separation between extension and base parsing:
 
-```text
-┌─────────────────────────────────────────┐
-│           3rd Party Project             │
-│      (Inherits ALL Features)           │
-├─────────────────────────────────────────┤
-│         Extension Registry              │
-│     (Grammar + Statement Parsers)      │
-├─────────────────────────────────────────┤
-│        Grammar Composer                │
-│   (Cached Dynamic Composition)         │
-├─────────────────────────────────────────┤
-│      Rumpsteak-Aura Parser             │
-│    (Standard Grammar + Features)       │
-└─────────────────────────────────────────┘
+```mermaid
+graph TD
+    A["**3rd Party Project**<br/>Inherits all features"]
+    B["**Extension Registry**<br/>Grammar + Parsers"]
+    C["**Grammar Composer**<br/>Dynamic composition"]
+    D["**Rumpsteak-Aura Parser**<br/>Standard grammar + Features"]
+    E["**Validated AST**"]
+    
+    A --> B
+    B --> C
+    C --> D
+    D --> E
 ```
 
 Key benefits:
