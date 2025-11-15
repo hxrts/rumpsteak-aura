@@ -11,7 +11,10 @@ use pest::Parser;
 use pest_derive::Parser;
 use proc_macro2::{Ident, Span, TokenStream};
 use quote::format_ident;
+use std::collections::hash_map::DefaultHasher;
 use std::collections::{HashMap, HashSet};
+use std::hash::{Hash, Hasher};
+use std::sync::{Arc, RwLock};
 use syn::Result;
 use thiserror::Error;
 
@@ -422,7 +425,7 @@ fn parse_role_param(
     }
 }
 
-/// Parse a role index using enhanced syntax  
+/// Parse a role index using enhanced syntax
 fn parse_role_index(
     pair: pest::iterators::Pair<Rule>,
     _role_name: &str,
@@ -603,7 +606,11 @@ impl ParseContext {
         }
     }
 
-    pub fn from_pair(pair: &pest::iterators::Pair<Rule>, declared_roles: &[Role], namespace: &Option<String>) -> Self {
+    pub fn from_pair(
+        pair: &pest::iterators::Pair<Rule>,
+        declared_roles: &[Role],
+        namespace: &Option<String>,
+    ) -> Self {
         let (line, column) = pair.as_span().start_pos().line_col();
         Self {
             declared_roles: declared_roles.to_vec(),
@@ -616,7 +623,8 @@ impl ParseContext {
 
 /// Parse a choreographic protocol from a string
 pub fn parse_choreography_str(input: &str) -> std::result::Result<Choreography, ParseError> {
-    parse_choreography_str_with_extensions(input, &ExtensionRegistry::new()).map(|(choreo, _)| choreo)
+    parse_choreography_str_with_extensions(input, &ExtensionRegistry::new())
+        .map(|(choreo, _)| choreo)
 }
 
 /// Parse a choreographic protocol from a string with extension support
@@ -625,11 +633,15 @@ pub fn parse_choreography_str_with_extensions(
     registry: &ExtensionRegistry,
 ) -> std::result::Result<(Choreography, Vec<Box<dyn ProtocolExtension>>), ParseError> {
     // Generate composed grammar if extensions are registered
-    let pairs = if registry.has_extensions() {
+    let (preprocessed_input, pairs) = if registry.has_extensions() {
         // Use dynamic grammar composition
-        parse_with_dynamic_grammar(input, registry)?
+        let (preprocessed, pairs) = parse_with_dynamic_grammar(input, registry)?;
+        (Some(preprocessed), pairs)
     } else {
-        ChoreographyParser::parse(Rule::choreography, input).map_err(Box::new)?
+        (
+            None,
+            ChoreographyParser::parse(Rule::choreography, input).map_err(Box::new)?,
+        )
     };
 
     let mut name = format_ident!("Unnamed");
@@ -741,7 +753,9 @@ pub fn parse_choreography_str_with_extensions(
 
     // Parse extension statements from the AST
     let extensions = if registry.has_extensions() {
-        parse_extension_statements(input, &roles, &namespace, registry)?
+        let default_input = input.to_string();
+        let extension_input = preprocessed_input.as_ref().unwrap_or(&default_input);
+        parse_extension_statements(extension_input, &roles, &namespace, registry)?
     } else {
         Vec::new()
     };
@@ -1435,39 +1449,20 @@ fn inline_calls(statements: &[Statement]) -> Vec<Statement> {
 fn parse_with_dynamic_grammar<'a>(
     input: &'a str,
     registry: &ExtensionRegistry,
-) -> std::result::Result<pest::iterators::Pairs<'a, Rule>, ParseError> {
-    use crate::compiler::grammar::GrammarComposer;
-    
-    let mut composer = GrammarComposer::new();
-    
-    // Register all grammar extensions
-    for extension in registry.grammar_extensions() {
-        composer.register_extension_from_trait(extension)?;
-    }
-    
-    // Compose the grammar
-    let composed_grammar = composer.compose().map_err(|e| ParseError::Syntax {
-        span: ErrorSpan {
-            line: 1,
-            column: 1,
-            line_end: 1,
-            column_end: 1,
-            snippet: "Grammar composition failed".to_string(),
-        },
-        message: format!("Grammar composition error: {}", e),
-    })?;
-    
-    // Parse with composed grammar
-    let _parser = create_dynamic_parser(&composed_grammar)?;
-    
-    // For now, use the static parser since Pest doesn't support true dynamic grammar
-    Ok(ChoreographyParser::parse(Rule::choreography, input).map_err(Box::new)?)
+) -> std::result::Result<(String, pest::iterators::Pairs<'a, Rule>), ParseError> {
+    // Clean and elegant approach: preprocess extension syntax then parse
+    let preprocessed = preprocess_extension_syntax(input, registry)?;
+
+    // Parse the original input for now, but return the preprocessed version
+    // so the caller can handle extensions based on the preprocessing
+    let pairs = ChoreographyParser::parse(Rule::choreography, input).map_err(Box::new)?;
+
+    Ok((preprocessed, pairs))
 }
 
 /// Create a dynamic parser from composed grammar
-fn create_dynamic_parser(
-    _grammar: &str,
-) -> std::result::Result<ChoreographyParser, ParseError> {
+#[allow(dead_code)]
+fn create_dynamic_parser(_grammar: &str) -> std::result::Result<ChoreographyParser, ParseError> {
     // For now, return the static parser since Pest doesn't support
     // true dynamic grammar generation at runtime.
     // In a full implementation, this would use dynamic code generation
@@ -1475,33 +1470,256 @@ fn create_dynamic_parser(
     Ok(ChoreographyParser {})
 }
 
+/// Preprocess extension syntax to transform it into standard rumpsteak syntax
+/// This is the core of our elegant extension system - transform extension syntax
+/// to standard syntax that the base parser can handle
+fn preprocess_extension_syntax(
+    input: &str,
+    registry: &ExtensionRegistry,
+) -> std::result::Result<String, ParseError> {
+    let mut processed = input.to_string();
+
+    // Process each type of extension syntax
+    for extension in registry.grammar_extensions() {
+        processed = preprocess_extension_rules(&processed, extension)?;
+    }
+
+    Ok(processed)
+}
+
+/// Transform extension-specific syntax patterns for a single extension
+fn preprocess_extension_rules(
+    input: &str,
+    extension: &dyn crate::extensions::GrammarExtension,
+) -> std::result::Result<String, ParseError> {
+    let mut result = input.to_string();
+
+    // Handle Aura-style annotations: Role[annotations] -> Role: Message
+    // Transform to: Role -> Role: Message /* annotations */
+    if extension.extension_id() == "aura_annotations" {
+        result = transform_aura_annotations(&result)?;
+    }
+
+    Ok(result)
+}
+
+// Cache for compiled regex patterns (performance optimization)
+lazy_static::lazy_static! {
+    static ref AURA_ANNOTATION_REGEX: regex::Regex = regex::Regex::new(
+        r"(\w+)\[([^\]]+)\]\s*->\s*(\w+):\s*(\w+);"
+    ).expect("Failed to compile Aura annotation regex");
+
+    /// Cache for preprocessed syntax transformations
+    static ref PREPROCESSING_CACHE: Arc<RwLock<HashMap<u64, String>>> = Arc::new(RwLock::new(HashMap::new()));
+}
+
+/// Transform Aura annotation syntax to standard comments with caching
+/// Alice[guard_capability="send", flow_cost=100] -> Bob: Message;
+/// becomes:
+/// Alice -> Bob: Message; // aura:guard_capability="send",flow_cost=100
+fn transform_aura_annotations(input: &str) -> std::result::Result<String, ParseError> {
+    // Create cache key
+    let mut hasher = DefaultHasher::new();
+    input.hash(&mut hasher);
+    "aura_annotations".hash(&mut hasher);
+    let cache_key = hasher.finish();
+
+    // Check cache first
+    if let Ok(cache) = PREPROCESSING_CACHE.read() {
+        if let Some(cached) = cache.get(&cache_key) {
+            return Ok(cached.clone());
+        }
+    }
+
+    // Perform transformation
+    let transformed = AURA_ANNOTATION_REGEX.replace_all(input, |caps: &regex::Captures| {
+        let sender = &caps[1];
+        let annotations = &caps[2];
+        let receiver = &caps[3];
+        let message = &caps[4];
+
+        // Transform to standard syntax with comment
+        format!(
+            "{} -> {}: {}; // aura:{}",
+            sender, receiver, message, annotations
+        )
+    });
+
+    let result = transformed.to_string();
+
+    // Cache the result
+    if let Ok(mut cache) = PREPROCESSING_CACHE.write() {
+        cache.insert(cache_key, result.clone());
+    }
+
+    Ok(result)
+}
+
 /// Parse extension statements from the parsed AST
 fn parse_extension_statements(
-    _input: &str,
+    input: &str,
     roles: &[Role],
     namespace: &Option<String>,
     registry: &ExtensionRegistry,
 ) -> std::result::Result<Vec<Box<dyn ProtocolExtension>>, ParseError> {
     let mut extensions = Vec::new();
-    
+
     // Create parse context
     let _context = ParseContext::new(roles.to_vec(), namespace.clone());
-    
-    // For now, create example timeout extensions if registry has timeout support
+
+    // Parse Aura-style annotation comments if Aura extensions are registered
+    if registry.has_extension("aura_annotations") {
+        extensions.extend(parse_aura_annotation_comments(input)?);
+    }
+
+    // Keep existing timeout support for compatibility
     if registry.has_extension("timeout") {
         use crate::extensions::timeout::TimeoutProtocol;
         use std::time::Duration;
-        
+
         let timeout_ext = TimeoutProtocol {
             duration: Duration::from_secs(30),
             role_names: roles.iter().map(|r| r.name.to_string()).collect(),
             body_repr: "default".to_string(),
         };
-        
+
         extensions.push(Box::new(timeout_ext) as Box<dyn ProtocolExtension>);
     }
-    
+
     Ok(extensions)
+}
+
+/// Parse Aura annotation comments from transformed input
+/// Looks for: // aura:guard_capability="send",flow_cost=100
+fn parse_aura_annotation_comments(
+    input: &str,
+) -> std::result::Result<Vec<Box<dyn crate::extensions::ProtocolExtension>>, ParseError> {
+    use std::collections::HashMap;
+
+    let mut extensions = Vec::new();
+
+    for line in input.lines() {
+        if let Some(comment_start) = line.find("// aura:") {
+            let comment_content = &line[comment_start + 8..]; // Skip "// aura:"
+
+            // Parse the comment content as key=value pairs
+            let mut annotations = HashMap::new();
+            for pair in comment_content.split(',') {
+                if let Some(eq_pos) = pair.find('=') {
+                    let key = pair[..eq_pos].trim();
+                    let value = pair[eq_pos + 1..].trim().trim_matches('"');
+                    annotations.insert(key.to_string(), value.to_string());
+                }
+            }
+
+            if !annotations.is_empty() {
+                // Extract sender and receiver from the line (before the comment)
+                let statement_part = &line[..comment_start];
+                if let Some((sender, receiver, message)) = parse_send_statement(statement_part) {
+                    let aura_send =
+                        create_aura_annotated_send(sender, receiver, message, annotations);
+                    extensions
+                        .push(Box::new(aura_send) as Box<dyn crate::extensions::ProtocolExtension>);
+                }
+            }
+        }
+    }
+
+    Ok(extensions)
+}
+
+/// Parse a send statement to extract sender, receiver, and message
+/// "Alice -> Bob: Message;" returns Some(("Alice", "Bob", "Message"))
+fn parse_send_statement(statement: &str) -> Option<(String, String, String)> {
+    let statement = statement.trim();
+
+    // Find "->"
+    let arrow_pos = statement.find("->")?;
+    let sender = statement[..arrow_pos].trim().to_string();
+
+    let after_arrow = &statement[arrow_pos + 2..];
+    let colon_pos = after_arrow.find(':')?;
+    let receiver = after_arrow[..colon_pos].trim().to_string();
+
+    let after_colon = &after_arrow[colon_pos + 1..];
+    let message = after_colon.trim().trim_end_matches(';').trim().to_string();
+
+    Some((sender, receiver, message))
+}
+
+/// Simple Aura extension implementation for demonstration
+#[derive(Debug, Clone)]
+struct SimpleAuraExtension {
+    sender: String,
+    receiver: String,
+    #[allow(dead_code)]
+    message_type: String,
+    annotations: std::collections::HashMap<String, String>,
+}
+
+impl crate::extensions::ProtocolExtension for SimpleAuraExtension {
+    fn type_name(&self) -> &'static str {
+        "SimpleAuraExtension"
+    }
+
+    fn mentions_role(&self, role: &crate::ast::Role) -> bool {
+        role.name == self.sender || role.name == self.receiver
+    }
+
+    fn validate(
+        &self,
+        _roles: &[crate::ast::Role],
+    ) -> std::result::Result<(), crate::extensions::ExtensionValidationError> {
+        Ok(())
+    }
+
+    fn project(
+        &self,
+        _role: &crate::ast::Role,
+        _context: &crate::extensions::ProjectionContext,
+    ) -> std::result::Result<crate::ast::LocalType, crate::compiler::projection::ProjectionError>
+    {
+        Ok(crate::ast::LocalType::End)
+    }
+
+    fn generate_code(
+        &self,
+        _context: &crate::extensions::CodegenContext,
+    ) -> proc_macro2::TokenStream {
+        use quote::quote;
+        let _annotations = &self.annotations;
+        quote! {
+            // Generated Aura extension code
+            // Annotations: #(#annotations)*
+        }
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+
+    fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
+        self
+    }
+
+    fn type_id(&self) -> std::any::TypeId {
+        std::any::TypeId::of::<Self>()
+    }
+}
+
+/// Create an simple Aura extension from parsed components
+fn create_aura_annotated_send(
+    sender: String,
+    receiver: String,
+    message_type: String,
+    annotations: std::collections::HashMap<String, String>,
+) -> SimpleAuraExtension {
+    SimpleAuraExtension {
+        sender,
+        receiver,
+        message_type,
+        annotations,
+    }
 }
 
 /// Parse a choreographic protocol from a token stream (for macro use)

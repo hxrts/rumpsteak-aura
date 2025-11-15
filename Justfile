@@ -3,6 +3,12 @@
 # Default task
 default: book
 
+# Run the same checks as GitHub CI
+ci-dry-run:
+    cargo fmt --all -- --check
+    cargo clippy --workspace --all-targets --all-features -- -D warnings
+    cargo test --workspace --all-targets --all-features
+
 # Generate docs/SUMMARY.md from Markdown files in docs/ and subfolders
 summary:
     #!/usr/bin/env bash

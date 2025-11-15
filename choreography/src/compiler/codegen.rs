@@ -360,10 +360,10 @@ fn generate_extension_code(
         // Extension registry setup
         pub fn create_extension_registry() -> crate::extensions::ExtensionRegistry {
             let mut registry = crate::extensions::ExtensionRegistry::new();
-            
+
             // In a real implementation, this would register runtime extension handlers
             // For now, we just return the empty registry
-            
+
             registry
         }
     }

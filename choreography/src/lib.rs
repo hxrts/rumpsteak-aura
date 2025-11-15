@@ -52,8 +52,9 @@ pub fn parse_and_generate_with_extensions(
     use compiler::parser::parse_choreography_str_with_extensions;
     use compiler::projection::project;
 
-    let (choreography, extensions) = parse_choreography_str_with_extensions(input, extension_registry)
-        .map_err(CompilationError::ParseError)?;
+    let (choreography, extensions) =
+        parse_choreography_str_with_extensions(input, extension_registry)
+            .map_err(CompilationError::ParseError)?;
 
     // Validate the choreography
     choreography
@@ -69,7 +70,8 @@ pub fn parse_and_generate_with_extensions(
     }
 
     // Generate code with extensions
-    let generated_code = generate_choreography_code_with_extensions(&choreography, &local_types, &extensions);
+    let generated_code =
+        generate_choreography_code_with_extensions(&choreography, &local_types, &extensions);
 
     Ok(generated_code)
 }

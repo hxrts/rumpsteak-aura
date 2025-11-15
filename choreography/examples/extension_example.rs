@@ -75,7 +75,7 @@ fn demo_extension_composition() -> Result<(), Box<dyn std::error::Error>> {
     println!("\nDemo 3: Extension Composition");
 
     // Create a parser with multiple extensions
-    let parser = ExtensionParserBuilder::new()
+    let mut parser = ExtensionParserBuilder::new()
         .with_extension(PriorityGrammarExtension, PriorityStatementParser)
         .with_extension(LoggingGrammarExtension, LoggingStatementParser)
         .build();

@@ -236,6 +236,103 @@ When the role receives the choice, the projection is `Branch`. When the role is 
 
 When a role appears in zero branches, the projection is `End`. When a role appears in one branch, that projection is used. When a role appears in two or more branches, projections are merged if compatible. An error occurs if conflicts exist.
 
+### 6. Dynamic Role Projection
+
+Dynamic roles require special handling during projection. The system supports runtime-determined role counts and range-based selection.
+
+The global protocol uses dynamic roles.
+
+```rust
+Protocol::Send {
+    from: coordinator,
+    to: workers, // workers.param = RoleParam::Dynamic
+    message: Task,
+    continuation: End,
+}
+```
+
+Coordinator sends to all workers.
+
+Coordinator's projection shows broadcast to dynamic set.
+
+```rust
+LocalType::Send {
+    to: workers, // Dynamic role reference
+    message: Task,
+    continuation: End,
+}
+```
+
+The coordinator sends to all worker instances at runtime.
+
+Workers' projection shows receive.
+
+```rust
+LocalType::Receive {
+    from: coordinator,
+    message: Task,
+    continuation: End,
+}
+```
+
+Each worker instance receives the task.
+
+Range-based selection targets subsets.
+
+```rust
+Protocol::Send {
+    from: workers, // With range [0..threshold]
+    to: coordinator,
+    message: Response,
+    continuation: End,
+}
+```
+
+Only workers in range respond.
+
+Projection for workers in range shows send.
+
+```rust
+LocalType::Send {
+    to: coordinator,
+    message: Response,
+    continuation: End,
+}
+```
+
+Workers outside range have no operation.
+
+```rust
+LocalType::End
+```
+
+Role indexing uses symbolic parameters.
+
+```rust
+Protocol::Send {
+    from: workers, // With index [i]
+    to: database,
+    message: Query,
+    continuation: End,
+}
+```
+
+Each worker instance acts independently.
+
+Workers' projection preserves index semantics.
+
+```rust
+LocalType::Send {
+    to: database,
+    message: Query,
+    continuation: End,
+}
+```
+
+Each instance executes independently with its own index.
+
+Dynamic role projection has these constraints. Wildcard broadcast `Workers[*]` requires all instances. Range selection `Workers[0..n]` requires subset determination at runtime. Index semantics `Workers[i]` preserve independence. Validation ensures safe dynamic role usage. Code generation includes runtime checks.
+
 ## Implementation Notes
 
 ### LocalType Variants
@@ -261,3 +358,5 @@ Each variant represents a different local type pattern.
 ### Code Generation
 
 The `generate_type_expr` function in `codegen.rs` handles all variants. This includes the new `LocalChoice` and `Loop` types. Code generation transforms local types into Rust session types.
+
+Dynamic roles use specialized code generation via `generate_choreography_code_with_dynamic_roles`. This function includes runtime role binding. Validation occurs at choreography initialization. Generated code supports dynamic role counts.

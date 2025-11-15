@@ -247,6 +247,84 @@ let mut handler = FaultInjection::new(base)
 
 Use this to verify retry logic and error recovery.
 
+### Advanced Feature Combinations
+
+Combine namespaces, annotations, and dynamic roles in complex protocols.
+
+```rust
+choreography! {
+    #[namespace = "distributed_system"]
+    ThresholdConsensus {
+        roles: Leader, Followers[*], Monitor
+
+        [@phase = "prepare", @timeout = 5000]
+        Leader -> Followers[*]: Prepare
+
+        [@min_responses = "quorum"]
+        Followers[0..quorum] -> Leader: PrepareOk
+
+        choice Leader {
+            commit: {
+                [@audit_log = "true"]
+                Leader -> Followers[*]: Commit
+
+                [@parallel = "true"]
+                Followers[i] -> Monitor: CommitAck
+            }
+            abort: {
+                [@alert_level = "high"]
+                Leader -> Monitor: AbortNotice
+            }
+        }
+    }
+}
+```
+
+This example shows namespace isolation for the protocol. Dynamic role count allows runtime-determined follower count. Range selection targets quorum subset. Annotations provide timeout and audit metadata. Choice combines with dynamic roles for flexible protocols.
+
+### Dynamic Role Binding
+
+Bind role counts at runtime for threshold protocols.
+
+```rust
+choreography! {
+    Threshold {
+        roles: Coordinator, Signers[*]
+
+        Coordinator -> Signers[*]: Request
+        Signers[0..threshold] -> Coordinator: Signature
+    }
+}
+```
+
+The wildcard syntax `Signers[*]` defers count to runtime. Range syntax `Signers[0..threshold]` selects subset. Code generation includes runtime validation. Generated code supports dynamic binding.
+
+### Annotation-Driven Optimization
+
+Use annotations to guide runtime behavior and optimization.
+
+```rust
+choreography! {
+    OptimizedProtocol {
+        roles: Client, Server, Cache
+
+        [@cost = 100, @priority = "high"]
+        Client -> Server: Request
+
+        [@timeout = 1000]
+        Server[@connection_pool = "true"] -> Cache: CacheQuery
+
+        [@compress = "gzip", @cache_ttl = 300]
+        Cache -> Server: CachedData
+
+        [@retry = 3, @backoff = "exponential"]
+        Server -> Client: Response
+    }
+}
+```
+
+Statement annotations specify cost and priority. Role annotations configure connection behavior. Multiple annotations combine for complex policies. Runtime handlers can access annotation metadata.
+
 ## Running Examples
 
 Navigate to the example and run with cargo.

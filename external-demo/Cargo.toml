@@ -1,0 +1,43 @@
+[package]
+name = "external-demo"
+version = "0.6.0"
+edition = "2021"
+
+# This is an external project - exclude from rumpsteak-aura workspace
+[workspace]
+
+[dependencies]
+# Re-export all rumpsteak-aura functionality
+rumpsteak-aura = { path = ".." }
+rumpsteak-aura-choreography = { path = "../choreography" }
+rumpsteak-aura-macros = { path = "../macros" }
+
+# Import our proc macros from the separate crate
+external-demo-macros = { path = "../external-demo-macros" }
+
+# Dependencies needed for extension system
+proc-macro2 = "1.0"
+quote = "1.0"
+syn = { version = "2.0", features = ["full"] }
+
+# Additional dependencies for examples
+tokio = { version = "1.0", features = ["full"] }
+futures = "0.3"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+[[example]]
+name = "simple_ping_pong"
+path = "examples/simple_ping_pong.rs"
+
+[[example]]
+name = "secure_request_response"
+path = "examples/secure_request_response.rs"
+
+[[example]]
+name = "threshold_ceremony"
+path = "examples/threshold_ceremony.rs"
+
+[[example]]
+name = "extension_demo"
+path = "examples/extension_demo.rs"

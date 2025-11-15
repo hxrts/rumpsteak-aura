@@ -1,5 +1,7 @@
 # Rumpsteak (Aura) ♨️
 
+Rust-based choreographic programming DSL for projecting session typed protocols.
+
 Where did the grotesque name come from? The session type system is forked from Zak Cutner's [Rumpsteak](https://github.com/zakcutner/rumpsteak) library. This is an experiment in projecting session types from a global viewpoint. So I've added a choreographic programming DSL which generates session typed code into an effect API.**
 
 [![Crate](https://img.shields.io/crates/v/rumpsteak-aura)](https://crates.io/crates/rumpsteak-aura)

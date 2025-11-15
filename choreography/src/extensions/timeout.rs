@@ -216,7 +216,7 @@ impl ProtocolExtension for TimeoutProtocol {
 
 /// Convenience function to register the timeout extension
 pub fn register_timeout_extension(registry: &mut ExtensionRegistry) {
-    registry.register_grammar(TimeoutGrammarExtension);
+    let _ = registry.register_grammar(TimeoutGrammarExtension);
     registry.register_parser(TimeoutStatementParser, "timeout".to_string());
 }
 
